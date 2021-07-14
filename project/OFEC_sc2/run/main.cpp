@@ -1,20 +1,18 @@
 #define CATCH_CONFIG_RUNNER
 #include "../utility/catch.hpp"
 
-#include "prime_method.h"
-#include "custom_method.h"
+//ctime务必在前
+#include <ctime>
+#include <sc2api/sc2_api.h>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include <ctime>
-
-
-#include <sc2api/sc2_api.h>
 #include "sc2utils/sc2_manage_process.h"
 
-#include "../project/pathing/include/GA_TSP.h"
-#include "../project/pathing/include/Mineral_TSP.h"
-#include "../project/pathing/include/pathing_bot.h"
+
+#include "../project/pathing_2agent/include/GA_TSP.h"
+#include "../project/pathing_2agent/include/Mineral_TSP.h"
+#include "../project/pathing_2agent/include/pathing_bot.h"
 
 
 using namespace std;
@@ -26,7 +24,14 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
+	//coordinator.SetFeatureLayers(sc2::FeatureLayerSettings(24.0f, 64, 64, 64, 64));
+
+	coordinator.SetWindowLocation(800, 100);
 	coordinator.SetRealtime(true);
+	//coordinator.SetWindowSize(100, 100);
+	//coordinator.SetRender(sc2::RenderSettings(100,100,100,100));
+	//coordinator.SetFeatureLayers(FeatureLayerSettings(24.0f, 80, 80, 80, 80));
+
 
 	PathingBot bot;
 	coordinator.SetParticipants({
