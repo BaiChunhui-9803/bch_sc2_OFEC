@@ -111,6 +111,9 @@ set_target_properties(libprotoc PROPERTIES FOLDER contrib)
 set_target_properties(protoc PROPERTIES FOLDER contrib)
 set_target_properties(ipv6-parse PROPERTIES FOLDER contrib)
 
+add_subdirectory("OFEC")
+set_target_properties(OFEC PROPERTIES FOLDER OFEC)
+
 if (MSVC)
     set_target_properties(libprotobuf libprotobuf-lite libprotoc protoc PROPERTIES COMPILE_FLAGS "/W0")
     set_source_files_properties(${libprotobuf_files} PROPERTIES COMPILE_FLAGS "/W0")
@@ -143,3 +146,20 @@ endif ()
 if (BUILD_API_TESTS)
     add_subdirectory("tests")
 endif ()
+
+############################################################
+# Add my project into the sc2api
+add_subdirectory("project/OFEC_sc2")
+set_target_properties(OFEC_sc2 PROPERTIES FOLDER OFEC_sc2)
+
+add_subdirectory("project/pathing")
+set_target_properties(pathing PROPERTIES FOLDER project)
+
+add_subdirectory("project/micro_kiting")
+set_target_properties(micro_kiting PROPERTIES FOLDER project)
+
+add_subdirectory("project/test")
+set_target_properties(test PROPERTIES FOLDER project)
+
+add_subdirectory("project/pathing_2agent")
+set_target_properties(pathing_2agent PROPERTIES FOLDER project)

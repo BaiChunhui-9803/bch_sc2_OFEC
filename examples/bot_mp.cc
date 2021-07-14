@@ -7,7 +7,7 @@
 
 
 // Set this flag to true if you want to play against your bot.
-static bool PlayerOneIsHuman = false;
+static bool PlayerOneIsHuman = true;
 
 class Human : public sc2::Agent {
 public:
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-    
+
     bot1.Control()->DumpProtoUsage();
     bot2.Control()->DumpProtoUsage();
 

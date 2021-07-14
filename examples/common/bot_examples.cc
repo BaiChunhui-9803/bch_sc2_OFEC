@@ -11,7 +11,7 @@
 #include "sc2lib/sc2_lib.h"
 
 namespace sc2 {
-    
+
 static int TargetSCVCount = 15;
 
 struct IsAttackable {

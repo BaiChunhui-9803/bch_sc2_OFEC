@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-const char* kReplayFolder = "E:/Replays/";
+const char* kReplayFolder = "D:/bch_sc2/replays/3.16.1-Pack_2/replays/000034772b83aed5732879a679487bbd496304b1490313ae9daaef3117391707.SC2Replay";
 
 class Replay : public sc2::ReplayObserver {
 public:
