@@ -21,16 +21,18 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	coordinator.SetRealtime(true);
+	coordinator.SetWindowLocation(800, 100);
+	coordinator.SetRealtime(false);
 
-	PathingBot bot;
+	//PathingBot bot;
+	NearestBot1Agent bot;
 	coordinator.SetParticipants({
 		CreateParticipant(sc2::Race::Terran, &bot),
 		sc2::CreateComputer(sc2::Race::Zerg)
 		});
 
 	coordinator.LaunchStarcraft();
-	const char* kmap = "mini_games/CollectMineralShards_12000s.SC2Map";
+	const char* kmap = "mini_games/CollectMineralShards_1800s.SC2Map";
 	coordinator.StartGame(kmap);
 
 	while (coordinator.Update()) {

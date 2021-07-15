@@ -56,7 +56,7 @@ public:
     bool SetBegin_Flag = false;
     bool Move1_Flag = false;
     bool Move2_Flag = false;
-    void PathingBot::draw();
+    void PathingBot::draw_OnMATLAB();
 
 public:
     virtual void OnGameStart() final {
@@ -91,6 +91,10 @@ public:
             std::cout << "GameLoop:" << observation->GetGameLoop() << '\t';
             std::cout << "Minerals:" << observation->GetMinerals() << std::endl;
             debug->DebugTextOut("GameLoop:" + std::to_string(observation->GetGameLoop()));
+            /*std::ofstream fout;
+            fout.open("D:/bch_sc2_OFEC/sc2api/project/pathing_2agent/datafile/compare_data/compare_pathing_2agent.txt", std::ios::out | std::ios::app);
+            fout << observation->GetGameLoop() << '\t' << observation->GetMinerals() << std::endl;*/
+
             //debug->SendDebug();
         }
 
@@ -106,7 +110,7 @@ public:
             m_GA.initialize_Algorithm(m_Actuator.get_mineral_vec());
             m_best_solution = m_GA.GA();
             action->SendChat("Optimization done, now perform solution.");
-            draw();
+            draw_OnMATLAB();
             //m_GA.GA();
             m_game_stage = Move_Flag;
             action->SendChat("Start moving to collect.");
@@ -242,7 +246,7 @@ bool PathingBot::is_end(const sc2::ObservationInterface* observation) {
     }
 }
 
-void PathingBot::draw() {
+void PathingBot::draw_OnMATLAB() {
     char n;
     POINT p;
     //GetCursorPos(&p);

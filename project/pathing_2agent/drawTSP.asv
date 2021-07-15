@@ -77,36 +77,7 @@ ylabel('路径长度\it\fontname{Times New Roman}(path length)','FontSize',12);
 figure(2)
 
 comP2A=importdata('D:/bch_sc2_OFEC/sc2api/project/pathing_2agent/datafile/compare_data/compare_pathing_2agent.txt');
-comP1A=importdata('D:/bch_sc2_OFEC/sc2api/project/pathing_2agent/datafile/compare_data/compare_pathing_bot.txt');
-comN2=importdata('D:/bch_sc2_OFEC/sc2api/project/pathing_2agent/datafile/compare_data/compare_nearest_2agent.txt');
-comN1=importdata('D:/bch_sc2_OFEC/sc2api/project/pathing_2agent/datafile/compare_data/compare_nearest_bot.txt');
-x1=comP2A(:,1);
-y1=comP2A(:,2);
-x2=comP1A(:,1);
-y2=comP1A(:,2);
-x3=comN2(:,1);
-y3=comN2(:,2);
-x4=comN1(:,1);
-y4=comN1(:,2);
-sz=1;
-mkr='.';
-c1='r';
-c2='m';
-c3='b';
-c4='g';
-scatter(x1,y1,sz,c1,mkr)
-hold on
-scatter(x2,y2,sz,c2,mkr)
-hold on
-scatter(x3,y3,sz,c3,mkr)
-hold on
-scatter(x4,y4,sz,c4,mkr)
+x=comP2A(:,1);
+y=comP2A(:,2);
 
-title('不同算法效果对比')
-xlabel('游戏帧\it\fontname{Times New Roman}(Game Loop)','FontSize',12);
-ylabel('收集资源总数\it\fontname{Times New Roman}(Collected Minerals)','FontSize',12);
-legend('GA\_2agent','GA\_1agent','Near\_2agent','Near\_1agent')
-
-
-
-
+scatter(x,y);
