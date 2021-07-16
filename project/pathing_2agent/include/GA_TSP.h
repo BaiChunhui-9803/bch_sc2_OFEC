@@ -13,8 +13,8 @@
 #define PopSize 30                  //初始种群大小
 #define GenerationsMaxN 20000       //最大代数
 #define CountN 1000                 //控制代数
-#define p_cross 0.7                      //交叉概率
-#define p_mutate 0.05                      //变异概率
+#define p_cross 0.7                 //交叉概率
+#define p_mutate 0.05               //变异概率
 #define MaxValue 200                //路径上限最大值
 #define ValuetoFitness 10000        //路径长度修正值
 

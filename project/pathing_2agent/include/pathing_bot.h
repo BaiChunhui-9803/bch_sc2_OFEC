@@ -91,9 +91,9 @@ public:
             std::cout << "GameLoop:" << observation->GetGameLoop() << '\t';
             std::cout << "Minerals:" << observation->GetMinerals() << std::endl;
             debug->DebugTextOut("GameLoop:" + std::to_string(observation->GetGameLoop()));
-            /*std::ofstream fout;
-            fout.open("D:/bch_sc2_OFEC/sc2api/project/pathing_2agent/datafile/compare_data/compare_pathing_2agent.txt", std::ios::out | std::ios::app);
-            fout << observation->GetGameLoop() << '\t' << observation->GetMinerals() << std::endl;*/
+            //std::ofstream fout;
+            //fout.open("D:/bch_sc2_OFEC/sc2api/project/pathing_2agent/datafile/compare_data/compare_pathing_2agent_6.txt", std::ios::out | std::ios::app);
+            //fout << observation->GetGameLoop() << '\t' << observation->GetMinerals() << std::endl;
 
             //debug->SendDebug();
         }
@@ -110,7 +110,7 @@ public:
             m_GA.initialize_Algorithm(m_Actuator.get_mineral_vec());
             m_best_solution = m_GA.GA();
             action->SendChat("Optimization done, now perform solution.");
-            draw_OnMATLAB();
+            //draw_OnMATLAB();
             //m_GA.GA();
             m_game_stage = Move_Flag;
             action->SendChat("Start moving to collect.");

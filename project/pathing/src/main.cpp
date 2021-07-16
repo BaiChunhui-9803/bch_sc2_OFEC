@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	coordinator.SetWindowLocation(800, 100);
-	coordinator.SetRealtime(false);
+	coordinator.SetRealtime(true);
 
 	//PathingBot bot;
 	NearestBot1Agent bot;
