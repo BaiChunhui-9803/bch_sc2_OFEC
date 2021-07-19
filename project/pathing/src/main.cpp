@@ -22,10 +22,10 @@ int main(int argc, char* argv[]) {
 	}
 
 	coordinator.SetWindowLocation(800, 100);
-	coordinator.SetRealtime(true);
+	coordinator.SetRealtime(false);
 
 	//PathingBot bot;
-	NearestBot1Agent bot;
+	RandBotAgent bot;
 	coordinator.SetParticipants({
 		CreateParticipant(sc2::Race::Terran, &bot),
 		sc2::CreateComputer(sc2::Race::Zerg)

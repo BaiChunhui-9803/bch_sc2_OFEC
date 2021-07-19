@@ -92,7 +92,7 @@ public:
             std::cout << "Minerals:" << observation->GetMinerals() << std::endl;
             debug->DebugTextOut("GameLoop:" + std::to_string(observation->GetGameLoop()));
             //std::ofstream fout;
-            //fout.open("D:/bch_sc2_OFEC/sc2api/project/pathing_2agent/datafile/compare_data/compare_pathing_2agent_6.txt", std::ios::out | std::ios::app);
+            //fout.open("D:/bch_sc2_OFEC/sc2api/project/pathing_2agent/datafile/compare_data/compare_pathing_2agent_7.txt", std::ios::out | std::ios::app);
             //fout << observation->GetGameLoop() << '\t' << observation->GetMinerals() << std::endl;
 
             //debug->SendDebug();
