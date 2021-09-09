@@ -1,6 +1,7 @@
 #include "sc2api/sc2_api.h"
 #include "MicroKitingBot.h"
 #include <iostream>
+#include <fstream>
 
 namespace sc2 {
 
@@ -28,6 +29,9 @@ namespace sc2 {
 		}
 
 		Units units = observation->GetUnits(Unit::Alliance::Self);
+		Units units_enemy = observation->GetUnits(Unit::Alliance::Enemy);
+		if (units_enemy.size() == 6) Update_Enemy_Flag = true;
+		std::cout << "观测敌方数量：" << units_enemy.size() << std::endl;
 		for (const auto& u : units) {
 			switch (static_cast<UNIT_TYPEID>(u->unit_type)) {
 			case UNIT_TYPEID::TERRAN_MARINE: {
@@ -38,6 +42,10 @@ namespace sc2 {
 				else {
 					if (Distance2D(mp, backup_target_) < 1.5f) {
 						move_back_ = false;
+						std::ofstream fout;
+						fout.open("D:/bch_sc2_OFEC/sc2api/project/micro_kiting/datafile/kiting_pre_map.txt", std::ios::app);
+						fout << backup_target_.x << '\t' << backup_target_.y << '\t';
+						fout.close();
 					}
 
 					action->UnitCommand(u, ABILITY_ID::SMART, backup_target_);
@@ -48,6 +56,15 @@ namespace sc2 {
 				break;
 			}
 			}
+		}
+
+		//敌人数量降至0时，因某种原因不再进行OnStep循环，故在1时进行判断
+		if (units_enemy.size() == 1 && Update_Enemy_Flag) {
+			set_Game_Ended_(sc2::GameResult::Win);
+			std::ofstream fout;
+			fout.open("D:/bch_sc2_OFEC/sc2api/project/micro_kiting/datafile/kiting_pre_map.txt", std::ios::app);
+			fout << std::endl;
+			fout.close();
 		}
 	}
 

@@ -105,7 +105,7 @@ scatter(x4,y4,sz,c4,mkr)
 title('不同算法效果对比')
 xlabel('游戏帧\it\fontname{Times New Roman}(Game Loop)','FontSize',12);
 ylabel('收集资源总数\it\fontname{Times New Roman}(Collected Minerals)','FontSize',12);
-legend('GA\_2agent','GA\_1agent','Near\_2agent','Near\_1agent')
+legend('GA\_2agent','GA\_1agent','Near\_2agent','Near\_1agent','Location','northwest')
 
 
 

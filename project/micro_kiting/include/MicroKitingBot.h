@@ -14,6 +14,13 @@ public:
     // 单位被摧毁执行
     virtual void OnUnitDestroyed(const Unit* unit) override;
 
+    inline bool get_Game_Ended_() {
+        return game_win_;
+    }
+    inline void set_Game_Ended_(sc2::GameResult game_result) {
+        if (game_result == sc2::GameResult::Win) game_win_ = true;
+        else game_win_ = false;
+    }
 private:
     // 获取单位为alliace的平均position 更新Point2D& position
     bool GetPosition(UNIT_TYPEID unit_type, Unit::Alliance alliace, Point2D& position);
@@ -26,6 +33,8 @@ private:
     bool move_back_;
     Point2D backup_target_;
     Point2D backup_start_;
+    bool game_win_ = false;
+    bool Update_Enemy_Flag = false;
 };
 
 

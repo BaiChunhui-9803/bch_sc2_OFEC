@@ -1,5 +1,6 @@
 #include "sc2api/sc2_api.h"
 #include "MicroKitingBot.h"
+#include "MicroAgentBot.h"
 
 #include "sc2utils/sc2_arg_parser.h"
 #include "sc2utils/sc2_manage_process.h"
@@ -7,29 +8,40 @@
 
 //*************************************************************************************************
 int main(int argc, char* argv[]) {
-	sc2::Coordinator coordinator;
-	if (!coordinator.LoadSettings(argc, argv)) {
-		return 1;
-	}
+	for (int i = 0; i < 100; i++) {
+		sc2::Coordinator coordinator;
+		if (!coordinator.LoadSettings(argc, argv)) {
+			return 1;
+		}
 
-	coordinator.SetRealtime(true);
+		coordinator.SetWindowLocation(800, 100);
+		coordinator.SetRealtime(true);
 
-	// 添加自定义bot
-	sc2::MicroKitingBot bot;
-	coordinator.SetParticipants({
-		CreateParticipant(sc2::Race::Terran, &bot),
-		CreateComputer(sc2::Race::Zerg),
-		});
+		// 添加自定义bot
+		//MicroKitingBot bot;
+		MicroAgentBot bot;
 
-	// 启动游戏
-	coordinator.LaunchStarcraft();
-	// 加载地图
-	coordinator.StartGame(sc2::kMapMarineMicro);
-	//coordinator.StartGame("Example/MarineMicro_distributed.SC2Map");
+		coordinator.SetParticipants({
+			CreateParticipant(sc2::Race::Terran, &bot),
+			CreateComputer(sc2::Race::Zerg),
+			});
 
-	while (coordinator.Update()) {
-		if (sc2::PollKeyPress()) {
-			break;
+
+		// 启动游戏
+		coordinator.LaunchStarcraft();
+
+		// 加载地图
+		//coordinator.StartGame(sc2::kMapMarineMicro);
+		coordinator.StartGame("Example/MarineMicro_6enemy.SC2Map");
+
+		while (coordinator.Update()) {
+			if (sc2::PollKeyPress()) {
+				break;
+			}
+
+			if (bot.get_Game_Ended_()) {
+				break;
+			}
 		}
 	}
 
