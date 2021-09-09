@@ -24,6 +24,7 @@ int main(int argc, char* argv[]) {
 
 	//coordinator.SetFeatureLayers(sc2::FeatureLayerSettings(24.0f, 64, 64, 64, 64));
 
+
 	coordinator.SetWindowLocation(800, 100);
 	coordinator.SetRealtime(true);
 	//coordinator.SetWindowSize(100, 100);
@@ -38,7 +39,7 @@ int main(int argc, char* argv[]) {
 		});
 
 	coordinator.LaunchStarcraft();
-	const char* kmap = "mini_games/CollectMineralShards_12000s.SC2Map";
+	const char* kmap = "mini_games/CollectMineralShards_1800s.SC2Map";
 	coordinator.StartGame(kmap);
 
 	while (coordinator.Update()) {

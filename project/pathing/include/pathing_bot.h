@@ -282,8 +282,6 @@ int NearestBot1Agent::get_index_unit(const sc2::Unit* unit, const sc2::Units& un
 }
 
 
-
-
 class NearestBot2Agent :public Agent {
 
 private:
@@ -449,3 +447,84 @@ int NearestBot2Agent::get_index_unit(const sc2::Unit* unit, const sc2::Units& un
     }
     return -1;
 }
+
+
+
+class RandBotAgent :public Agent {
+
+private:
+    sc2::Tag begin1_tag = 0;
+    sc2::Tag begin2_tag = 0;
+    bool move_flag1 = false;
+    bool move_flag2 = false;
+    sc2::Point2D target1;
+    sc2::Point2D target2;
+    int mineral_max = 0;
+public:
+
+
+
+public:
+
+    virtual void OnGameStart() final {
+        std::cout << "Hello, World!" << std::endl;
+    }
+
+    virtual void OnStep() final {
+        //观测器
+        const sc2::ObservationInterface* observation = Observation();
+        //控制器
+        sc2::ActionInterface* action = Actions();
+        //单元容器
+        sc2::Units units_vec = observation->GetUnits();
+
+        if (mineral_max < observation->GetMinerals()) {
+            mineral_max = observation->GetMinerals();
+            std::cout << "GameLoop:" << observation->GetGameLoop() << '\t';
+            std::cout << "Minerals:" << observation->GetMinerals() << std::endl;
+            std::ofstream fout;
+            fout.open("D:/bch_sc2_OFEC/sc2api/project/pathing_2agent/datafile/compare_data/compare_rand_2agent.txt", std::ios::out | std::ios::app);
+            fout << observation->GetGameLoop() << '\t' << observation->GetMinerals() << std::endl;
+        }
+
+        for (auto&u : units_vec) {
+            if (u->unit_type == UNIT_TYPEID::TERRAN_MARINE) {
+                if (begin1_tag == 0) {
+                    begin1_tag = u->tag;
+                    continue;
+                }
+                if (begin2_tag == 0) {
+                    begin2_tag = u->tag;
+                    continue;
+                }
+            }
+        }
+
+        for (auto&u : units_vec) {
+            if (u->unit_type == UNIT_TYPEID::TERRAN_MARINE && u->tag == begin1_tag) {
+                if (!move_flag1) {
+                    target1 = units_vec.at(rand() % units_vec.size())->pos;
+                    action->UnitCommand(u, ABILITY_ID::MOVE, target1);
+                    move_flag1 = true;
+                }
+
+                if (sc2::Distance2D(sc2::Point2D(u->pos), target1) < 1.5f) {
+                    move_flag1 = false;
+                }
+            }
+
+            if (u->unit_type == UNIT_TYPEID::TERRAN_MARINE && u->tag == begin2_tag) {
+                if (!move_flag2) {
+                    target2 = units_vec.at(rand() % units_vec.size())->pos;
+                    action->UnitCommand(u, ABILITY_ID::MOVE, target2);
+                    move_flag2 = true;
+                }
+
+                if (sc2::Distance2D(sc2::Point2D(u->pos), target2) < 1.5f) {
+                    move_flag2 = false;
+                }
+            }
+        }
+    }
+
+};
