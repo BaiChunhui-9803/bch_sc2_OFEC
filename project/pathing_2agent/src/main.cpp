@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	//coordinator.SetFeatureLayers(sc2::FeatureLayerSettings(24.0f, 64, 64, 64, 64));
+	coordinator.SetFeatureLayers(sc2::FeatureLayerSettings(24.0f, 64, 64, 64, 64));
 
 
 	coordinator.SetWindowLocation(800, 100);

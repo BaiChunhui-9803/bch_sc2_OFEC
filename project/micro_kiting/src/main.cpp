@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		coordinator.SetWindowLocation(800, 100);
-		coordinator.SetRealtime(true);
+		coordinator.SetRealtime(false);
 
 		// 添加自定义bot
 		//MicroKitingBot bot;
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 			});
 
 
-		// 启动游戏
+		// 启动游戏		
 		coordinator.LaunchStarcraft();
 
 		// 加载地图
