@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 
 
 	coordinator.SetWindowLocation(800, 100);
-	coordinator.SetRealtime(true);
+	coordinator.SetRealtime(false);
 	//coordinator.SetWindowSize(100, 100);
 	//coordinator.SetRender(sc2::RenderSettings(100,100,100,100));
 	//coordinator.SetFeatureLayers(FeatureLayerSettings(24.0f, 80, 80, 80, 80));

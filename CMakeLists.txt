@@ -165,3 +165,7 @@ add_subdirectory("project/pathing_2agent")
 set_target_properties(pathing_2agent PROPERTIES FOLDER project)
 
 
+
+
+add_subdirectory("project/IM")
+set_target_properties(IM PROPERTIES FOLDER project)

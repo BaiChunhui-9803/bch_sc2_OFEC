@@ -152,7 +152,7 @@ public:
             m_GA.initialize_Algorithm(m_Actuator.get_mineral_vec());
             m_best_solution = m_GA.GA();
             action->SendChat("Optimization done, now perform solution.");
-            //draw_OnMATLAB();
+            draw_OnMATLAB();
             m_game_stage = Move_Flag;
             action->SendChat("Start moving to collect.");
         }
