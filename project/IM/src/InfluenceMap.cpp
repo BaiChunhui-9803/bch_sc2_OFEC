@@ -1,5 +1,6 @@
 #include "InfluenceMap.h"
 
+
 MapPosition::MapPosition(UnitsVec& unit_vector) {
 	if (unit_vector.size() != 0) {
 		MapPoint pos_center;
@@ -105,7 +106,14 @@ void InfluenceMap::update_beighbors(GridPoint center, sc2::Unit::Alliance allian
 
 }
 
-//void InfluenceMap::writeIMToFile() {
-//	std::ofstream fout;
-//	fout.open(fOutPathIMarr);
-//}
+void InfluenceMap::writeIMarrToFile() {
+	std::ofstream fout;
+	fout.open(fOutPathIMarr);
+	for (int i = 0; i < MAP_GRID_SIZE; ++i) {
+		for (int j = 0; j < MAP_GRID_SIZE; ++j) {
+			fout << (this->getMapArray())[i][j] << " ";
+		}
+		fout << std::endl;
+	}
+	fout.close();
+}

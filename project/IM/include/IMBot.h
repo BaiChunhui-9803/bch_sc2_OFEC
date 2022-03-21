@@ -10,7 +10,6 @@ std::ostream& operator<<(std::ostream& os, const arrint2D* arr);
 std::ostream& operator<<(std::ostream& os, const GridPoint& grid_point);
 std::ostream& operator<<(std::ostream& os, const MapPoint& map_point);
 
-
 namespace sc2 {
     class IMBot : public sc2::Agent {
     private:

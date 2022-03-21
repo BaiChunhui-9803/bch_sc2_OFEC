@@ -27,7 +27,7 @@ namespace sc2 {
 		InfluenceMap IM_self(units_vec_self, Self);
 		InfluenceMap IM_enemy(units_vec_enemy, Enemy);
 		IM.updateIMValue(units_vec);
-
+		IM.writeIMarrToFile();
 		std::cout << IM;
 		auto in = IM.getMapArray();
 		auto a=IM.m_map_arr;
@@ -55,6 +55,7 @@ std::ostream& operator<<(std::ostream& os, const arrint2D* arr) {
 	}
 	return os;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const GridPoint& grid_point) {
 	os << "(" << grid_point.x << "," << grid_point.y << ")";

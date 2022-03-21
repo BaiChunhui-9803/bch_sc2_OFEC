@@ -26,15 +26,12 @@ typedef sc2::Point2DI GridPoint;
 typedef const int arrint2D[MAP_GRID_SIZE];
 
 //读写文件路径
-//const char* fOutPathIMarr = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr.txt";
-
-
-
+static const char* fOutPathIMarr = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr.txt";
 
 //势力图的敌我关系
 enum MapAlliance {
     Self = 1,
-    Enemy = 2,
+    Enemy = 4,
     Neutral = 3,
 };
 
@@ -47,8 +44,9 @@ enum InfluenceShape {
 struct InfluenceRule {
     InfluenceShape m_shape = Square;
     unsigned int m_range = Rule_Size;
-    int m_self_level[Rule_Size] = { 10, 7, 4, 1 };
-    int m_enemy_level[Rule_Size] = { -10, -7, -4, -1 };
+    //由于递增原因，势力增长为16、9=5+3+1、4=3+1、1
+    int m_self_level[Rule_Size] = { 16, 5, 3, 1 };
+    int m_enemy_level[Rule_Size] = { -16, -5, -3, -1 };
 };
 
 //势力图的关键点坐标
@@ -105,8 +103,7 @@ public:
     //根据unit_vector更新势力图中的势力值
     void updateIMValue(const UnitsVec& unit_vector);
 
-    void writeIMToFile();
-
+    void writeIMarrToFile();
 
 private:
     void update_(const sc2::Unit *const unit);
