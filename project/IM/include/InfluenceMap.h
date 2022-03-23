@@ -1,18 +1,29 @@
+#ifndef _INFLUENCEMAP_H_
+#define _INFLUENCEMAP_H_
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #include "sc2api/sc2_interfaces.h"
 #include "sc2api/sc2_agent.h"
 #include "sc2api/sc2_map_info.h"
 #include "sc2renderer/sc2_renderer.h"
+//open/close
+#include "gnuplot-iostream.h"
+
+#ifdef _WIN32
+#include "windows.h"
+static int flagPressQ = 0;
+#endif
+
 
 //离散势力图的长度/宽度
-#define MAP_GRID_SIZE 50
+#define MAP_GRID_SIZE 25
 //实际势力图的长度
-#define MAP_X_LENGTH 50
+#define MAP_X_LENGTH 25
 //实际势力图的宽度
-#define MAP_Y_LENGTH 50
+#define MAP_Y_LENGTH 25
 //势力范围大小
 #define Rule_Size 4
 
@@ -27,6 +38,7 @@ typedef const int arrint2D[MAP_GRID_SIZE];
 
 //读写文件路径
 static const char* fOutPathIMarr = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr.txt";
+static const char* fOutPathIMarr3r = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_3row.txt";
 
 //势力图的敌我关系
 enum MapAlliance {
@@ -86,6 +98,10 @@ public:
     MapAlliance m_map_alliance;
     //势力图的离散矩阵
     int m_map_arr[MAP_GRID_SIZE][MAP_GRID_SIZE] = {};
+#ifdef GNUPLOT_IOSTREAM_H
+    Gnuplot gp;
+#endif
+
 
 public:
     InfluenceMap(UnitsVec& unit_vector, MapAlliance map_alliance);
@@ -102,10 +118,19 @@ public:
     MapPoint turnGridToMap(const GridPoint& grid_point);
     //根据unit_vector更新势力图中的势力值
     void updateIMValue(const UnitsVec& unit_vector);
-
+    //将IMarr写入文件中
     void writeIMarrToFile();
+
+#ifdef GNUPLOT_IOSTREAM_H
+    //调用gnuplot可视化IMarr
+    void displayIMarr();
+    //调用windows.h快捷键关闭plot
+    void pressQ();
+#endif
 
 private:
     void update_(const sc2::Unit *const unit);
     void update_beighbors(GridPoint center, sc2::Unit::Alliance alliance, int level, InfluenceRule rule = InfluenceRule());
 };
+
+#endif _INFLUENCEMAP_H_

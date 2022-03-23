@@ -107,13 +107,66 @@ void InfluenceMap::update_beighbors(GridPoint center, sc2::Unit::Alliance allian
 }
 
 void InfluenceMap::writeIMarrToFile() {
-	std::ofstream fout;
-	fout.open(fOutPathIMarr);
+	std::ofstream fout1;
+	fout1.open(fOutPathIMarr);
 	for (int i = 0; i < MAP_GRID_SIZE; ++i) {
 		for (int j = 0; j < MAP_GRID_SIZE; ++j) {
-			fout << (this->getMapArray())[i][j] << " ";
+			fout1 << (this->getMapArray())[i][j] << " ";
 		}
-		fout << std::endl;
+		fout1 << std::endl;
 	}
-	fout.close();
+	fout1.close();
+
+	std::ofstream fout2;
+	fout2.open(fOutPathIMarr3r);
+	for (int i = 0; i < MAP_GRID_SIZE; ++i) {
+		for (int j = 0; j < MAP_GRID_SIZE; ++j) {
+			fout2 << i << " " << j << " " << (this->getMapArray())[i][j] << std::endl;
+		}
+		fout2 << std::endl;
+	}
+	fout2.close();
 }
+
+
+#ifdef GNUPLOT_IOSTREAM_H
+void InfluenceMap::displayIMarr() {
+	if (flagPressQ) {
+		pressQ();
+	}
+	gp << "set terminal qt title \"title\" position 1930,10" << std::endl;
+
+	gp << "set title \"Heat Map generated from a file containing Z values only\" font \"Times New Roman, 12\"" << std::endl;
+	gp << "unset key" << std::endl;
+	gp << "set tic scale 0" << std::endl;
+
+	gp << "set cblabel font \"Times New Roman, 12\"" << std::endl;
+	gp << "set cbtics" << std::endl;
+
+	gp << "set xrange[-0.5:24.5]" << std::endl;
+	gp << "set yrange[-0.5:24.5]" << std::endl;
+
+	gp << "FILE1 = \"D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr.txt\"" << std::endl;
+	gp << "map1= FILE1" << std::endl;
+	gp << "FILE2 = \"D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_3row.txt\"" << std::endl;
+	gp << "map2 = FILE2" << std::endl;
+	gp << "set view map" << std::endl;
+
+	gp << "set contour base" << std::endl;
+	gp << "plot map2 using 2:1:3 with image, \\" << std::endl;
+	gp << "map2 using 2:1:($3 == 0 ?\"\":sprintf(\"%g\",$3)) with labels font \"Times, 8\" textcolor rgbcolor \"white\"" << std::endl;
+
+	++flagPressQ;
+}
+
+#ifdef _WIN32
+void InfluenceMap::pressQ() {
+	keybd_event('Q', 0, 0, 0); //°´ÏÂQ¼ü
+	keybd_event('Q', 0, KEYEVENTF_KEYUP, 0);//ËÉ¿ªQ¼ü
+}
+#endif
+
+
+
+
+#endif

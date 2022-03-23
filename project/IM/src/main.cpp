@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
 	coordinator.SetWindowLocation(800, 100);
 	// true: 实际速度
 	// false: 加速，允许使用暂停
-	coordinator.SetRealtime(false);
+	coordinator.SetRealtime(true);
 
 	// 添加自定义bot
 	sc2::IMBot bot;
@@ -29,8 +29,8 @@ int main(int argc, char* argv[]) {
 	coordinator.LaunchStarcraft();
 
 	// 加载地图
-	//coordinator.StartGame(sc2::kMapMarineMicro);
-	coordinator.StartGame("Example/MarineMicro_6enemy.SC2Map");
+	//coordinator.StartGame("Example/MarineMicro_6enemy.SC2Map");
+	coordinator.StartGame("Example/MarineMicro_distributed.SC2Map");
 	//coordinator.StartGame("Example/MarineMicro_1enemy.SC2Map");
 
 	while (coordinator.Update()) {

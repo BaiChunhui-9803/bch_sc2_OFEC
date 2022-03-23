@@ -5,7 +5,7 @@
 
 #include "IMBot.h"
 
-
+int i = 0;
 namespace sc2 {
 
 	void IMBot::OnGameStart() {
@@ -28,11 +28,15 @@ namespace sc2 {
 		InfluenceMap IM_enemy(units_vec_enemy, Enemy);
 		IM.updateIMValue(units_vec);
 		IM.writeIMarrToFile();
-		std::cout << IM;
+		//std::cout << IM;
 		auto in = IM.getMapArray();
 		auto a=IM.m_map_arr;
 		auto aa=&(IM.m_map_arr);
-		int i;
+
+#ifdef GNUPLOT_IOSTREAM_H
+		++i;
+		if (i % 10 == 0) IM.displayIMarr();
+#endif
 
 	}
 }

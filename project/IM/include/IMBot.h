@@ -1,3 +1,5 @@
+#ifndef _IMBOT_H_
+#define _IMBOT_H_
 #include <iostream>
 
 #include "sc2api/sc2_api.h"
@@ -30,3 +32,5 @@ namespace sc2 {
 
 
 }
+
+#endif _IMBOT_H_
