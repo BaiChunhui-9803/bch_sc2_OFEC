@@ -9,8 +9,10 @@
 #include "sc2api/sc2_agent.h"
 #include "sc2api/sc2_map_info.h"
 #include "sc2renderer/sc2_renderer.h"
-//open/close
+/***********************/
 #include "gnuplot-iostream.h"
+#define _AUTO_CLOSE_PLOT
+/***********************/
 
 #ifdef _WIN32
 #include "windows.h"
@@ -37,8 +39,12 @@ typedef sc2::Point2DI GridPoint;
 typedef const int arrint2D[MAP_GRID_SIZE];
 
 //读写文件路径
-static const char* fOutPathIMarr = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr.txt";
-static const char* fOutPathIMarr3r = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_3row.txt";
+static const std::string fOutPathIMarr = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr.txt";
+static const std::string fOutPathIMarr3r = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_3row.txt";
+static const std::string fOutPathIMarrSelf = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_self.txt";
+static const std::string fOutPathIMarrSelf3r = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_self_3row.txt";
+static const std::string fOutPathIMarrEnemy = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_enemy.txt";
+static const std::string fOutPathIMarrEnemy3r = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_enemy_3row.txt";
 
 //势力图的敌我关系
 enum MapAlliance {
@@ -72,11 +78,11 @@ private:
 
 public:
     MapPosition() :
-        m_center(MapPoint(0.0f, 0.0f)),
-        m_top_left(MapPoint(0.0f - MAP_X_LENGTH / 2.0, 0.0f + MAP_Y_LENGTH / 2.0)),
-        m_top_right(MapPoint(0.0f + MAP_X_LENGTH / 2.0, 0.0f + MAP_Y_LENGTH / 2.0)),
-        m_bottom_left(MapPoint(0.0f - MAP_X_LENGTH / 2.0, 0.0f - MAP_Y_LENGTH / 2.0)),
-        m_bottom_right(MapPoint(0.0f + MAP_X_LENGTH / 2.0, 0.0f - MAP_Y_LENGTH / 2.0)) {};
+        m_center(MapPoint(64.0f, 64.0f)),
+        m_top_left(MapPoint(64.0f - MAP_X_LENGTH / 2.0, 64.0f + MAP_Y_LENGTH / 2.0)),
+        m_top_right(MapPoint(64.0f + MAP_X_LENGTH / 2.0, 64.0f + MAP_Y_LENGTH / 2.0)),
+        m_bottom_left(MapPoint(64.0f - MAP_X_LENGTH / 2.0, 64.0f - MAP_Y_LENGTH / 2.0)),
+        m_bottom_right(MapPoint(64.0f + MAP_X_LENGTH / 2.0, 64.0f - MAP_Y_LENGTH / 2.0)) {};
     ~MapPosition() = default;
     MapPosition(UnitsVec& unit_vector);
     MapPoint getCenter() const { return m_center; }
@@ -98,15 +104,14 @@ public:
     MapAlliance m_map_alliance;
     //势力图的离散矩阵
     int m_map_arr[MAP_GRID_SIZE][MAP_GRID_SIZE] = {};
-#ifdef GNUPLOT_IOSTREAM_H
-    Gnuplot gp;
-#endif
+
 
 
 public:
+    InfluenceMap(MapAlliance map_alliance);
     InfluenceMap(UnitsVec& unit_vector, MapAlliance map_alliance);
     ~InfluenceMap() = default;
-
+    //InfluenceMap(const InfluenceMap& IM);
     MapPosition getMapPosition() const { return m_map_position; }
     MapAlliance getMapAlliance() const { return m_map_alliance; }
     arrint2D* getMapArray() const { return m_map_arr; }
@@ -119,18 +124,24 @@ public:
     //根据unit_vector更新势力图中的势力值
     void updateIMValue(const UnitsVec& unit_vector);
     //将IMarr写入文件中
-    void writeIMarrToFile();
+    void writeIMarrToFile(const std::string foutPath, const std::string fout3rPath);
 
-#ifdef GNUPLOT_IOSTREAM_H
-    //调用gnuplot可视化IMarr
-    void displayIMarr();
-    //调用windows.h快捷键关闭plot
-    void pressQ();
-#endif
 
 private:
     void update_(const sc2::Unit *const unit);
     void update_beighbors(GridPoint center, sc2::Unit::Alliance alliance, int level, InfluenceRule rule = InfluenceRule());
 };
 
-#endif _INFLUENCEMAP_H_
+#ifdef GNUPLOT_IOSTREAM_H
+//调用gnuplot可视化IMarr
+void displayIMarr();
+
+#ifdef _WIN32
+#ifdef _AUTO_CLOSE_PLOT
+//调用windows.h快捷键关闭plot
+void pressQ();
+#endif
+#endif
+#endif
+
+#endif // _INFLUENCEMAP_H_

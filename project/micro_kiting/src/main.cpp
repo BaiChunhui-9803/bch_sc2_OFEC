@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 			});
 
 
-		// 启动游戏		
+		// 启动游戏
 		coordinator.LaunchStarcraft();
 
 		// 加载地图

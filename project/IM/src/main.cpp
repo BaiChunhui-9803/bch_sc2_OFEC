@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
 	coordinator.SetWindowLocation(800, 100);
 	// true: 实际速度
 	// false: 加速，允许使用暂停
-	coordinator.SetRealtime(true);
+	coordinator.SetRealtime(false);
 
 	// 添加自定义bot
 	sc2::IMBot bot;

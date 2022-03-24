@@ -21,22 +21,36 @@ namespace sc2 {
 		sc2::Units units_vec = observation->GetUnits();
 		sc2::Units units_vec_self = observation->GetUnits(sc2::Unit::Alliance::Self);
 		sc2::Units units_vec_enemy = observation->GetUnits(Unit::Alliance::Enemy);
-
 		/***********************************************/
-		InfluenceMap IM(units_vec, Neutral);
-		InfluenceMap IM_self(units_vec_self, Self);
-		InfluenceMap IM_enemy(units_vec_enemy, Enemy);
-		IM.updateIMValue(units_vec);
-		IM.writeIMarrToFile();
-		//std::cout << IM;
-		auto in = IM.getMapArray();
-		auto a=IM.m_map_arr;
-		auto aa=&(IM.m_map_arr);
+		/****************传递/更新/存储IM*****************/
+		//InfluenceMap IM1(units_vec, Neutral);
+		//InfluenceMap IM2(units_vec_self, Self);
+		//InfluenceMap IM3(units_vec_enemy, Enemy);
+		//m_IM = IM1;
+		//m_IM_self = IM2;
+		//m_IM_enemy = IM3;
 
+		m_IM.updateIMValue(units_vec);
+		m_IM_self.updateIMValue(units_vec_self);
+		m_IM_enemy.updateIMValue(units_vec_enemy);
+		m_IM.writeIMarrToFile(fOutPathIMarr, fOutPathIMarr3r);
+		m_IM_self.writeIMarrToFile(fOutPathIMarrSelf, fOutPathIMarrSelf3r);
+		m_IM_enemy.writeIMarrToFile(fOutPathIMarrEnemy, fOutPathIMarrEnemy3r);
+		//std::cout << IM;
 #ifdef GNUPLOT_IOSTREAM_H
 		++i;
-		if (i % 10 == 0) IM.displayIMarr();
+		if (i % 10 == 0) {
+			displayIMarr();
+		}
 #endif
+		/***********************************************/
+		/*************算法初始化/传递游戏信息*************/
+		//updateGameInfo(units_vec, IM);
+
+
+
+
+
 
 	}
 }
@@ -70,4 +84,17 @@ std::ostream & operator<<(std::ostream & os, const MapPoint & map_point)
 {
 	os << "(" << map_point.x << "," << map_point.y << ")";
 	return os;
+}
+
+bool sc2::IMBot::updateGameInfo(const UnitsVec& units, const InfluenceMap& IM) {
+	for (auto &u : units) {
+		NodeUnit node_unit;
+		node_unit.n_alliance = u->alliance;
+		node_unit.n_tag = u->tag;
+		node_unit.n_type = u->unit_type;
+		node_unit.n_pos = u->pos;
+		m_game_info.info_vec_unit.push_back(node_unit);
+	}
+	//m_game_info.info_IM = IM;
+	return true;
 }

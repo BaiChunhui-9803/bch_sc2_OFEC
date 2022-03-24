@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.1)
 
+# 1.语言标准与预处理器
+set(CMAKE_CXX_STANDARD 17)
+add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+
 # 2.project name，指定项目的名称，一般和项目的文件夹名称对应
 project(IM)
 
@@ -24,6 +28,12 @@ include_directories(../../contrib/civetweb/include)
 include_directories(../../build/contrib/ipv6-parse)
 include_directories(../../build/generated)
 include_directories(../../contrib/SDL-mirror/include)
+include_directories(D:/boost_1_75_0/stage/lib)
+include_directories(D:/boost_1_75_0)
+
+# C/C++ 常规 附加库目录
+link_directories(D:/boost_1_75_0)
+link_directories(D:/Boost/lib)
 
 # 链接器 输入 附加依赖项
 target_link_libraries(${PROJECT_NAME} 
@@ -41,11 +51,3 @@ imm32.lib
 version.lib
 dinput8.lib
 )
-
-
-
-
-
-
-
-

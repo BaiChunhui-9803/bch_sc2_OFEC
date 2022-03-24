@@ -18,12 +18,39 @@ MapPosition::MapPosition(UnitsVec& unit_vector) {
 }
 
 
-
-
-InfluenceMap::InfluenceMap(UnitsVec& unit_vector, MapAlliance map_alliance) :
-	m_map_position(MapPosition(unit_vector)), m_map_alliance(map_alliance) {
+InfluenceMap::InfluenceMap(MapAlliance map_alliance) :
+	m_map_position(MapPosition()), m_map_alliance(map_alliance) {
 	m_map_arr;
 }
+
+InfluenceMap::InfluenceMap(UnitsVec& unit_vector, MapAlliance map_alliance) :
+	m_map_position(MapPosition()), m_map_alliance(map_alliance) {
+	m_map_arr;
+}
+
+//InfluenceMap::InfluenceMap(const InfluenceMap& IM) :
+//	m_map_position(IM.getMapPosition()),
+//	m_map_alliance(IM.getMapAlliance()) {
+//	//std::copy(std::begin(IM.m_map_arr), std::end(IM.m_map_arr), std::begin(m_map_arr));
+//}
+
+//InfluenceMap& InfluenceMap::operator=(const InfluenceMap& IM) {
+//	if (this != &IM) {
+//		this->m_map_position = IM.getMapPosition();
+//		this->m_map_alliance = IM.getMapAlliance();
+//		//std::copy(std::begin(IM.m_map_arr), std::end(IM.m_map_arr), std::begin(this->m_map_arr));
+//	}
+//	return *this;
+//}
+//
+//InfluenceMap & InfluenceMap::operator=(const InfluenceMap&& IM) {
+//	if (this != &IM) {
+//		this->m_map_position = IM.getMapPosition();
+//		this->m_map_alliance = IM.getMapAlliance();
+//		//std::copy(std::begin(IM.m_map_arr), std::end(IM.m_map_arr), std::begin(this->m_map_arr));
+//	}
+//	return *this;
+//}
 
 GridPoint InfluenceMap::turnMapToGrid(const MapPoint& map_point) {
 	float Xmin = this->m_map_position.getBottomLeft().x;
@@ -106,9 +133,9 @@ void InfluenceMap::update_beighbors(GridPoint center, sc2::Unit::Alliance allian
 
 }
 
-void InfluenceMap::writeIMarrToFile() {
+void InfluenceMap::writeIMarrToFile(const std::string foutPath, const std::string fout3rPath) {
 	std::ofstream fout1;
-	fout1.open(fOutPathIMarr);
+	fout1.open(foutPath);
 	for (int i = 0; i < MAP_GRID_SIZE; ++i) {
 		for (int j = 0; j < MAP_GRID_SIZE; ++j) {
 			fout1 << (this->getMapArray())[i][j] << " ";
@@ -118,7 +145,7 @@ void InfluenceMap::writeIMarrToFile() {
 	fout1.close();
 
 	std::ofstream fout2;
-	fout2.open(fOutPathIMarr3r);
+	fout2.open(fout3rPath);
 	for (int i = 0; i < MAP_GRID_SIZE; ++i) {
 		for (int j = 0; j < MAP_GRID_SIZE; ++j) {
 			fout2 << i << " " << j << " " << (this->getMapArray())[i][j] << std::endl;
@@ -130,43 +157,61 @@ void InfluenceMap::writeIMarrToFile() {
 
 
 #ifdef GNUPLOT_IOSTREAM_H
-void InfluenceMap::displayIMarr() {
+void displayIMarr() {
+
+	Gnuplot gp;
+#ifdef _AUTO_CLOSE_PLOT
 	if (flagPressQ) {
 		pressQ();
 	}
+#endif
 	gp << "set terminal qt title \"title\" position 1930,10" << std::endl;
-
-	gp << "set title \"Heat Map generated from a file containing Z values only\" font \"Times New Roman, 12\"" << std::endl;
-	gp << "unset key" << std::endl;
 	gp << "set tic scale 0" << std::endl;
-
-	gp << "set cblabel font \"Times New Roman, 12\"" << std::endl;
-	gp << "set cbtics" << std::endl;
-
-	gp << "set xrange[-0.5:24.5]" << std::endl;
-	gp << "set yrange[-0.5:24.5]" << std::endl;
-
-	gp << "FILE1 = \"D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr.txt\"" << std::endl;
-	gp << "map1= FILE1" << std::endl;
-	gp << "FILE2 = \"D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_3row.txt\"" << std::endl;
-	gp << "map2 = FILE2" << std::endl;
+	gp << "set key font \"Times New Roman, 10\" textcolor rgbcolor \"white\"" << std::endl;
+	gp << "set cblabel font \"Times New Roman, 8\"" << std::endl;
+	gp << "set cbtics scale 0 font \"Times New Roman, 8\"" << std::endl;
+	gp << "set xlabel \"x\" offset 0, 0, 0 font \"Times New Roman, 8\"" << std::endl;
+	gp << "set ylabel \"y\" norotate offset 1, 0, 0 font \"Times New Roman, 8\"" << std::endl;
+	gp << "set xtics font \"Times New Roman, 8\"" << std::endl;
+	gp << "set ytics font \"Times New Roman, 8\"" << std::endl;
+	gp << "set xrange[-0.5:24.5] noreverse nowriteback" << std::endl;
+	gp << "set yrange[-0.5:24.5] noreverse nowriteback" << std::endl;
 	gp << "set view map" << std::endl;
-
+	gp << "set title \"Influence Map with both Selfs and Enemys\" font \"Times New Roman, 12\"" << std::endl;
+	gp << "FILE1 = \"D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_3row.txt\"" << std::endl;
+	gp << "map1 = FILE1" << std::endl;
 	gp << "set contour base" << std::endl;
-	gp << "plot map2 using 2:1:3 with image, \\" << std::endl;
-	gp << "map2 using 2:1:($3 == 0 ?\"\":sprintf(\"%g\",$3)) with labels font \"Times, 8\" textcolor rgbcolor \"white\"" << std::endl;
+	gp << "plot map1 using 2:1:3 with image t \"Influence Map\", \\" << std::endl;
+	gp << "map1 using 2:1:($3 == 0 ?\"\":sprintf(\"%g\",$3)) t \"Influence Map\" with labels font \"Times, 8\" textcolor rgbcolor \"white\"" << std::endl;
+
+#if 0
+	//gp << "set view map" << std::endl;
+	//gp << "set title \"Influence Map with Selfs\" font \"Times New Roman, 12\"" << std::endl;
+	//gp << "FILE2 = \"D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_self_3row.txt\"" << std::endl;
+	//gp << "map2 = FILE2" << std::endl;
+	//gp << "set contour base" << std::endl;
+	//gp << "plot map2 using 2:1:3 with image t \"Influence Map\", \\" << std::endl;
+	//gp << "map2 using 2:1:($3 == 0 ?\"\":sprintf(\"%g\",$3)) t \"Influence Value\" with labels font \"Times, 8\" textcolor rgbcolor \"white\"" << std::endl;
+
+	//gp << "set view map" << std::endl;
+	//gp << "set title \"Influence Map with Enemys\" font \"Times New Roman, 12\"" << std::endl;
+	//gp << "FILE3 = \"D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_enemy_3row.txt\"" << std::endl;
+	//gp << "map3 = FILE3" << std::endl;
+	//gp << "set contour base" << std::endl;
+	//gp << "plot map3 using 2:1:3 with image t \"Influence Map\", \\" << std::endl;
+	//gp << "map3 using 2:1:($3 == 0 ?\"\":sprintf(\"%g\",$3)) t \"Influence Value\" with labels font \"Times, 8\" textcolor rgbcolor \"white\"" << std::endl;
+
+#endif
 
 	++flagPressQ;
 }
 
 #ifdef _WIN32
-void InfluenceMap::pressQ() {
+#ifdef _AUTO_CLOSE_PLOT
+void pressQ() {
 	keybd_event('Q', 0, 0, 0); //°´ÏÂQ¼ü
 	keybd_event('Q', 0, KEYEVENTF_KEYUP, 0);//ËÉ¿ªQ¼ü
 }
 #endif
-
-
-
-
+#endif
 #endif
