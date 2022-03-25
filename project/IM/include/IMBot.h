@@ -10,10 +10,12 @@
 typedef float PerGameloop;
 typedef float HPself;
 typedef float HPenemy;
+typedef float HPselfdM;
+typedef float HPenemydM;
 typedef std::vector<InfluenceMap> IMVec;
-typedef boost::tuple<PerGameloop, Gameloop, HPself, HPenemy, InfluenceMap> IMNode;
-typedef std::unique_ptr<boost::tuple<PerGameloop, Gameloop, HPself, HPenemy, InfluenceMap>> IMNode_ptr;
-typedef std::list<std::unique_ptr<boost::tuple<PerGameloop, Gameloop, HPself, HPenemy, InfluenceMap>>> IMptrList;
+typedef boost::tuple<PerGameloop, Gameloop, HPselfdM, HPenemydM, InfluenceMap> IMNode;
+typedef std::unique_ptr<boost::tuple<PerGameloop, Gameloop, HPselfdM, HPenemydM, InfluenceMap>> IMNode_ptr;
+typedef std::list<std::unique_ptr<boost::tuple<PerGameloop, Gameloop, HPselfdM, HPenemydM, InfluenceMap>>> IMptrList;
 
 
 std::ostream& operator<<(std::ostream& os, const InfluenceMap& IM);
@@ -63,9 +65,10 @@ namespace sc2 {
 
     public:
         //传递游戏信息
-        bool updateGameInfo(const UnitsVec& units, const InfluenceMap& IM);
+        bool updateGameInfo(const UnitsVec& units);
         const HPself getHPSelf(const UnitsVec& units) const;
         const HPenemy getHPEnemy(const UnitsVec& units) const;
+        bool updatePerGameLoop(const Gameloop loop_cnt);
     };
 
 

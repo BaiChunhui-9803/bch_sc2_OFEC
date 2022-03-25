@@ -152,7 +152,7 @@ void InfluenceMap::writeIMarrToFile(const std::string foutPath, const std::strin
 	fout2.open(fout3rPath);
 	for (int i = 0; i < MAP_GRID_SIZE; ++i) {
 		for (int j = 0; j < MAP_GRID_SIZE; ++j) {
-			fout2 << i << " " << j << " " << (this->getMapArray())[i][j] << std::endl;
+			fout2 << i << " " << j << " " << (this->getMapArray())[MAP_GRID_SIZE - i - 1][j] << std::endl;
 		}
 		fout2 << std::endl;
 	}
@@ -179,7 +179,7 @@ void displayIMarr() {
 	gp << "set xtics font \"Times New Roman, 8\"" << std::endl;
 	gp << "set ytics font \"Times New Roman, 8\"" << std::endl;
 	gp << "set xrange[-0.5:24.5] noreverse nowriteback" << std::endl;
-	gp << "set yrange[-0.5:24.5] noreverse nowriteback" << std::endl;
+	gp << "set yrange[-0.5:24.5] reverse nowriteback" << std::endl;
 	gp << "set view map" << std::endl;
 	gp << "set title \"Influence Map with both Selfs and Enemys\" font \"Times New Roman, 12\"" << std::endl;
 	gp << "FILE1 = \"D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_3row.txt\"" << std::endl;
@@ -218,4 +218,13 @@ void pressQ() {
 }
 #endif
 #endif
+
+//bool InfluenceMap::turnIMNtoIMS(const UnitsVec& units_enemy) {
+//	return true;
+//}
+
+
+
+
+
 #endif

@@ -5,7 +5,8 @@
 
 #include "IMBot.h"
 
-int i = 0;
+Gameloop display_cnt = 0;
+Gameloop gameloop_cnt = 0;
 namespace sc2 {
 
 	void IMBot::OnGameStart() {
@@ -33,12 +34,8 @@ namespace sc2 {
 		UnitsVec units_vec_enemy = observation->GetUnits(Unit::Alliance::Enemy);
 		/***********************************************/
 		/****************传递/更新/存储IM****************/
-		//InfluenceMap IM1(units_vec, Neutral);
 		InfluenceMap IM2(units_vec_self, Self);
 		InfluenceMap IM3(units_vec_enemy, Enemy);
-		//m_IM = IM1;
-		//m_IM_self = IM2;
-		//m_IM_enemy = IM3;
 		m_IMptr_list.push_back(std::make_unique<IMNode>(boost::make_tuple(
 			0.0f,
 			observation->GetGameLoop(),
@@ -46,7 +43,6 @@ namespace sc2 {
 			this->getHPEnemy(units_vec_enemy) / m_game_set.getMaxHPEnemy(),
 			InfluenceMap(units_vec, Neutral))));
 		m_IMptr_list.back()->get<4>().updateIMValue(units_vec);
-		//m_IM.updateIMValue(units_vec);
 		IM2.updateIMValue(units_vec_self);
 		IM3.updateIMValue(units_vec_enemy);
 		m_IMptr_list.back()->get<4>().writeIMarrToFile(fOutPathIMarr, fOutPathIMarr3r);
@@ -54,20 +50,31 @@ namespace sc2 {
 		IM3.writeIMarrToFile(fOutPathIMarrEnemy, fOutPathIMarrEnemy3r);
 		//std::cout << IM;
 #ifdef GNUPLOT_IOSTREAM_H
-		++i;
-		if (i % 10 == 0) {
+		//if (display_cnt % 10 == 0) {
 			displayIMarr();
-		}
+		//}
 #endif
 		/***********************************************/
 		/*************算法初始化/传递游戏信息*************/
-		updateGameInfo(units_vec, m_IM);
+		updateGameInfo(units_vec);
+		if (gameloop_cnt % 10 == 0) updatePerGameLoop(gameloop_cnt);
 
 
 
 
 
 
+
+
+
+
+
+		/***********************************************/
+		/********************变量自增********************/
+		//游戏循环计数器
+		++display_cnt;
+		++gameloop_cnt;
+		/***********************************************/
 	}
 }
 
@@ -102,7 +109,7 @@ std::ostream & operator<<(std::ostream & os, const MapPoint & map_point)
 	return os;
 }
 
-bool sc2::IMBot::updateGameInfo(const UnitsVec& units, const InfluenceMap& IM) {
+bool sc2::IMBot::updateGameInfo(const UnitsVec& units) {
 	for (auto &u : units) {
 		NodeUnit node_unit;
 		node_unit.n_alliance = u->alliance;
@@ -111,7 +118,6 @@ bool sc2::IMBot::updateGameInfo(const UnitsVec& units, const InfluenceMap& IM) {
 		node_unit.n_pos = u->pos;
 		m_game_info.info_vec_unit.push_back(node_unit);
 	}
-	//m_game_info.info_IM = IM;
 	return true;
 }
 
@@ -129,4 +135,11 @@ const HPenemy sc2::IMBot::getHPEnemy(const UnitsVec& units) const {
 		value += u->health;
 	}
 	return value;
+}
+
+bool sc2::IMBot::updatePerGameLoop(const Gameloop loop_cnt) {
+	for (auto it = this->m_IMptr_list.begin(); it != this->m_IMptr_list.end(); ++it) {
+		(*it)->head = float((*it)->get<1>()) / float(loop_cnt);
+	}
+	return true;
 }

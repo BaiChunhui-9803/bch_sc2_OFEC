@@ -127,10 +127,13 @@ public:
     void updateIMValue(const UnitsVec& unit_vector);
     //将IMarr写入文件中
     void writeIMarrToFile(const std::string foutPath, const std::string fout3rPath);
-
+    ////给定units_enemy，将IM_neutral->IM_self
+    //bool turnIMNtoIMS(InfluenceMap& IM, const UnitsVec& units_enemy);
+    ////给定units_self，将IM_self->IM_neutral
+    //bool turnIMNtoIME(const UnitsVec& units_self);
 
 private:
-    void update_(const sc2::Unit *const unit);
+    void update_(const sc2::Unit* const unit);
     void update_beighbors(GridPoint center, sc2::Unit::Alliance alliance, int level, InfluenceRule rule = InfluenceRule());
 };
 

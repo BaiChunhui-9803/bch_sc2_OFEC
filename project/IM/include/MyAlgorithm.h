@@ -35,7 +35,6 @@ struct NodeUnit {
 //算法所需要的游戏信息
 struct GameInfomation {
     std::vector<NodeUnit> info_vec_unit;
-    InfluenceMap info_IM;
 };
 
 class MyAlgorithm {
