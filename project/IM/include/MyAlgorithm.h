@@ -8,6 +8,7 @@
 
 using namespace sc2;
 typedef uint32_t Gameloop;
+typedef int IMPopId;
 
 //解的表示,一个带有Gameloop标志的动作/位置序列
 typedef std::map<Gameloop, std::pair<sc2::ABILITY_ID, sc2::Point3D>> MySoL;
@@ -30,6 +31,7 @@ struct NodeUnit {
     sc2::Tag n_tag;
     sc2::UnitTypeID n_type;
     sc2::Point3D n_pos;
+    IMPopId n_pop;
 };
 
 //算法所需要的游戏信息

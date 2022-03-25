@@ -56,6 +56,7 @@ namespace sc2 {
 #endif
 		/***********************************************/
 		/*************算法初始化/传递游戏信息*************/
+		m_IM_pop = updateIMPop(units_vec_enemy);
 		updateGameInfo(units_vec);
 		if (gameloop_cnt % 10 == 0) updatePerGameLoop(gameloop_cnt);
 
@@ -116,6 +117,7 @@ bool sc2::IMBot::updateGameInfo(const UnitsVec& units) {
 		node_unit.n_tag = u->tag;
 		node_unit.n_type = u->unit_type;
 		node_unit.n_pos = u->pos;
+		node_unit.n_pop = getIMPop(MapPoint(u->pos));
 		m_game_info.info_vec_unit.push_back(node_unit);
 	}
 	return true;
@@ -142,4 +144,56 @@ bool sc2::IMBot::updatePerGameLoop(const Gameloop loop_cnt) {
 		(*it)->head = float((*it)->get<1>()) / float(loop_cnt);
 	}
 	return true;
+}
+
+std::vector<GridPoint> sc2::IMBot::updateIMPop(const UnitsVec& units_vec_enemy) {
+	int gridmap[MAP_GRID_SIZE][MAP_GRID_SIZE] = {};
+	std::vector<GridPoint> gridvec;
+	int i = 0;
+	for (auto &u : units_vec_enemy) {
+		GridPoint gridpoint = m_IM.turnMapToGrid(MapPoint(u->pos));
+		std::vector<int> beighbor_vec = findBeighborsIn2(gridpoint, gridmap);
+		if (isNewPop(gridpoint, beighbor_vec)) {
+			++i;
+			gridmap[gridpoint.x][gridpoint.y] = i;
+			gridvec.push_back(GridPoint(gridpoint.x, gridpoint.y));
+		}
+
+	}
+	return gridvec;
+}
+
+bool sc2::IMBot::isNewPop(const GridPoint& grid_point, const std::vector<int>& vec) {
+	for (int i = 0; i < vec.size(); ++i) {
+		if (vec.at(i) != 0) return false;
+	}
+	return true;
+}
+
+std::vector<int> sc2::IMBot::findBeighborsIn2(const GridPoint& grid_point, arrint2D* arr_ptr) {
+	int max_x = MAP_GRID_SIZE - 1;
+	int max_y = MAP_GRID_SIZE - 1;
+	std::vector<int> list;
+	list.push_back(arr_ptr[grid_point.x][grid_point.y]);
+	for (int dx = (grid_point.x > 0 ? -2 : 0); dx <= (grid_point.x < max_x ? 2 : 0); ++dx) {
+		for (int dy = (grid_point.y > 0 ? -2 : 0); dy <= (grid_point.y < max_y ? 2 : 0); ++dy) {
+			if (dx != 0 || dy != 0) {
+				list.push_back(arr_ptr[grid_point.x + dx][grid_point.y + dy]);
+			}
+		}
+	}
+
+	return list;
+}
+
+IMPopId sc2::IMBot::getIMPop(const MapPoint& map_point) {
+	GridPoint gridppint = m_IM.turnMapToGrid(map_point);
+	int distance_min = 0;
+	for (int i = 0; i < m_IM_pop.size(); ++i) {
+
+	}
+
+
+
+	return IMPopId();
 }
