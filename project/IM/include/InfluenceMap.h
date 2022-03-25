@@ -11,7 +11,7 @@
 #include "sc2renderer/sc2_renderer.h"
 /***********************/
 #include "gnuplot-iostream.h"
-#define _AUTO_CLOSE_PLOT
+//#define _AUTO_CLOSE_PLOT
 /***********************/
 
 #ifdef _WIN32
@@ -108,10 +108,12 @@ public:
 
 
 public:
+    InfluenceMap();
     InfluenceMap(MapAlliance map_alliance);
     InfluenceMap(UnitsVec& unit_vector, MapAlliance map_alliance);
     ~InfluenceMap() = default;
     //InfluenceMap(const InfluenceMap& IM);
+    //InfluenceMap& operator=(const InfluenceMap& IM);
     MapPosition getMapPosition() const { return m_map_position; }
     MapAlliance getMapAlliance() const { return m_map_alliance; }
     arrint2D* getMapArray() const { return m_map_arr; }

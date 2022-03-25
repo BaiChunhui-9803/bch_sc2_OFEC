@@ -17,6 +17,10 @@ MapPosition::MapPosition(UnitsVec& unit_vector) {
 	}
 }
 
+InfluenceMap::InfluenceMap() :
+	m_map_position(MapPosition()), m_map_alliance(Neutral) {
+	m_map_arr;
+}
 
 InfluenceMap::InfluenceMap(MapAlliance map_alliance) :
 	m_map_position(MapPosition()), m_map_alliance(map_alliance) {
@@ -33,16 +37,16 @@ InfluenceMap::InfluenceMap(UnitsVec& unit_vector, MapAlliance map_alliance) :
 //	m_map_alliance(IM.getMapAlliance()) {
 //	//std::copy(std::begin(IM.m_map_arr), std::end(IM.m_map_arr), std::begin(m_map_arr));
 //}
-
+//
 //InfluenceMap& InfluenceMap::operator=(const InfluenceMap& IM) {
 //	if (this != &IM) {
 //		this->m_map_position = IM.getMapPosition();
 //		this->m_map_alliance = IM.getMapAlliance();
-//		//std::copy(std::begin(IM.m_map_arr), std::end(IM.m_map_arr), std::begin(this->m_map_arr));
+//		std::copy(std::begin(IM.m_map_arr), std::end(IM.m_map_arr), std::begin(this->m_map_arr));
 //	}
 //	return *this;
 //}
-//
+////
 //InfluenceMap & InfluenceMap::operator=(const InfluenceMap&& IM) {
 //	if (this != &IM) {
 //		this->m_map_position = IM.getMapPosition();
