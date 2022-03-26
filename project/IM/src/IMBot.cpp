@@ -55,11 +55,17 @@ namespace sc2 {
 		//}
 #endif
 		/***********************************************/
-		/*************算法初始化/传递游戏信息*************/
+		/*******更新敌人群落/算法初始化/传递游戏信息*******/
 		m_IM_pop = updateIMPop(units_vec_enemy);
 		updateGameInfo(units_vec);
 		if (gameloop_cnt % 10 == 0) updatePerGameLoop(gameloop_cnt);
-
+		for (int i = 0; i < m_IM_pop.size(); ++i) {
+			std::cout << "IM_pop-" << i << "(" << m_IM_pop.at(i).x << "," << m_IM_pop.at(i).y << ")\n";
+		}
+		for (int i = 0; i < m_game_info.info_vec_unit.size(); ++i) {
+			std::cout << i << "-gridpos:" << m_IM.turnMapToGrid(MapPoint(m_game_info.info_vec_unit.at(i).n_pos)) << "\t";
+			std::cout << i << "-pop:" << m_game_info.info_vec_unit.at(i).n_pop << "\n";
+		}
 
 
 
@@ -117,7 +123,8 @@ bool sc2::IMBot::updateGameInfo(const UnitsVec& units) {
 		node_unit.n_tag = u->tag;
 		node_unit.n_type = u->unit_type;
 		node_unit.n_pos = u->pos;
-		node_unit.n_pop = getIMPop(MapPoint(u->pos));
+		if (node_unit.n_alliance == Enemy) node_unit.n_pop = getIMPop(MapPoint(u->pos));
+		else node_unit.n_pop = -1;
 		m_game_info.info_vec_unit.push_back(node_unit);
 	}
 	return true;
@@ -188,12 +195,14 @@ std::vector<int> sc2::IMBot::findBeighborsIn2(const GridPoint& grid_point, arrin
 
 IMPopId sc2::IMBot::getIMPop(const MapPoint& map_point) {
 	GridPoint gridppint = m_IM.turnMapToGrid(map_point);
-	int distance_min = 0;
+	int id;
+	float distance_min = 99.0f;
 	for (int i = 0; i < m_IM_pop.size(); ++i) {
-
+		float distance = sc2::Distance2D(MapPoint(gridppint.x, gridppint.y), MapPoint(m_IM_pop.at(i).x, m_IM_pop.at(i).y));
+		if (distance < distance_min) {
+			distance_min = distance;
+			id = i;
+		}
 	}
-
-
-
-	return IMPopId();
+	return id;
 }
