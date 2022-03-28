@@ -9,6 +9,7 @@
 using namespace sc2;
 typedef uint32_t Gameloop;
 typedef int IMPopId;
+typedef std::vector<GridPoint> IMPop;
 
 //解的表示,一个带有Gameloop标志的动作/位置序列
 typedef std::map<Gameloop, std::pair<sc2::ABILITY_ID, sc2::Point3D>> MySoL;
@@ -42,12 +43,14 @@ struct GameInfomation {
 class MyAlgorithm {
 private:
     //存放解的容器
-    VecMySoL m_vec_sol;
+    VecMySoL myal_vec_sol;
+    IMPop myal_IM_pop;
 
 public:
 
     //算法初始化
-    void initialize_Algorithm(const GameInfomation& game_info);
+    void initialize_Algorithm(const GameInfomation& game_info, const IMPop& IM_pop);
+    //算法根据IM_pop生成一个解
 
 };
 

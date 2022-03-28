@@ -63,11 +63,12 @@ namespace sc2 {
 			std::cout << "IM_pop-" << i << "(" << m_IM_pop.at(i).x << "," << m_IM_pop.at(i).y << ")\n";
 		}
 		for (int i = 0; i < m_game_info.info_vec_unit.size(); ++i) {
+
 			std::cout << i << "-gridpos:" << m_IM.turnMapToGrid(MapPoint(m_game_info.info_vec_unit.at(i).n_pos)) << "\t";
 			std::cout << i << "-pop:" << m_game_info.info_vec_unit.at(i).n_pop << "\n";
 		}
 
-
+		m_AL.initialize_Algorithm(m_game_info, m_IM_pop);
 
 
 

@@ -53,7 +53,7 @@ namespace sc2 {
 
     public:
         //ÓÑÔªÀà
-        friend class MyAlgorithm;
+
         MyAlgorithm m_AL;
 
 
