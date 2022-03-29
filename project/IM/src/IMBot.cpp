@@ -49,36 +49,63 @@ namespace sc2 {
 		IM2.writeIMarrToFile(fOutPathIMarrSelf, fOutPathIMarrSelf3r);
 		IM3.writeIMarrToFile(fOutPathIMarrEnemy, fOutPathIMarrEnemy3r);
 		//std::cout << IM;
-#ifdef GNUPLOT_IOSTREAM_H
-		//if (display_cnt % 10 == 0) {
+#ifdef _DRAW_
+		if (display_cnt % 50 == 0) {
 		displayIMarr();
-		//}
+		}
 #endif
 		/***********************************************/
 		/*******更新敌人群落/算法初始化/传递游戏信息*******/
 		m_IM_pop = updateIMPop(units_vec_enemy);
-		for (int i = 0; i < units_vec_enemy.size(); ++i) {
-			std::cout << "Mappos-" << i << ":(" << units_vec_enemy.at(i)->pos.x << "," << units_vec_enemy.at(i)->pos.y << ")\n";
+		if (m_game_stage == Update_Flag) {
+			m_game_stage = Move_Flag;
 		}
+		//for (int i = 0; i < units_vec_enemy.size(); ++i) {
+		//	std::cout << "Mappos-" << i << ":(" << units_vec_enemy.at(i)->pos.x << "," << units_vec_enemy.at(i)->pos.y << ")\n";
+		//}
 		updateGameInfo(units_vec);
 		if (gameloop_cnt % 10 == 0) updatePerGameLoop(gameloop_cnt);
-		for (int i = 0; i < m_IM_pop.size(); ++i) {
-			std::cout << "IM_pop-" << i << "(" << m_IM_pop.at(i).first.x << "," << m_IM_pop.at(i).first.y << ")\n";
-		}
-		for (int i = 0; i < m_game_info.info_vec_unit.size(); ++i) {
+		//for (int i = 0; i < m_IM_pop.size(); ++i) {
+		//	std::cout << "IM_pop-" << i << "(" << m_IM_pop.at(i).first.x << "," << m_IM_pop.at(i).first.y << ")\n";
+		//}
+		//for (int i = 0; i < m_game_info.info_vec_unit.size(); ++i) {
 
-			std::cout << i << "-gridpos:" << m_IM.turnMapToGrid(MapPoint(m_game_info.info_vec_unit.at(i).n_pos)) << "\t";
-			std::cout << i << "-pop:" << m_game_info.info_vec_unit.at(i).n_pop << "\n";
-		}
+		//	std::cout << i << "-gridpos:" << m_IM.turnMapToGrid(MapPoint(m_game_info.info_vec_unit.at(i).n_pos)) << "\t";
+		//	std::cout << i << "-pop:" << m_game_info.info_vec_unit.at(i).n_pop << "\n";
+		//}
 
 		m_AL.initialize_Algorithm(m_game_info, m_IM_pop);
+		if (m_lock == false) {
+			m_target_tag = m_AL.findNearsetPoint();
+			m_lock = true;
+		}
+		MapPoint target;
+		for (int i = 0; i < units_vec_enemy.size(); ++i) {
+			if (units_vec_enemy.at(i)->tag == m_target_tag) {
+				target = units_vec_enemy.at(i)->pos;
+			}
+		}
+		for (const auto& u : units_vec_self) {
+			MapPoint point_begin1(u->pos.x, u->pos.y);
+			if (m_game_stage == Attack_Flag) {
+				action->UnitCommand(u, ABILITY_ID::ATTACK, target);
+				//m_game_stage = Blank_Flag;
+			}
+			else {
+				if (Distance2D(point_begin1, target) < 1.5f) {
+					m_game_stage = Attack_Flag;
+				}
+
+				if (m_game_stage == Move_Flag) {
+					action->UnitCommand(u, ABILITY_ID::SMART, target);
+				}
+
+			}
+		}
 
 
 
-
-
-
-
+		m_game_info.info_vec_unit.clear();
 
 		/***********************************************/
 		/********************变量自增********************/
@@ -87,6 +114,15 @@ namespace sc2 {
 		++gameloop_cnt;
 		/***********************************************/
 	}
+}
+
+void sc2::IMBot::OnUnitDestroyed(const Unit* unit) {
+	if (unit->tag == m_target_tag) {
+		m_lock = false;
+		m_game_stage = Move_Flag;
+	}
+
+
 }
 
 std::ostream& operator<<(std::ostream& os, const InfluenceMap& IM) {

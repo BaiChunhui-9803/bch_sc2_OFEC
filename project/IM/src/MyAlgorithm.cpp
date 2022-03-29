@@ -15,17 +15,26 @@ void MyAlgorithm::initialize_Algorithm(const GameInfomation& game_info, const IM
 	}
 	myal_center_self = myal_IM.getCenterMapPoint(vec_mappoint);
 
-	for (int i = 0; i < game_info.info_vec_unit.size(); ++i) {
-		if (game_info.info_vec_unit.at(i).n_alliance == Enemy) {
-			float distance_w = myal_IM.calculateWeightDistance(
+}
+
+sc2::Tag MyAlgorithm::findNearsetPoint() {
+	float distance;
+	float distance_min = 99.0f;
+	int index;
+	for (int i = 0; i < myal_game_info.info_vec_unit.size(); ++i) {
+		if (myal_game_info.info_vec_unit.at(i).n_alliance == Enemy) {
+			float distance = myal_IM.calculateWeightDistance(
 				myal_IM_pop,
 				myal_game_info.info_vec_unit.at(i).n_pop,
 				myal_center_self,
-				MapPoint(game_info.info_vec_unit.at(i).n_pos));
-			std::cout << myal_game_info.info_vec_unit.at(i).n_pop << ": " << distance_w << std::endl;
+				MapPoint(myal_game_info.info_vec_unit.at(i).n_pos));
+			if (distance < distance_min) {
+				distance_min = distance;
+				index = i;
+			}
 		}
 	}
-
+	return myal_game_info.info_vec_unit.at(index).n_tag;
 }
 
 //void MyAlgorithm::Algorithm() {

@@ -25,6 +25,21 @@ std::ostream& operator<<(std::ostream& os, const arrint2D* arr);
 std::ostream& operator<<(std::ostream& os, const GridPoint& grid_point);
 std::ostream& operator<<(std::ostream& os, const MapPoint& map_point);
 
+enum Game_Stage {
+    //空环节
+    Blank_Flag = 0,
+    //节点更新环节
+    Update_Flag = 1,
+    //执行算法环节
+    Algorithm_Flag = 2,
+    //单元1移动环节
+    Move_Flag = 3,
+    //单元1攻击环节
+    Attack_Flag = 4,
+    //游戏结束环节
+    End_Flag = 7
+};
+
 struct GameSet {
 private:
     HPself max_HPself = 0.0f;
@@ -51,7 +66,9 @@ namespace sc2 {
         InfluenceMap m_IM_self = InfluenceMap(Self);
         InfluenceMap m_IM_enemy = InfluenceMap(Enemy);
         IMPopVec m_IM_pop;
-
+        Game_Stage m_game_stage = Update_Flag;
+        bool m_lock = false;
+        sc2::Tag m_target_tag;
     public:
         //友元类
 
@@ -63,7 +80,8 @@ namespace sc2 {
         virtual void OnGameStart() final;
         // 游戏走帧执行 Your bots OnStep function will be called each time the coordinator steps the simulation forward.
         virtual void OnStep() final;
-
+        // 单位被摧毁执行
+        virtual void OnUnitDestroyed(const Unit* unit) override;
 
 
     public:

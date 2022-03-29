@@ -9,8 +9,9 @@
 #include "sc2api/sc2_agent.h"
 #include "sc2api/sc2_map_info.h"
 #include "sc2renderer/sc2_renderer.h"
-/***********************/
 #include "gnuplot-iostream.h"
+/***********************/
+#define _DRAW_
 //#define _AUTO_CLOSE_PLOT
 /***********************/
 
@@ -144,7 +145,7 @@ private:
     void update_beighbors(GridPoint center, sc2::Unit::Alliance alliance, int level, InfluenceRule rule = InfluenceRule());
 };
 
-#ifdef GNUPLOT_IOSTREAM_H
+#ifdef _DRAW_
 //调用gnuplot可视化IMarr
 void displayIMarr();
 

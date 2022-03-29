@@ -160,7 +160,7 @@ void InfluenceMap::writeIMarrToFile(const std::string foutPath, const std::strin
 }
 
 
-#ifdef GNUPLOT_IOSTREAM_H
+#ifdef _DRAW_
 void displayIMarr() {
 
 	Gnuplot gp;
@@ -210,6 +210,8 @@ void displayIMarr() {
 	++flagPressQ;
 }
 
+#endif
+
 #ifdef _WIN32
 #ifdef _AUTO_CLOSE_PLOT
 void pressQ() {
@@ -240,4 +242,3 @@ float InfluenceMap::calculateWeightDistance(const IMPopVec& popvec, const int in
 	float distance2 = (popvec.at(index).second + 1.0) / 2.0;
 	return distance1 * distance2 * distance2;
 }
-#endif
