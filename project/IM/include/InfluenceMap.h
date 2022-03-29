@@ -37,6 +37,7 @@ typedef sc2::Point2D MapPoint;
 typedef sc2::Point2DI GridPoint;
 //arrint2D* 二维数组指针
 typedef const int arrint2D[MAP_GRID_SIZE];
+typedef std::vector<std::pair<GridPoint, size_t>> IMPopVec;
 
 //读写文件路径
 static const std::string fOutPathIMarr = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr.txt";
@@ -133,6 +134,10 @@ public:
     //bool turnIMNtoIME(const UnitsVec& units_self);
     //给定一组units，计算中心位置的pos
     MapPoint getCenterMapPoint(const std::vector<MapPoint>& vec_mappoint);
+    //计算两点之间的距离
+    float calculateDistance(const MapPoint& point_a, const MapPoint& point_b);
+    //计算两点之间的带权距离
+    float calculateWeightDistance(const IMPopVec& popvec, const int index, const MapPoint& point_a, const MapPoint& point_b);
 
 private:
     void update_(const sc2::Unit* const unit);

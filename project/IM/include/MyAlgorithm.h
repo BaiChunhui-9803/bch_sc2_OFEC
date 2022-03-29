@@ -9,7 +9,7 @@
 using namespace sc2;
 typedef uint32_t Gameloop;
 typedef int IMPopId;
-typedef std::vector<GridPoint> IMPop;
+typedef std::vector<std::pair<GridPoint, size_t>> IMPopVec;
 
 //解的表示,一个带有Gameloop标志的动作/位置序列
 typedef std::map<Gameloop, std::pair<sc2::ABILITY_ID, sc2::Point3D>> MySoL;
@@ -47,7 +47,7 @@ private:
     //游戏信息(从IMBot拷贝)
     GameInfomation myal_game_info;
     //IMpop(从IMBot拷贝)
-    IMPop myal_IM_pop;
+    IMPopVec myal_IM_pop;
     //IM(执行器)
     InfluenceMap myal_IM = InfluenceMap(Neutral);
     //SelfUnits的中心位置
@@ -56,7 +56,7 @@ private:
 public:
 
     //算法初始化
-    void initialize_Algorithm(const GameInfomation& game_info, const IMPop& IM_pop);
+    void initialize_Algorithm(const GameInfomation& game_info, const IMPopVec& IM_pop);
     //算法根据IM_pop生成一个解
 
 };

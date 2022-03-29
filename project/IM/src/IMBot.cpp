@@ -63,7 +63,7 @@ namespace sc2 {
 		updateGameInfo(units_vec);
 		if (gameloop_cnt % 10 == 0) updatePerGameLoop(gameloop_cnt);
 		for (int i = 0; i < m_IM_pop.size(); ++i) {
-			std::cout << "IM_pop-" << i << "(" << m_IM_pop.at(i).x << "," << m_IM_pop.at(i).y << ")\n";
+			std::cout << "IM_pop-" << i << "(" << m_IM_pop.at(i).first.x << "," << m_IM_pop.at(i).first.y << ")\n";
 		}
 		for (int i = 0; i < m_game_info.info_vec_unit.size(); ++i) {
 
@@ -157,9 +157,9 @@ bool sc2::IMBot::updatePerGameLoop(const Gameloop loop_cnt) {
 	return true;
 }
 
-std::vector<GridPoint> sc2::IMBot::updateIMPop(const UnitsVec& units_vec_enemy) {
+IMPopVec sc2::IMBot::updateIMPop(const UnitsVec& units_vec_enemy) {
 	int gridmap[MAP_GRID_SIZE][MAP_GRID_SIZE] = {};
-	std::vector<GridPoint> gridvec;
+	IMPopVec popvec;
 	int i = 0;
 	for (auto &u : units_vec_enemy) {
 		GridPoint gridpoint = m_IM.turnMapToGrid(MapPoint(u->pos));
@@ -167,11 +167,14 @@ std::vector<GridPoint> sc2::IMBot::updateIMPop(const UnitsVec& units_vec_enemy) 
 		if (isNewPop(gridpoint, beighbor_vec)) {
 			++i;
 			gridmap[gridpoint.x][gridpoint.y] = i;
-			gridvec.push_back(GridPoint(gridpoint.x, gridpoint.y));
+			popvec.push_back(std::pair<GridPoint, size_t>(GridPoint(gridpoint.x, gridpoint.y), 0));
 		}
+		//else {
+		//	++popvec.at(i).second;
+		//}
 
 	}
-	return gridvec;
+	return popvec;
 }
 
 bool sc2::IMBot::isNewPop(const GridPoint& grid_point, const std::vector<int>& vec) {
@@ -202,11 +205,12 @@ IMPopId sc2::IMBot::getIMPop(const MapPoint& map_point) {
 	int id;
 	float distance_min = 99.0f;
 	for (int i = 0; i < m_IM_pop.size(); ++i) {
-		float distance = sc2::Distance2D(MapPoint(gridppint.x, gridppint.y), MapPoint(m_IM_pop.at(i).x, m_IM_pop.at(i).y));
+		float distance = sc2::Distance2D(MapPoint(gridppint.x, gridppint.y), MapPoint(m_IM_pop.at(i).first.x, m_IM_pop.at(i).first.y));
 		if (distance < distance_min) {
 			distance_min = distance;
 			id = i;
 		}
 	}
+	++m_IM_pop.at(id).second;
 	return id;
 }

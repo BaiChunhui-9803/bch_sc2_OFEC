@@ -231,6 +231,13 @@ MapPoint InfluenceMap::getCenterMapPoint(const std::vector<MapPoint>& vec_mappoi
 	return (sum / vec_mappoint.size());
 }
 
+float InfluenceMap::calculateDistance(const MapPoint& point_a, const MapPoint& point_b) {
+	return float(sqrt((point_a.x - point_b.x)*(point_a.x - point_b.x) + (point_a.y - point_b.y)*(point_a.y - point_b.y)));
+}
 
-
+float InfluenceMap::calculateWeightDistance(const IMPopVec& popvec, const int index, const MapPoint& point_a, const MapPoint& point_b) {
+	float distance1 = sqrt((point_a.x - point_b.x)*(point_a.x - point_b.x) + (point_a.y - point_b.y)*(point_a.y - point_b.y));
+	float distance2 = (popvec.at(index).second + 1.0) / 2.0;
+	return distance1 * distance2 * distance2;
+}
 #endif

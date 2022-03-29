@@ -2,7 +2,7 @@
 
 
 
-void MyAlgorithm::initialize_Algorithm(const GameInfomation& game_info, const IMPop& IM_pop) {
+void MyAlgorithm::initialize_Algorithm(const GameInfomation& game_info, const IMPopVec& IM_pop) {
 	myal_vec_sol.clear();
 	myal_game_info = game_info;
 	myal_IM_pop = IM_pop;
@@ -14,6 +14,18 @@ void MyAlgorithm::initialize_Algorithm(const GameInfomation& game_info, const IM
 		}
 	}
 	myal_center_self = myal_IM.getCenterMapPoint(vec_mappoint);
+
+	for (int i = 0; i < game_info.info_vec_unit.size(); ++i) {
+		if (game_info.info_vec_unit.at(i).n_alliance == Enemy) {
+			float distance_w = myal_IM.calculateWeightDistance(
+				myal_IM_pop,
+				myal_game_info.info_vec_unit.at(i).n_pop,
+				myal_center_self,
+				MapPoint(game_info.info_vec_unit.at(i).n_pos));
+			std::cout << myal_game_info.info_vec_unit.at(i).n_pop << ": " << distance_w << std::endl;
+		}
+	}
+
 }
 
 //void MyAlgorithm::Algorithm() {
