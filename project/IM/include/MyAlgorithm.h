@@ -44,7 +44,14 @@ class MyAlgorithm {
 private:
     //存放解的容器
     VecMySoL myal_vec_sol;
+    //游戏信息(从IMBot拷贝)
+    GameInfomation myal_game_info;
+    //IMpop(从IMBot拷贝)
     IMPop myal_IM_pop;
+    //IM(执行器)
+    InfluenceMap myal_IM = InfluenceMap(Neutral);
+    //SelfUnits的中心位置
+    MapPoint myal_center_self;
 
 public:
 

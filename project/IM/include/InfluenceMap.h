@@ -131,6 +131,8 @@ public:
     //bool turnIMNtoIMS(InfluenceMap& IM, const UnitsVec& units_enemy);
     ////给定units_self，将IM_self->IM_neutral
     //bool turnIMNtoIME(const UnitsVec& units_self);
+    //给定一组units，计算中心位置的pos
+    MapPoint getCenterMapPoint(const std::vector<MapPoint>& vec_mappoint);
 
 private:
     void update_(const sc2::Unit* const unit);

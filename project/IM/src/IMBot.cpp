@@ -51,12 +51,15 @@ namespace sc2 {
 		//std::cout << IM;
 #ifdef GNUPLOT_IOSTREAM_H
 		//if (display_cnt % 10 == 0) {
-			displayIMarr();
+		displayIMarr();
 		//}
 #endif
 		/***********************************************/
 		/*******更新敌人群落/算法初始化/传递游戏信息*******/
 		m_IM_pop = updateIMPop(units_vec_enemy);
+		for (int i = 0; i < units_vec_enemy.size(); ++i) {
+			std::cout << "Mappos-" << i << ":(" << units_vec_enemy.at(i)->pos.x << "," << units_vec_enemy.at(i)->pos.y << ")\n";
+		}
 		updateGameInfo(units_vec);
 		if (gameloop_cnt % 10 == 0) updatePerGameLoop(gameloop_cnt);
 		for (int i = 0; i < m_IM_pop.size(); ++i) {

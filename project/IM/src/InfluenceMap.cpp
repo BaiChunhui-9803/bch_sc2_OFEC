@@ -223,7 +223,13 @@ void pressQ() {
 //	return true;
 //}
 
-
+MapPoint InfluenceMap::getCenterMapPoint(const std::vector<MapPoint>& vec_mappoint) {
+	MapPoint sum = MapPoint();
+	for (int i = 0; i < vec_mappoint.size(); ++i) {
+		sum += vec_mappoint.at(i);
+	}
+	return (sum / vec_mappoint.size());
+}
 
 
 
