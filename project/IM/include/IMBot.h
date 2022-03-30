@@ -32,10 +32,12 @@ enum Game_Stage {
     Update_Flag = 1,
     //执行算法环节
     Algorithm_Flag = 2,
-    //单元1移动环节
+    //单元移动环节
     Move_Flag = 3,
-    //单元1攻击环节
+    //单元攻击环节
     Attack_Flag = 4,
+    //风筝环节
+    Kite_Flag = 5,
     //游戏结束环节
     End_Flag = 7
 };
@@ -68,7 +70,10 @@ namespace sc2 {
         IMPopVec m_IM_pop;
         Game_Stage m_game_stage = Update_Flag;
         bool m_lock = false;
+        bool m_lock2 = false;
         sc2::Tag m_target_tag;
+        MapPoint m_target_kite;
+
     public:
         //友元类
 

@@ -90,14 +90,27 @@ namespace sc2 {
 			if (m_game_stage == Attack_Flag) {
 				action->UnitCommand(u, ABILITY_ID::ATTACK, target);
 				//m_game_stage = Blank_Flag;
+				m_game_stage = Kite_Flag;
+				m_lock2 = false;
 			}
 			else {
-				if (Distance2D(point_begin1, target) < 1.5f) {
+				if (Distance2D(point_begin1, target) < 1.5f && m_game_stage != Kite_Flag) {
 					m_game_stage = Attack_Flag;
 				}
 
 				if (m_game_stage == Move_Flag) {
 					action->UnitCommand(u, ABILITY_ID::SMART, target);
+				}
+
+				if (m_game_stage == Kite_Flag) {
+					if (m_lock2 == false) {
+						m_target_kite = m_AL.getKiteMapPoint(m_AL.getPopIndex(m_target_tag));
+						m_lock2 = true;
+					}
+					action->UnitCommand(u, ABILITY_ID::SMART, m_target_kite);
+					if (Distance2D(point_begin1, m_target_kite) < 1.5f) {
+						m_game_stage = Attack_Flag;
+					}
 				}
 
 			}
@@ -193,9 +206,10 @@ bool sc2::IMBot::updatePerGameLoop(const Gameloop loop_cnt) {
 	return true;
 }
 
+//此处有bug，popvec无限大
 IMPopVec sc2::IMBot::updateIMPop(const UnitsVec& units_vec_enemy) {
 	int gridmap[MAP_GRID_SIZE][MAP_GRID_SIZE] = {};
-	IMPopVec popvec;
+	IMPopVec popvec = {};
 	int i = 0;
 	for (auto &u : units_vec_enemy) {
 		GridPoint gridpoint = m_IM.turnMapToGrid(MapPoint(u->pos));

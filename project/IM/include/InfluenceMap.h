@@ -137,8 +137,10 @@ public:
     MapPoint getCenterMapPoint(const std::vector<MapPoint>& vec_mappoint);
     //计算两点之间的距离
     float calculateDistance(const MapPoint& point_a, const MapPoint& point_b);
-    //计算两点之间的带权距离
+    //计算两点(点于群)之间的带权距离
     float calculateWeightDistance(const IMPopVec& popvec, const int index, const MapPoint& point_a, const MapPoint& point_b);
+    //计算两点(点于点)之间的引力
+    //float calculateGravitation(const IMPopVec& popvec, const int index, const MapPoint& point_a, const MapPoint& point_b);
 
 private:
     void update_(const sc2::Unit* const unit);

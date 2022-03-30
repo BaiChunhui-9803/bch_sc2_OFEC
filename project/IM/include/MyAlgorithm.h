@@ -61,6 +61,10 @@ public:
     sc2::Tag findNearsetPoint();
     //算法根据IM_pop生成一个解
 
+    //计算kite点坐标
+    MapPoint getKiteMapPoint(const int index);
+    //给定tag,返回其所在的群
+    int getPopIndex(const sc2::Tag tag);
 };
 
 
