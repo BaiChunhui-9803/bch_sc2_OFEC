@@ -15,11 +15,11 @@ int main(int argc, char* argv[]) {
 		}
 
 		coordinator.SetWindowLocation(800, 100);
-		coordinator.SetRealtime(false);
+		coordinator.SetRealtime(true);
 
 		// 添加自定义bot
-		//MicroKitingBot bot;
-		MicroAgentBot bot;
+		MicroKitingBot bot;
+		//MicroAgentBot bot;
 
 		coordinator.SetParticipants({
 			CreateParticipant(sc2::Race::Terran, &bot),
@@ -32,7 +32,10 @@ int main(int argc, char* argv[]) {
 
 		// 加载地图
 		//coordinator.StartGame(sc2::kMapMarineMicro);
-		coordinator.StartGame("Example/MarineMicro_6enemy.SC2Map");
+		//coordinator.StartGame("Example/MarineMicro_6enemy.SC2Map");
+		//coordinator.StartGame("Example/MarineMicro_distributed.SC2Map");
+		coordinator.StartGame("Example/MarineMicro_distributed_circle.SC2Map");
+
 
 		while (coordinator.Update()) {
 			if (sc2::PollKeyPress()) {

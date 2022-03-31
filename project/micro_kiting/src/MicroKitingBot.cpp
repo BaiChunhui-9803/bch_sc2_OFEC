@@ -12,6 +12,12 @@ namespace sc2 {
 
 	void MicroKitingBot::OnStep() {
 		const ObservationInterface* observation = Observation();
+		//Debug()->DebugMoveCamera()
+		//ControlInterface
+		//ObserverActionInterface* observation_action();
+		//ControlInterface* control = Control();
+		//ObserverActionInterface* observation_action= ObserverActionInterface(control);
+		//ObserverActionInterface* observation_action = sc2::ObserverActionInterface::CameraMove();
 		ActionInterface* action = Actions();
 
 		Point2D mp, zp;
@@ -27,7 +33,9 @@ namespace sc2 {
 		if (!GetNearestZergling(mp)) {
 			return;
 		}
-
+		//Debug()->DebugMoveCamera(mp);
+		Debug()->DebugMoveCamera(backup_target_);
+		Debug()->SendDebug();
 		Units units = observation->GetUnits(Unit::Alliance::Self);
 		Units units_enemy = observation->GetUnits(Unit::Alliance::Enemy);
 		if (units_enemy.size() == 6) Update_Enemy_Flag = true;
