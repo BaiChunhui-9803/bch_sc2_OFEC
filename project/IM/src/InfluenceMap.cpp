@@ -178,8 +178,8 @@ void displayIMarr() {
 	gp << "set ylabel \"y\" norotate offset 1, 0, 0 font \"Times New Roman, 8\"" << std::endl;
 	gp << "set xtics font \"Times New Roman, 8\"" << std::endl;
 	gp << "set ytics font \"Times New Roman, 8\"" << std::endl;
-	gp << "set xrange[-0.5:24.5] noreverse nowriteback" << std::endl;
-	gp << "set yrange[-0.5:24.5] reverse nowriteback" << std::endl;
+	gp << "set xrange[-0.5:49.5] noreverse nowriteback" << std::endl;
+	gp << "set yrange[-0.5:49.5] reverse nowriteback" << std::endl;
 	gp << "set view map" << std::endl;
 	gp << "set title \"Influence Map with both Selfs and Enemys\" font \"Times New Roman, 12\"" << std::endl;
 	gp << "FILE1 = \"D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IM_arr_3row.txt\"" << std::endl;

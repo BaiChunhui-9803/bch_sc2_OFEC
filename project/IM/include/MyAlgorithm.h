@@ -57,6 +57,8 @@ public:
 
     //算法初始化
     void initialize_Algorithm(const GameInfomation& game_info, const IMPopVec& IM_pop);
+    //返回myal_center_self
+    MapPoint getCenterSelf();
     //寻找带权距离最近的点
     sc2::Tag findNearsetPoint();
     //算法根据IM_pop生成一个解

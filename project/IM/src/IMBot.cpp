@@ -90,7 +90,6 @@ namespace sc2 {
 			if (m_game_stage == Attack_Flag) {
 				action->UnitCommand(u, ABILITY_ID::ATTACK, target);
 				//m_game_stage = Blank_Flag;
-				m_game_stage = Kite_Flag;
 				m_lock2 = false;
 			}
 			else {
@@ -103,10 +102,10 @@ namespace sc2 {
 				}
 
 				if (m_game_stage == Kite_Flag) {
-					if (m_lock2 == false) {
-						m_target_kite = m_AL.getKiteMapPoint(m_AL.getPopIndex(m_target_tag));
-						m_lock2 = true;
-					}
+					//if (m_lock2 == false) {
+					//	m_target_kite = m_AL.getKiteMapPoint(m_AL.getPopIndex(m_target_tag));
+					//	m_lock2 = true;
+					//}
 					action->UnitCommand(u, ABILITY_ID::SMART, m_target_kite);
 					if (Distance2D(point_begin1, m_target_kite) < 1.5f) {
 						m_game_stage = Attack_Flag;
@@ -130,10 +129,13 @@ namespace sc2 {
 }
 
 void sc2::IMBot::OnUnitDestroyed(const Unit* unit) {
-	if (unit->tag == m_target_tag) {
-		m_lock = false;
-		m_game_stage = Move_Flag;
-	}
+	m_game_stage = Kite_Flag;
+	m_target_kite = m_AL.getKiteMapPoint(m_AL.getPopIndex(m_target_tag));
+	m_lock = false;
+	//if (unit->tag == m_target_tag) {
+	//	m_lock = false;
+	//	m_game_stage = Move_Flag;
+	//}
 
 
 }

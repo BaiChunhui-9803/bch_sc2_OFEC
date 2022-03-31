@@ -22,11 +22,11 @@ static int flagPressQ = 0;
 
 
 //离散势力图的长度/宽度
-#define MAP_GRID_SIZE 25
+#define MAP_GRID_SIZE 50
 //实际势力图的长度
-#define MAP_X_LENGTH 25
+#define MAP_X_LENGTH 50
 //实际势力图的宽度
-#define MAP_Y_LENGTH 25
+#define MAP_Y_LENGTH 50
 //势力范围大小
 #define Rule_Size 4
 
