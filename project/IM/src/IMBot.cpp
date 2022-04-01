@@ -10,6 +10,8 @@ Gameloop gameloop_cnt = 0;
 namespace sc2 {
 
 	void IMBot::OnGameStart() {
+		move_back_ = false;
+		targeted_enemy_ = 0;
 		//观测器
 		const ObservationInterface* static_observation = Observation();
 		//控制器
@@ -29,22 +31,22 @@ namespace sc2 {
 		//控制器
 		ActionInterface* action = Actions();
 		//单元容器
-		UnitsVec units_vec = observation->GetUnits();
-		UnitsVec units_vec_self = observation->GetUnits(sc2::Unit::Alliance::Self);
-		UnitsVec units_vec_enemy = observation->GetUnits(Unit::Alliance::Enemy);
+		m_units_vec = observation->GetUnits();
+		m_units_vec_self = observation->GetUnits(sc2::Unit::Alliance::Self);
+		m_units_vec_enemy = observation->GetUnits(Unit::Alliance::Enemy);
 		/***********************************************/
 		/****************传递/更新/存储IM****************/
-		InfluenceMap IM2(units_vec_self, Self);
-		InfluenceMap IM3(units_vec_enemy, Enemy);
+		InfluenceMap IM2(m_units_vec_self, Self);
+		InfluenceMap IM3(m_units_vec_enemy, Enemy);
 		m_IMptr_list.push_back(std::make_unique<IMNode>(boost::make_tuple(
 			0.0f,
 			observation->GetGameLoop(),
-			this->getHPSelf(units_vec_self) / m_game_set.getMaxHPSelf(),
-			this->getHPEnemy(units_vec_enemy) / m_game_set.getMaxHPEnemy(),
-			InfluenceMap(units_vec, Neutral))));
-		m_IMptr_list.back()->get<4>().updateIMValue(units_vec);
-		IM2.updateIMValue(units_vec_self);
-		IM3.updateIMValue(units_vec_enemy);
+			this->getHPSelf(m_units_vec_self) / m_game_set.getMaxHPSelf(),
+			this->getHPEnemy(m_units_vec_enemy) / m_game_set.getMaxHPEnemy(),
+			InfluenceMap(m_units_vec, Neutral))));
+		m_IMptr_list.back()->get<4>().updateIMValue(m_units_vec);
+		IM2.updateIMValue(m_units_vec_self);
+		IM3.updateIMValue(m_units_vec_enemy);
 		m_IMptr_list.back()->get<4>().writeIMarrToFile(fOutPathIMarr, fOutPathIMarr3r);
 		IM2.writeIMarrToFile(fOutPathIMarrSelf, fOutPathIMarrSelf3r);
 		IM3.writeIMarrToFile(fOutPathIMarrEnemy, fOutPathIMarrEnemy3r);
@@ -56,14 +58,14 @@ namespace sc2 {
 #endif
 		/***********************************************/
 		/*******更新敌人群落/算法初始化/传递游戏信息*******/
-		m_IM_pop = updateIMPop(units_vec_enemy);
+		m_IM_pop = updateIMPop(m_units_vec_enemy);
 		if (m_game_stage == Update_Flag) {
-			m_game_stage = Move_Flag;
+			m_game_stage = Action_Flag;
 		}
 		//for (int i = 0; i < units_vec_enemy.size(); ++i) {
 		//	std::cout << "Mappos-" << i << ":(" << units_vec_enemy.at(i)->pos.x << "," << units_vec_enemy.at(i)->pos.y << ")\n";
 		//}
-		updateGameInfo(units_vec);
+		updateGameInfo(m_units_vec);
 		if (gameloop_cnt % 10 == 0) updatePerGameLoop(gameloop_cnt);
 		//for (int i = 0; i < m_IM_pop.size(); ++i) {
 		//	std::cout << "IM_pop-" << i << "(" << m_IM_pop.at(i).first.x << "," << m_IM_pop.at(i).first.y << ")\n";
@@ -74,46 +76,77 @@ namespace sc2 {
 		//	std::cout << i << "-pop:" << m_game_info.info_vec_unit.at(i).n_pop << "\n";
 		//}
 
-		m_AL.initialize_Algorithm(m_game_info, m_IM_pop);
+		m_AL.initializeAlgorithm(m_game_info, m_IM_pop);
 		if (m_lock == false) {
-			m_target_tag = m_AL.findNearsetPoint();
+			targeted_enemy_tag_ = m_AL.findNearsetPoint();
 			m_lock = true;
 		}
-		MapPoint target;
-		for (int i = 0; i < units_vec_enemy.size(); ++i) {
-			if (units_vec_enemy.at(i)->tag == m_target_tag) {
-				target = units_vec_enemy.at(i)->pos;
+
+		for (int i = 0; i < m_units_vec_enemy.size(); ++i) {
+			if (m_units_vec_enemy.at(i)->tag == targeted_enemy_tag_) {
+				targeted_enemy_ = m_units_vec_enemy.at(i);
 			}
 		}
-		for (const auto& u : units_vec_self) {
-			MapPoint point_begin1(u->pos.x, u->pos.y);
-			if (m_game_stage == Attack_Flag) {
-				action->UnitCommand(u, ABILITY_ID::ATTACK, target);
-				//m_game_stage = Blank_Flag;
-				m_lock2 = false;
-			}
-			else {
-				if (Distance2D(point_begin1, target) < 1.5f && m_game_stage != Kite_Flag) {
-					m_game_stage = Attack_Flag;
-				}
 
-				if (m_game_stage == Move_Flag) {
-					action->UnitCommand(u, ABILITY_ID::SMART, target);
-				}
+		MapPoint point_begin=m_AL.getCenterSelf();
+		Debug()->DebugMoveCamera(point_begin);
+		Debug()->SendDebug();
 
-				if (m_game_stage == Kite_Flag) {
-					//if (m_lock2 == false) {
-					//	m_target_kite = m_AL.getKiteMapPoint(m_AL.getPopIndex(m_target_tag));
-					//	m_lock2 = true;
-					//}
-					action->UnitCommand(u, ABILITY_ID::SMART, m_target_kite);
-					if (Distance2D(point_begin1, m_target_kite) < 1.5f) {
-						m_game_stage = Attack_Flag;
+		if (m_game_stage == Action_Flag) {
+			for (const auto& u : m_units_vec_self) {
+				switch (static_cast<UNIT_TYPEID>(u->unit_type)) {
+				case UNIT_TYPEID::TERRAN_MARINE: {
+					if (!move_back_) {
+						action->UnitCommand(u, ABILITY_ID::ATTACK, targeted_enemy_);
+
 					}
-				}
+					else {
+						if (Distance2D(point_begin, backup_target_) < 1.5f) {
+							move_back_ = false;
+							//m_loop_tag++;
+						}
 
+						action->UnitCommand(u, ABILITY_ID::SMART, backup_target_);
+					}
+					break;
+				}
+				default: {
+					break;
+				}
+				}
 			}
 		}
+		//for (const auto& u : units_vec_self) {
+		//	MapPoint point_begin1(u->pos.x, u->pos.y);
+		//	if (m_game_stage == Attack_Flag) {
+		//		action->UnitCommand(u, ABILITY_ID::ATTACK, target);
+		//		//m_game_stage = Blank_Flag;
+		//		m_lock2 = false;
+		//		//Debug()->DebugMoveCamera(point_begin1);
+		//		//Debug()->SendDebug();
+		//	}
+		//	else {
+		//		if (Distance2D(point_begin1, target) < 1.5f && m_game_stage != Kite_Flag) {
+		//			m_game_stage = Attack_Flag;
+		//		}
+
+		//		if (m_game_stage == Move_Flag) {
+		//			action->UnitCommand(u, ABILITY_ID::SMART, target);
+		//		}
+
+		//		if (m_game_stage == Kite_Flag) {
+		//			//if (m_lock2 == false) {
+		//			//	m_target_kite = m_AL.getKiteMapPoint(m_AL.getPopIndex(m_target_tag));
+		//			//	m_lock2 = true;
+		//			//}
+		//			action->UnitCommand(u, ABILITY_ID::SMART, m_target_kite);
+		//			if (Distance2D(point_begin1, m_target_kite) < 1.5f) {
+		//				m_game_stage = Attack_Flag;
+		//			}
+		//		}
+
+		//	}
+		//}
 
 
 
@@ -129,13 +162,54 @@ namespace sc2 {
 }
 
 void sc2::IMBot::OnUnitDestroyed(const Unit* unit) {
-	m_game_stage = Kite_Flag;
-	m_target_kite = m_AL.getKiteMapPoint(m_AL.getPopIndex(m_target_tag));
-	m_lock = false;
-	//if (unit->tag == m_target_tag) {
-	//	m_lock = false;
-	//	m_game_stage = Move_Flag;
-	//}
+
+	if (unit->tag == targeted_enemy_tag_) {
+
+		//更新游戏信息
+		m_units_vec = Observation()->GetUnits();
+		m_units_vec_self = Observation()->GetUnits(sc2::Unit::Alliance::Self);
+		m_units_vec_enemy = Observation()->GetUnits(Unit::Alliance::Enemy);
+		m_IM_pop = updateIMPop(m_units_vec_enemy);
+		updateGameInfo(m_units_vec);
+		m_AL.updateAlgorithm(m_game_info, m_IM_pop);
+		targeted_enemy_tag_ = m_AL.findNearsetPoint();
+
+		//计算新位置
+		MapPoint point_begin = m_AL.getCenterSelf();
+		MapPoint point_enemy = m_AL.getKiteMapPoint(m_AL.getPopIndex(targeted_enemy_tag_));
+		for (int i = 0; i < m_units_vec_enemy.size(); ++i) {
+			if (m_units_vec_enemy.at(i)->tag == targeted_enemy_tag_) {
+				targeted_enemy_ = m_units_vec_enemy.at(i);
+			}
+		}
+		//if (!GetPosition(UNIT_TYPEID::ZERG_ZERGLING, Unit::Alliance::Enemy, zp)) {
+		//	set_Game_Ended_(sc2::GameResult::Win);
+		//	return;
+		//}
+
+		Vector2D diff = point_begin - point_enemy;
+		Normalize2D(diff);
+
+		targeted_enemy_ = 0;
+		move_back_ = true;
+		backup_start_ = point_begin;
+		backup_target_ = point_enemy;
+		//backup_target_ = mp + diff * 3.0f;
+		//if (m_loop_tag != (m_loop_vec.size() - 1)) {
+		//	backup_target_ = m_best_sol.at(0).at(m_loop_vec.at(m_loop_tag)).second;
+		//}
+		//else {
+		//	backup_target_ = mp;
+		//}
+	}
+
+	//m_game_stage = Kite_Flag;
+	//m_target_kite = m_AL.getKiteMapPoint(m_AL.getPopIndex(m_target_tag));
+	//m_lock = false;
+	////if (unit->tag == m_target_tag) {
+	////	m_lock = false;
+	////	m_game_stage = Move_Flag;
+	////}
 
 
 }
@@ -265,4 +339,15 @@ IMPopId sc2::IMBot::getIMPop(const MapPoint& map_point) {
 	}
 	++m_IM_pop.at(id).second;
 	return id;
+}
+
+void IMBot::set_Game_Ended_(sc2::GameResult game_result) {
+	if (game_result == sc2::GameResult::Win) {
+		game_win_ = true;
+		//double fitness = (get_Enemy_Max() - get_Enemy_Result()) - (get_Self_Max() - get_Self_Result());
+		//set_Fitness(fitness);
+		//std::cout << "此次模拟的适应值：" << get_Fitness() << std::endl;
+
+	}
+	else game_win_ = false;
 }

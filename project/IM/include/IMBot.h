@@ -33,11 +33,7 @@ enum Game_Stage {
     //执行算法环节
     Algorithm_Flag = 2,
     //单元移动环节
-    Move_Flag = 3,
-    //单元攻击环节
-    Attack_Flag = 4,
-    //风筝环节
-    Kite_Flag = 5,
+    Action_Flag = 3,
     //游戏结束环节
     End_Flag = 7
 };
@@ -60,6 +56,12 @@ public:
 namespace sc2 {
     class IMBot : public sc2::Agent {
     private:
+        //单元容器
+        UnitsVec m_units_vec;
+        UnitsVec m_units_vec_self;
+        UnitsVec m_units_vec_enemy;
+
+        //
         IMVec m_IM_vec;
         IMptrList m_IMptr_list = {};
         GameSet m_game_set = GameSet();
@@ -68,11 +70,18 @@ namespace sc2 {
         InfluenceMap m_IM_self = InfluenceMap(Self);
         InfluenceMap m_IM_enemy = InfluenceMap(Enemy);
         IMPopVec m_IM_pop;
+
+        //标志位
+        bool game_win_ = false;
+        Tag targeted_enemy_tag_;
+        //移动标志位
+        bool move_back_;
+        const Unit* targeted_enemy_;
+        MapPoint backup_target_;
+        MapPoint backup_start_;
+        //游戏状态标志位
         Game_Stage m_game_stage = Update_Flag;
         bool m_lock = false;
-        bool m_lock2 = false;
-        sc2::Tag m_target_tag;
-        MapPoint m_target_kite;
 
     public:
         //友元类
@@ -88,7 +97,8 @@ namespace sc2 {
         // 单位被摧毁执行
         virtual void OnUnitDestroyed(const Unit* unit) override;
 
-
+        inline bool get_Game_Ended_() { return game_win_; }
+        void set_Game_Ended_(sc2::GameResult game_result);
     public:
         //传递游戏信息
         bool updateGameInfo(const UnitsVec& units);

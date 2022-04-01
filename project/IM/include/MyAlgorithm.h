@@ -56,7 +56,9 @@ private:
 public:
 
     //算法初始化
-    void initialize_Algorithm(const GameInfomation& game_info, const IMPopVec& IM_pop);
+    void initializeAlgorithm(const GameInfomation& game_info, const IMPopVec& IM_pop);
+    //算法更新
+    bool updateAlgorithm(const GameInfomation& game_info, const IMPopVec& IM_pop);
     //返回myal_center_self
     MapPoint getCenterSelf();
     //寻找带权距离最近的点

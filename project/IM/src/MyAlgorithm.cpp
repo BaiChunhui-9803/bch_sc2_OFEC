@@ -2,19 +2,33 @@
 
 
 
-void MyAlgorithm::initialize_Algorithm(const GameInfomation& game_info, const IMPopVec& IM_pop) {
+void MyAlgorithm::initializeAlgorithm(const GameInfomation& game_info, const IMPopVec& IM_pop) {
 	myal_vec_sol.clear();
 	myal_game_info = game_info;
 	myal_IM_pop = IM_pop;
 	std::vector<MapPoint> vec_mappoint;
 	for (auto it = game_info.info_vec_unit.begin(); it != game_info.info_vec_unit.end(); ++it) {
-		if (it->n_alliance == Enemy) {
+		if (it->n_alliance == Self) {
 			MapPoint point(it->n_pos.x, it->n_pos.y);
 			vec_mappoint.push_back(point);
 		}
 	}
 	myal_center_self = myal_IM.getCenterMapPoint(vec_mappoint);
 
+}
+
+bool MyAlgorithm::updateAlgorithm(const GameInfomation& game_info, const IMPopVec& IM_pop) {
+	myal_game_info = game_info;
+	myal_IM_pop = IM_pop;
+	std::vector<MapPoint> vec_mappoint;
+	for (auto it = game_info.info_vec_unit.begin(); it != game_info.info_vec_unit.end(); ++it) {
+		if (it->n_alliance == Self) {
+			MapPoint point(it->n_pos.x, it->n_pos.y);
+			vec_mappoint.push_back(point);
+		}
+	}
+	myal_center_self = myal_IM.getCenterMapPoint(vec_mappoint);
+	return 1;
 }
 
 MapPoint MyAlgorithm::getCenterSelf() {
