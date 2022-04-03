@@ -80,7 +80,7 @@ MapPoint MyAlgorithm::getKiteMapPoint(const int index) {
 		Normalize2D(diff);
 		float distance = myal_IM.calculateDistance(myal_center_self, point_enemy);
 		if (distance > 3.0f) {
-			point_kite = myal_center_self - diff * distance;
+			point_kite = myal_center_self - diff * distance / 2.0;
 		}
 		else {
 			point_kite = myal_center_self + diff * 3.0f;
@@ -92,7 +92,7 @@ MapPoint MyAlgorithm::getKiteMapPoint(const int index) {
 			if (i != index) {
 				MapPoint point_n = myal_IM.turnGridToMap(myal_IM_pop.at(i).first);
 				float k_n = myal_IM.calculateWeightDistance(myal_IM_pop, index, myal_center_self, point_n);
-				point_kite += 12.25f / (k_n) * (myal_center_self - point_n);
+				point_kite += 2.25f / (k_n) * (myal_center_self - point_n);
 			}
 			//	else {
 			//		MapPoint point_n = myal_IM.turnGridToMap(myal_IM_pop.at(i).first);
