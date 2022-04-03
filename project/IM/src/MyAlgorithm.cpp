@@ -35,6 +35,10 @@ MapPoint MyAlgorithm::getCenterSelf() {
 	return myal_center_self;
 }
 
+MapPoint MyAlgorithm::getCenterEnemy() {
+	return MapPoint();
+}
+
 sc2::Tag MyAlgorithm::findNearsetPoint() {
 	float distance;
 	float distance_min = 99.0f;
@@ -56,21 +60,48 @@ sc2::Tag MyAlgorithm::findNearsetPoint() {
 }
 
 MapPoint MyAlgorithm::getKiteMapPoint(const int index) {
-	MapPoint point_sum = myal_center_self;
-
-	for (int i = 0; i < myal_IM_pop.size(); ++i) {
-		if (i != index) {
-			MapPoint point_n = myal_IM.turnGridToMap(myal_IM_pop.at(i).first);
-			float k_n = myal_IM.calculateDistance(myal_center_self, point_n);
-			point_sum += 2.25f / (k_n * k_n) * (myal_center_self - point_n);
+	//MapPoint point_sum = myal_center_self;
+	//for (int i = 0; i < myal_IM_pop.size(); ++i) {
+	//	if (i != index) {
+	//		MapPoint point_n = myal_IM.turnGridToMap(myal_IM_pop.at(i).first);
+	//		float k_n = myal_IM.calculateDistance(myal_center_self, point_n);
+	//		point_sum += 2.25f / (k_n * k_n) * (myal_center_self - point_n);
+	//	}
+	//	else {
+	//		MapPoint point_n = myal_IM.turnGridToMap(myal_IM_pop.at(i).first);
+	//		float k_n = myal_IM.calculateDistance(myal_center_self, point_n);
+	//		point_sum += 12.25f / (k_n * k_n) * (point_n - myal_center_self);
+	//	}
+	//}
+	MapPoint point_enemy = myal_IM.turnGridToMap(myal_IM_pop.at(index).first);
+	MapPoint point_kite;
+	if (myal_IM_pop.size() == 1) {
+		Vector2D diff = myal_center_self - point_enemy;
+		Normalize2D(diff);
+		float distance = myal_IM.calculateDistance(myal_center_self, point_enemy);
+		if (distance > 3.0f) {
+			point_kite = myal_center_self - diff * distance;
 		}
 		else {
-			MapPoint point_n = myal_IM.turnGridToMap(myal_IM_pop.at(i).first);
-			float k_n = myal_IM.calculateDistance(myal_center_self, point_n);
-			point_sum += 12.25f / (k_n * k_n) * (point_n - myal_center_self);
+			point_kite = myal_center_self + diff * 3.0f;
 		}
 	}
-	return point_sum;
+	else {
+		point_kite = point_enemy;
+		for (int i = 0; i < myal_IM_pop.size(); ++i) {
+			if (i != index) {
+				MapPoint point_n = myal_IM.turnGridToMap(myal_IM_pop.at(i).first);
+				float k_n = myal_IM.calculateWeightDistance(myal_IM_pop, index, myal_center_self, point_n);
+				point_kite += 12.25f / (k_n) * (myal_center_self - point_n);
+			}
+			//	else {
+			//		MapPoint point_n = myal_IM.turnGridToMap(myal_IM_pop.at(i).first);
+			//		float k_n = myal_IM.calculateDistance(myal_center_self, point_n);
+			//		point_sum += 12.25f / (k_n * k_n) * (point_n - myal_center_self);
+		}
+	}
+
+	return point_kite;
 }
 
 int MyAlgorithm::getPopIndex(const sc2::Tag tag) {

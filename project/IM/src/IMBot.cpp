@@ -92,6 +92,7 @@ namespace sc2 {
 		Debug()->DebugMoveCamera(point_begin);
 		Debug()->SendDebug();
 
+		//targeted_enemy_tag_ = m_AL.findNearsetPoint();
 		if (m_game_stage == Action_Flag) {
 			for (const auto& u : m_units_vec_self) {
 				switch (static_cast<UNIT_TYPEID>(u->unit_type)) {

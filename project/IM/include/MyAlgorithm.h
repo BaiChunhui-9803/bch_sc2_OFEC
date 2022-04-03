@@ -52,6 +52,8 @@ private:
     InfluenceMap myal_IM = InfluenceMap(Neutral);
     //SelfUnits的中心位置
     MapPoint myal_center_self;
+    //EnemyUnits的中心位置
+    //MapPoint myal_center_enemy;
 
 public:
 
@@ -61,6 +63,8 @@ public:
     bool updateAlgorithm(const GameInfomation& game_info, const IMPopVec& IM_pop);
     //返回myal_center_self
     MapPoint getCenterSelf();
+    //返回myal_center_enemy
+    MapPoint getCenterEnemy();
     //寻找带权距离最近的点
     sc2::Tag findNearsetPoint();
     //算法根据IM_pop生成一个解
