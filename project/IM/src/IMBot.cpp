@@ -19,9 +19,9 @@ namespace sc2 {
 		UnitsVec static_units_vec = static_observation->GetUnits();
 		UnitsVec static_units_vec_self = static_observation->GetUnits(sc2::Unit::Alliance::Self);
 		UnitsVec static_units_vec_enemy = static_observation->GetUnits(Unit::Alliance::Enemy);
-		/****************设置游戏基本参数****************/
+		///****************设置游戏基本参数****************/
 		m_game_set.updateGameSet(static_units_vec_self, static_units_vec_enemy);
-		/***********************************************/
+		///***********************************************/
 	}
 
 	void IMBot::OnStep() {
@@ -33,6 +33,7 @@ namespace sc2 {
 		m_units_vec = observation->GetUnits();
 		m_units_vec_self = observation->GetUnits(sc2::Unit::Alliance::Self);
 		m_units_vec_enemy = observation->GetUnits(Unit::Alliance::Enemy);
+
 		/***********************************************/
 		/****************传递/更新/存储IM****************/
 		InfluenceMap IM2(m_units_vec_self, Self);
@@ -41,7 +42,9 @@ namespace sc2 {
 			0.0f,
 			observation->GetGameLoop(),
 			this->getHPSelf(m_units_vec_self) / m_game_set.getMaxHPSelf(),
+			//this->getHPSelf(m_units_vec_self),
 			this->getHPEnemy(m_units_vec_enemy) / m_game_set.getMaxHPEnemy(),
+			//(m_game_set.getMaxHPEnemy() - this->getHPEnemy(m_units_vec_enemy)),
 			InfluenceMap(m_units_vec, Neutral))));
 		m_IMptr_list.back()->get<4>().updateIMValue(m_units_vec);
 

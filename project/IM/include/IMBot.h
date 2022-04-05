@@ -50,6 +50,8 @@ public:
     const HPself getMaxHPSelf() const { return max_HPself; }
     const HPenemy getMaxHPEnemy() const { return max_HPenemy; }
     void updateGameSet(const UnitsVec& units_vec_self, const UnitsVec& units_vec_enemy) {
+        max_HPself = 0;
+        max_HPenemy = 0;
         for (auto &u : units_vec_self) max_HPself += u->health_max;
         for (auto &u : units_vec_enemy) max_HPenemy += u->health_max;
     }
