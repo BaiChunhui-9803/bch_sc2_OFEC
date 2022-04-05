@@ -5,8 +5,7 @@
 
 #include "IMBot.h"
 
-Gameloop display_cnt = 0;
-Gameloop gameloop_cnt = 0;
+
 namespace sc2 {
 
 	void IMBot::OnGameStart() {
@@ -120,10 +119,11 @@ namespace sc2 {
 		}
 
 		//敌人数量降至0时，因某种原因不再进行OnStep循环，故在1时进行判断
-		if (m_units_vec_enemy.size() == 1) {
+		if (m_units_vec_enemy.size() == 0) {
 			set_Game_Ended_(sc2::GameResult::Win);
 		}
 
+		writeIMptrList();
 		m_game_info.info_vec_unit.clear();
 
 		/***********************************************/
@@ -136,14 +136,17 @@ namespace sc2 {
 }
 
 void sc2::IMBot::OnUnitDestroyed(const Unit* unit) {
+	//更新游戏信息
+	m_units_vec = Observation()->GetUnits();
+	m_units_vec_self = Observation()->GetUnits(sc2::Unit::Alliance::Self);
+	m_units_vec_enemy = Observation()->GetUnits(Unit::Alliance::Enemy);
 
+	//敌人数量降至0时，因某种原因不再进行OnStep循环，故在1时进行判断
+	if (m_units_vec_enemy.size() == 0) {
+		set_Game_Ended_(sc2::GameResult::Win);
+	}
 	//if (unit->tag == targeted_enemy_tag_) {
-	if (unit->alliance == Enemy) {
-
-		//更新游戏信息
-		m_units_vec = Observation()->GetUnits();
-		m_units_vec_self = Observation()->GetUnits(sc2::Unit::Alliance::Self);
-		m_units_vec_enemy = Observation()->GetUnits(Unit::Alliance::Enemy);
+	if (unit->alliance == Enemy && !get_Game_Ended_()) {
 		m_IM_pop = updateIMPop(m_units_vec_enemy);
 		updateGameInfo(m_units_vec);
 		m_AL.updateAlgorithm(m_game_info, m_IM_pop);
@@ -322,7 +325,15 @@ void IMBot::set_Game_Ended_(sc2::GameResult game_result) {
 		//double fitness = (get_Enemy_Max() - get_Enemy_Result()) - (get_Self_Max() - get_Self_Result());
 		//set_Fitness(fitness);
 		//std::cout << "此次模拟的适应值：" << get_Fitness() << std::endl;
-
+		updatePerGameLoop(gameloop_cnt);
 	}
 	else game_win_ = false;
+}
+
+void sc2::IMBot::writeIMptrList() {
+	std::ofstream fout1;
+	fout1.open(fOutPathIMptrList);
+	for (auto it = m_IMptr_list.begin(); it != m_IMptr_list.end(); ++it) {
+		fout1 << (*it)->get<0>() << "\t" << (*it)->get<1>() << "\t" << (*it)->get<2>() << "\t" << (*it)->get<3>() << std::endl;
+	}
 }

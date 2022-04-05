@@ -78,7 +78,14 @@ MapPoint MyAlgorithm::getKiteMapPoint(const int index) {
 	//		point_sum += 12.25f / (k_n * k_n) * (point_n - myal_center_self);
 	//	}
 	//}
-	MapPoint point_enemy = myal_IM.turnGridToMap(myal_IM_pop.at(index).first);
+	MapPoint point_enemy;
+	if (index >= 0 && index < myal_IM_pop.size()) {
+		point_enemy = myal_IM.turnGridToMap(myal_IM_pop.at(index).first);
+	}
+	else {
+		point_enemy = myal_IM.turnGridToMap(myal_IM_pop.at(0).first);
+	}
+
 	MapPoint point_kite;
 	if (myal_IM_pop.size() == 1) {
 		Vector2D diff = myal_center_self - point_enemy;

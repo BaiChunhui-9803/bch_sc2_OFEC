@@ -19,6 +19,8 @@ typedef boost::tuple<PerGameloop, Gameloop, HPselfdM, HPenemydM, InfluenceMap> I
 typedef std::unique_ptr<boost::tuple<PerGameloop, Gameloop, HPselfdM, HPenemydM, InfluenceMap>> IMNode_ptr;
 typedef std::list<std::unique_ptr<boost::tuple<PerGameloop, Gameloop, HPselfdM, HPenemydM, InfluenceMap>>> IMptrList;
 
+//读写文件路径
+static const std::string fOutPathIMptrList = "D:/bch_sc2_OFEC/sc2api/project/IM/datafile/IMptr_list.txt";
 
 std::ostream& operator<<(std::ostream& os, const InfluenceMap& IM);
 std::ostream& operator<<(std::ostream& os, const arrint2D* arr);
@@ -83,6 +85,10 @@ namespace sc2 {
         Game_Stage m_game_stage = Update_Flag;
         bool m_lock = false;
 
+        //计数器
+        Gameloop display_cnt = 0;
+        Gameloop gameloop_cnt = 0;
+
     public:
         //友元类
 
@@ -109,6 +115,7 @@ namespace sc2 {
         bool isNewPop(const GridPoint& grid_point, const std::vector<int>& vec);
         std::vector<int> findBeighborsIn2(const GridPoint& grid_point, arrint2D* arr_ptr);
         IMPopId getIMPop(const MapPoint& map_point);
+        void writeIMptrList();
     };
 
 
