@@ -45,14 +45,15 @@ namespace sc2 {
 			this->getHPEnemy(m_units_vec_enemy) / m_game_set.getMaxHPEnemy(),
 			InfluenceMap(m_units_vec, Neutral))));
 		m_IMptr_list.back()->get<4>().updateIMValue(m_units_vec);
-		IM2.updateIMValue(m_units_vec_self);
-		IM3.updateIMValue(m_units_vec_enemy);
-		m_IMptr_list.back()->get<4>().writeIMarrToFile(fOutPathIMarr, fOutPathIMarr3r);
-		IM2.writeIMarrToFile(fOutPathIMarrSelf, fOutPathIMarrSelf3r);
-		IM3.writeIMarrToFile(fOutPathIMarrEnemy, fOutPathIMarrEnemy3r);
-		//std::cout << IM;
+
 #ifdef _DRAW_
-		if (display_cnt % 50 == 0) {
+		//IM2.updateIMValue(m_units_vec_self);
+		//IM3.updateIMValue(m_units_vec_enemy);
+		m_IMptr_list.back()->get<4>().writeIMarrToFile(fOutPathIMarr, fOutPathIMarr3r);
+		//IM2.writeIMarrToFile(fOutPathIMarrSelf, fOutPathIMarrSelf3r);
+		//IM3.writeIMarrToFile(fOutPathIMarrEnemy, fOutPathIMarrEnemy3r);
+		//std::cout << IM;
+		if (display_cnt % 5 == 0) {
 		displayIMarr();
 		}
 #endif
@@ -117,39 +118,11 @@ namespace sc2 {
 				}
 			}
 		}
-		//for (const auto& u : units_vec_self) {
-		//	MapPoint point_begin1(u->pos.x, u->pos.y);
-		//	if (m_game_stage == Attack_Flag) {
-		//		action->UnitCommand(u, ABILITY_ID::ATTACK, target);
-		//		//m_game_stage = Blank_Flag;
-		//		m_lock2 = false;
-		//		//Debug()->DebugMoveCamera(point_begin1);
-		//		//Debug()->SendDebug();
-		//	}
-		//	else {
-		//		if (Distance2D(point_begin1, target) < 1.5f && m_game_stage != Kite_Flag) {
-		//			m_game_stage = Attack_Flag;
-		//		}
 
-		//		if (m_game_stage == Move_Flag) {
-		//			action->UnitCommand(u, ABILITY_ID::SMART, target);
-		//		}
-
-		//		if (m_game_stage == Kite_Flag) {
-		//			//if (m_lock2 == false) {
-		//			//	m_target_kite = m_AL.getKiteMapPoint(m_AL.getPopIndex(m_target_tag));
-		//			//	m_lock2 = true;
-		//			//}
-		//			action->UnitCommand(u, ABILITY_ID::SMART, m_target_kite);
-		//			if (Distance2D(point_begin1, m_target_kite) < 1.5f) {
-		//				m_game_stage = Attack_Flag;
-		//			}
-		//		}
-
-		//	}
-		//}
-
-
+		//敌人数量降至0时，因某种原因不再进行OnStep循环，故在1时进行判断
+		if (m_units_vec_enemy.size() == 1) {
+			set_Game_Ended_(sc2::GameResult::Win);
+		}
 
 		m_game_info.info_vec_unit.clear();
 

@@ -47,7 +47,7 @@ MapPoint MyAlgorithm::getCenterEnemy() {
 sc2::Tag MyAlgorithm::findNearsetPoint() {
 	float distance;
 	float distance_min = 99.0f;
-	int index;
+	int index = 0;
 	for (int i = 0; i < myal_game_info.info_vec_unit.size(); ++i) {
 		if (myal_game_info.info_vec_unit.at(i).n_alliance == Enemy) {
 			float distance = myal_IM.calculateWeightDistance(
