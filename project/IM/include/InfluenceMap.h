@@ -61,6 +61,13 @@ enum InfluenceShape {
     Circle = 2,
 };
 
+enum Direction {
+    CSYS1 = 1,
+    CSYS2 = 2,
+    CSYS3 = 3,
+    CSYS4 = 4,
+};
+
 struct InfluenceRule {
     InfluenceShape m_shape = Square;
     unsigned int m_range = Rule_Size;
@@ -141,6 +148,8 @@ public:
     float calculateWeightDistance(const IMPopVec& popvec, const int index, const MapPoint& point_a, const MapPoint& point_b);
     //计算两点(点于点)之间的引力
     //float calculateGravitation(const IMPopVec& popvec, const int index, const MapPoint& point_a, const MapPoint& point_b);
+    //给定MapPoint点A,B,判断B在方位A的方位
+    Direction getDirection2P(const MapPoint& point_a, const MapPoint& point_b);
 
 private:
     void update_(const sc2::Unit* const unit);

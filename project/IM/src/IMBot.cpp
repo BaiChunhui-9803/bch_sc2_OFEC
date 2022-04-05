@@ -157,14 +157,15 @@ namespace sc2 {
 		/********************变量自增********************/
 		//游戏循环计数器
 		++display_cnt;
-		++gameloop_cnt;
+ 		++gameloop_cnt;
 		/***********************************************/
 	}
 }
 
 void sc2::IMBot::OnUnitDestroyed(const Unit* unit) {
 
-	if (unit->tag == targeted_enemy_tag_) {
+	//if (unit->tag == targeted_enemy_tag_) {
+	if (unit->alliance == Enemy) {
 
 		//更新游戏信息
 		m_units_vec = Observation()->GetUnits();

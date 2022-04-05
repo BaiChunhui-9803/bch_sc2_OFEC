@@ -53,7 +53,7 @@ private:
     //SelfUnits的中心位置
     MapPoint myal_center_self;
     //EnemyUnits的中心位置
-    //MapPoint myal_center_enemy;
+    MapPoint myal_center_enemy;
 
 public:
 
@@ -73,6 +73,7 @@ public:
     MapPoint getKiteMapPoint(const int index);
     //给定tag,返回其所在的群
     int getPopIndex(const sc2::Tag tag);
+    //给定index,方位,返回群的边缘
 };
 
 

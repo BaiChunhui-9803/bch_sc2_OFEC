@@ -227,6 +227,7 @@ void pressQ() {
 
 MapPoint InfluenceMap::getCenterMapPoint(const std::vector<MapPoint>& vec_mappoint) {
 	MapPoint sum = MapPoint();
+	int cnt = 0;
 	for (int i = 0; i < vec_mappoint.size(); ++i) {
 		sum += vec_mappoint.at(i);
 	}
@@ -241,4 +242,20 @@ float InfluenceMap::calculateWeightDistance(const IMPopVec& popvec, const int in
 	float distance1 = sqrt((point_a.x - point_b.x)*(point_a.x - point_b.x) + (point_a.y - point_b.y)*(point_a.y - point_b.y));
 	float distance2 = (popvec.at(index).second + 1.0) / 2.0;
 	return distance1 * distance2 * distance2;
+}
+
+Direction InfluenceMap::getDirection2P(const MapPoint& point_a, const MapPoint& point_b) {
+	if (point_a.x <= point_b.x && point_a.y <= point_b.y) {
+		return Direction::CSYS1;
+	}
+	else if (point_a.x >= point_b.x && point_a.y <= point_b.y) {
+		return Direction::CSYS2;
+	}
+	else if (point_a.x >= point_b.x && point_a.y >= point_b.y) {
+		return Direction::CSYS3;
+	}
+	else if (point_a.x <= point_b.x && point_a.y >= point_b.y) {
+		return Direction::CSYS4;
+	}
+
 }

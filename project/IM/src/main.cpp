@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
 	// º”‘ÿµÿÕº
 	//coordinator.StartGame("Example/MarineMicro_6enemy.SC2Map");
 	coordinator.StartGame("Example/MarineMicro_distributed.SC2Map");
+	coordinator.StartGame("Example/MarineMicro_distributed_circle.SC2Map");
 	//coordinator.StartGame("Example/MarineMicro_1enemy.SC2Map");
 
 	while (coordinator.Update()) {
