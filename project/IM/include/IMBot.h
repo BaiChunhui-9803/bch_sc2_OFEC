@@ -118,6 +118,7 @@ namespace sc2 {
         std::vector<int> findBeighborsIn2(const GridPoint& grid_point, arrint2D* arr_ptr);
         IMPopId getIMPop(const MapPoint& map_point);
         void writeIMptrList();
+        MapPoint getCenterSelf(const UnitsVec& units);
     };
 
 

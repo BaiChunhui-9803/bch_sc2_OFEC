@@ -33,7 +33,7 @@ namespace sc2 {
 		m_units_vec = observation->GetUnits();
 		m_units_vec_self = observation->GetUnits(sc2::Unit::Alliance::Self);
 		m_units_vec_enemy = observation->GetUnits(Unit::Alliance::Enemy);
-
+		sc2::DebugInterface* debug = Debug();
 		/***********************************************/
 		/****************´«µÝ/¸üÐÂ/´æ´¢IM****************/
 		InfluenceMap IM2(m_units_vec_self, Self);
@@ -55,7 +55,7 @@ namespace sc2 {
 		//IM2.writeIMarrToFile(fOutPathIMarrSelf, fOutPathIMarrSelf3r);
 		//IM3.writeIMarrToFile(fOutPathIMarrEnemy, fOutPathIMarrEnemy3r);
 		//std::cout << IM;
-		if (display_cnt % 5 == 0) {
+		if (display_cnt % 1 == 0) {
 		displayIMarr();
 		}
 #endif
@@ -69,6 +69,27 @@ namespace sc2 {
 		//	std::cout << "Mappos-" << i << ":(" << units_vec_enemy.at(i)->pos.x << "," << units_vec_enemy.at(i)->pos.y << ")\n";
 		//}
 		updateGameInfo(m_units_vec);
+		for (auto &u : m_game_info.info_vec_unit) {
+			if (u.n_alliance == Enemy) {
+				debug->DebugTextOut(std::to_string(u.n_pop), u.n_pos);
+			}
+		}
+		debug->SendDebug();
+
+		MapPoint center_self = getCenterSelf(m_units_vec_self);
+		for (auto &u : m_game_info.info_vec_unit) {
+			if (u.n_alliance == Enemy) {
+				float distance = m_IM.calculateWeightDistance(
+					m_IM_pop,
+					u.n_pop,
+					center_self,
+					MapPoint(u.n_pos));
+				debug->DebugTextOut(std::to_string(u.n_pop) + ":" + std::to_string(distance), u.n_pos);
+			}
+		}
+		//debug->DebugMoveCamera(center_self);
+		debug->SendDebug();
+
 		if (gameloop_cnt % 10 == 0) updatePerGameLoop(gameloop_cnt);
 		//for (int i = 0; i < m_IM_pop.size(); ++i) {
 		//	std::cout << "IM_pop-" << i << "(" << m_IM_pop.at(i).first.x << "," << m_IM_pop.at(i).first.y << ")\n";
@@ -92,8 +113,7 @@ namespace sc2 {
 		}
 
 		MapPoint point_begin=m_AL.getCenterSelf();
-		Debug()->DebugMoveCamera(point_begin);
-		Debug()->SendDebug();
+
 
 		//targeted_enemy_tag_ = m_AL.findNearsetPoint();
 		if (m_game_stage == Action_Flag) {
@@ -339,4 +359,12 @@ void sc2::IMBot::writeIMptrList() {
 	for (auto it = m_IMptr_list.begin(); it != m_IMptr_list.end(); ++it) {
 		fout1 << (*it)->get<0>() << "\t" << (*it)->get<1>() << "\t" << (*it)->get<2>() << "\t" << (*it)->get<3>() << std::endl;
 	}
+}
+
+MapPoint sc2::IMBot::getCenterSelf(const UnitsVec & units) {
+	MapPoint point_sum = MapPoint();
+	for (auto &u : units) {
+		point_sum += MapPoint(u->pos);
+	}
+	return point_sum / units.size();
 }
