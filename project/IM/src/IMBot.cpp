@@ -19,9 +19,9 @@ namespace sc2 {
 		UnitsVec static_units_vec = static_observation->GetUnits();
 		UnitsVec static_units_vec_self = static_observation->GetUnits(sc2::Unit::Alliance::Self);
 		UnitsVec static_units_vec_enemy = static_observation->GetUnits(Unit::Alliance::Enemy);
-		///****************设置游戏基本参数****************/
+		//****************设置游戏基本参数****************//
 		m_game_set.updateGameSet(static_units_vec_self, static_units_vec_enemy);
-		///***********************************************/
+		//***********************************************//
 	}
 
 	void IMBot::OnStep() {
@@ -55,7 +55,7 @@ namespace sc2 {
 		//IM2.writeIMarrToFile(fOutPathIMarrSelf, fOutPathIMarrSelf3r);
 		//IM3.writeIMarrToFile(fOutPathIMarrEnemy, fOutPathIMarrEnemy3r);
 		//std::cout << IM;
-		if (display_cnt % 1 == 0) {
+		if (display_cnt % 100 == 0) {
 		displayIMarr();
 		}
 #endif
@@ -65,16 +65,7 @@ namespace sc2 {
 		if (m_game_stage == Update_Flag) {
 			m_game_stage = Action_Flag;
 		}
-		//for (int i = 0; i < units_vec_enemy.size(); ++i) {
-		//	std::cout << "Mappos-" << i << ":(" << units_vec_enemy.at(i)->pos.x << "," << units_vec_enemy.at(i)->pos.y << ")\n";
-		//}
 		updateGameInfo(m_units_vec);
-		for (auto &u : m_game_info.info_vec_unit) {
-			if (u.n_alliance == Enemy) {
-				debug->DebugTextOut(std::to_string(u.n_pop), u.n_pos);
-			}
-		}
-		debug->SendDebug();
 
 		MapPoint center_self = getCenterSelf(m_units_vec_self);
 		for (auto &u : m_game_info.info_vec_unit) {
@@ -88,6 +79,7 @@ namespace sc2 {
 			}
 		}
 		//debug->DebugMoveCamera(center_self);
+		debug->DebugMoveCamera(backup_target_);
 		debug->SendDebug();
 
 		if (gameloop_cnt % 10 == 0) updatePerGameLoop(gameloop_cnt);

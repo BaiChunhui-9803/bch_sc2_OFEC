@@ -11,7 +11,7 @@
 #include "sc2renderer/sc2_renderer.h"
 #include "gnuplot-iostream.h"
 /***********************/
-#define _DRAW_
+//#define _DRAW_
 //#define _AUTO_CLOSE_PLOT
 /***********************/
 
