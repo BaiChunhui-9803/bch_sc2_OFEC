@@ -30,10 +30,15 @@ include_directories(../../build/generated)
 include_directories(../../contrib/SDL-mirror/include)
 include_directories(D:/boost_1_75_0/stage/lib)
 include_directories(D:/boost_1_75_0)
+include_directories(D:/Boost/lib)
+include_directories(D:/Boost/include)
 
-# C/C++ 常规 附加库目录
+# C/C++ 常规 附加包含目录
 link_directories(D:/boost_1_75_0)
 link_directories(D:/Boost/lib)
+link_directories(D:/Boost/include)
+
+# VC++目录 库目录
 
 # 链接器 输入 附加依赖项
 target_link_libraries(${PROJECT_NAME} 
