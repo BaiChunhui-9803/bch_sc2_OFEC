@@ -2,12 +2,13 @@
 
 #include "../../global/classical/sphere.h"
 
-namespace OFEC {
+namespace ofec {
 	class ShfitingSphere : public Sphere {
 	public:
 		void initialize_() override;
+		int updateEvalTag(SolBase &s, int id_alg, bool effective_eval) override;
 	protected:
-		EvalTag updateEvalTag(SolBase &s, int id_alg, bool effective_eval) override;
+		
 		size_t m_change_freq;
 	};
 }

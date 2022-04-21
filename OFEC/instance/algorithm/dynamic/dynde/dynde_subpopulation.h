@@ -19,16 +19,16 @@
 #ifndef OFEC_DYNDESUBPOP_H
 #define OFEC_DYNDESUBPOP_H
 #include "DynDE_individual.h"
-#include "../population.h"
-namespace OFEC {
+#include "../../template/classic/de/de_pop.h"
+namespace ofec {
 	//class DynDE;
-	class DynDE_subpopulation final : public DE::population<DynDE_individual> {
+	class SubPopDynDE final : public PopDE<IndDynDE> {
 	public:
 		//friend class DynDE;
-		explicit DynDE_subpopulation(size_t size);
-		EvalTag evolve() override;
-		bool get_flag() const { return m_flag; }
-		void set_flag(bool flag) { m_flag = flag; }
+		explicit SubPopDynDE(size_t size, int id_pro);
+		int evolve(int id_pro, int id_alg, int id_rnd) override;
+		bool getFlag() const { return m_flag; }
+		void setFlag(bool flag) { m_flag = flag; }
 	protected:
 		void assign_type();
 	protected:

@@ -19,19 +19,14 @@
 #ifndef OFEC_F8_HYBRID3_H
 #define OFEC_F8_HYBRID3_H
 
-#include "../../expensive/CEC2015/hybrid.h"
-namespace OFEC {
+#include "hybrid.h"
+
+namespace ofec {
 	namespace CEC2015 {
-		class F8_hybrid3 final : public hybrid
-		{
-		public:
-			F8_hybrid3(const ParamMap &v);
-			F8_hybrid3(const std::string &name, size_t size_var, size_t size_obj);
-			void initialize();
+		class F8_hybrid3 final : public Hybrid {
 		protected:
 			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-			void setFunction();
-		private:
+			void setFunction() override;
 		};
 	}
 	using CEC2015_GOP_F08 = CEC2015::F8_hybrid3;

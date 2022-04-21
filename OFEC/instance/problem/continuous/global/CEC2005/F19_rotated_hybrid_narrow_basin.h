@@ -19,17 +19,17 @@
 #include "composition.h"
 #include "../metrics_gop.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class RotatedHybridNarrowBasin final : public Composition, public MetricsGOP {
 		protected:
-			void initialize_() override;
+			bool loadTranslation(const std::string &path) override;
 			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-			void setFunction();
-			void setTranslation();
+			void setFunction() override;
+			void setTranslation() override;
 		};
 	}
-	using CEC2005_GOP_F19 = CEC2005::RotatedHybridNarrowBasin;
+	using CEC2005_GOP_F19 = cec2005::RotatedHybridNarrowBasin;
 }
 #endif // ! OFEC_F19_ROTATED_HYBRID_NARROW_BASIN_H
 

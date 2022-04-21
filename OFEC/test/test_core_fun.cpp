@@ -8,7 +8,7 @@
 
 #include<iostream>
 using namespace std;
-using namespace OFEC;
+using namespace ofec;
 
 
 TEST_CASE("utility", "[core_fun][calbest]")

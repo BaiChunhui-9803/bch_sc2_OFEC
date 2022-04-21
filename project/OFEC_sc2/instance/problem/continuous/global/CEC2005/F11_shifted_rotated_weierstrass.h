@@ -18,17 +18,16 @@
 #define OFEC_F11_SHIFTED_ROTATED_WEIERSTRASS_H
 
 #include "../classical/weierstrass.h"
+#include "../metrics_gop.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class ShiftedRotatedWeierstrass final: public Weierstrass {
-		public:
-			ShiftedRotatedWeierstrass(const ParamMap &v);
-			ShiftedRotatedWeierstrass(const std::string &name, size_t num_vars);
-			void initialize();
+		protected:
+			void initialize_() override;
 		};
 	}
-	using CEC2005_GOP_F11 = CEC2005::ShiftedRotatedWeierstrass;
+	using CEC2005_GOP_F11 = cec2005::ShiftedRotatedWeierstrass;
 }
 #endif // ! OFEC_F11_SHIFTED_ROTATED_WEIERSTRASS_H
 

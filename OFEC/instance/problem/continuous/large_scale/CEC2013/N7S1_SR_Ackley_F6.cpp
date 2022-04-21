@@ -1,6 +1,6 @@
 
 #include "N7S1_SR_Ackley_F6.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		N7S1_SR_Ackley_F6::N7S1_SR_Ackley_F6(const ParamMap &v) :
 			N7S1_SR_Ackley_F6((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -54,7 +54,7 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag N7S1_SR_Ackley_F6::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int N7S1_SR_Ackley_F6::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			size_t    i;
 			Real result = 0.0;
 			
@@ -82,7 +82,7 @@ namespace OFEC {
 			delete[]z;
 
 			obj[0] = result;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

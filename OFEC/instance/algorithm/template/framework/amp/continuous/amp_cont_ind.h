@@ -1,10 +1,11 @@
 #ifndef OFEC_AMP_INDIVIDUAL_CONTINUOUS_H
 #define OFEC_AMP_INDIVIDUAL_CONTINUOUS_H
-#include "../../../../core/instance_manager.h"
-#include "../../../../core/problem/continuous/continuous.h"
-#include "../../../../core/algorithm/solution.h"
 
-namespace OFEC {
+#include "../../../../../../core/instance_manager.h"
+#include "../../../../../../core/problem/continuous/continuous.h"
+#include "../../../../../../core/problem/solution.h"
+
+namespace ofec {
 	template<class IndType>
 	class IndContAMP : public IndType {
 	protected:
@@ -19,7 +20,7 @@ namespace OFEC {
 			for (size_t j = 0; j < this->m_var.size(); j++) {
                 this->m_var[j] += GET_RND(id_rnd).normal.nextNonStd(0, radius);
 			}
-			GET_CONOP(id_pro).validateSolution(*this, Validation::SetToBound, id_rnd);
+			GET_CONOP(id_pro).validateSolution(*this, Validation::kSetToBound, id_rnd);
 		}
 		void cauchyMove(int id_pro, int id_rnd, double radius=-1) {
 			auto& domain = GET_CONOP(id_pro).domain();
@@ -31,7 +32,7 @@ namespace OFEC {
                     this->m_var[i] += GET_RND(id_rnd).cauchy.nextNonStd(0, radius);
 				}
 			}
-			GET_CONOP(id_pro).validateSolution(*this, Validation::SetToBound, id_rnd);
+			GET_CONOP(id_pro).validateSolution(*this, Validation::kSetToBound, id_rnd);
 		}
 	};
 

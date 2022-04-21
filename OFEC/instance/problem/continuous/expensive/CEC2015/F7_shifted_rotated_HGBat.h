@@ -19,7 +19,7 @@
 
 #include "../../global/classical/HGBat.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F7_shifted_rotated_HGBat final : public HGBat
 		{

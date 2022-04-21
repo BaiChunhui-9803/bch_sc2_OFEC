@@ -19,7 +19,7 @@
 
 #include "../../global/classical/scaffer_F6.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F9_shifted_rotated_scaffer_F6 final : public scaffer_F6
 		{

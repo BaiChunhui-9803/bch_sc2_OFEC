@@ -13,33 +13,10 @@
 *************************************************************************/
 
 #include "rotated_discus.h"
-namespace OFEC {
 
-	rotated_discus::rotated_discus(const ParamMap &v) :
-		rotated_discus((v.at("problem name")), (v.at("number of variables")), 1) {
-		
+namespace ofec {
+	void RotatedDiscus::initialize_() {
+		Discus::initialize_();
+		loadRotation("/instance/problem/continuous/global/classical/data/");
 	}
-	rotated_discus::rotated_discus(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-		discus(name, size_var, 1) {
-		
-	}
-
-	void rotated_discus::initialize() {
-		m_variable_monitor = true;
-		setDomain(-100., 100.);
-		setInitialDomain(-100., 100.);
-
-		setOriginalGlobalOpt();
-
-		loadRotation("/instance/problem/continuous/global/CEC2005/data/");
-
-		setGlobalOpt();
-		m_initialized = true;
-	}
-
-	EvalTag rotated_discus::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		return discus::evaluateObjective(x, obj);
-
-	}
-
 }

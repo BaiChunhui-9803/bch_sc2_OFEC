@@ -1,6 +1,6 @@
 #include "UDF6.h"
 
-namespace OFEC {
+namespace ofec {
 	UDF6::UDF6(param_map & v) : UDF6(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -40,7 +40,7 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag UDF6::evaluateObjective(Real *x, std::vector<Real> &obj) {//recommend the number of variables is 20
+	int UDF6::evaluateObjective(Real *x, std::vector<Real> &obj) {//recommend the number of variables is 20
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -73,6 +73,6 @@ namespace OFEC {
 				obj[m] = 1 - Mt*x[0] + 2. / (floor(m_num_vars / 2.))*obj[m] + temp;
 			}
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

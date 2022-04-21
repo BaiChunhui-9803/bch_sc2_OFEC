@@ -10,7 +10,7 @@ vol. 20, no. 1, pp. 1¨C26, 2012.*/
 #include "../../utility/functional.h"
 #include <cstring>
 
-namespace OFEC {
+namespace ofec {
 	namespace NS {
 		template<typename ObjectiveType>
 		void deductive_sort(const std::vector<std::vector<ObjectiveType>*>& data, std::vector<int>& rank, const std::vector<optimization_mode>& opt_mode) {

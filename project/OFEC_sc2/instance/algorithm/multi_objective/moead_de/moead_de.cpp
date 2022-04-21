@@ -1,73 +1,99 @@
-#include "MOEAD_DE.h"
+#include "moead_de.h"
+#include "../../../record/rcr_vec_real.h"
 
-namespace OFEC{
-	MOEAD_DE_pop::MOEAD_DE_pop(size_t size_pop):DE::MOEA_DE_pop<>(size_pop){ }
+#ifdef OFEC_DEMO
+#include <core/global_ui.h>
+#endif
 
-	void MOEAD_DE_pop::initialize() {
-		MOEA_DE_pop::initialize();
-		MOEAD::initialize(this->m_inds);
+namespace ofec {
+	void MOEAD_DE::initialize_() {
+		Algorithm::initialize_();
+		auto& v = GET_PARAM(m_id_param);
+		m_pop_size = std::get<int>(v.at("population size"));
+		m_pop.reset();
 	}
 
-	EvalTag MOEAD_DE_pop::evolve() {
-		EvalTag tag = EvalTag::Normal;
-		tag = MOEAD::evolve();
-		this->m_iter++;
-		return tag;
+	void MOEAD_DE::record() {
+		std::vector<Real> entry;
+		entry.push_back(m_effective_eval);
+		Real IGD = GET_CONOP(m_id_pro).getOptima().invertGenDist(*m_pop);
+		entry.push_back(IGD);
+		dynamic_cast<RecordVecReal&>(GET_RCR(m_id_rcr)).record(m_id_alg, entry);
 	}
 
-	EvalTag MOEAD_DE_pop::evolve_mo() {
-		EvalTag tag = EvalTag::Normal;
+#ifdef OFEC_DEMO
+	void MOEAD_DE::updateBuffer() {
+		m_solution.clear();
+		m_solution.resize(1);
+		for (size_t i = 0; i < m_pop->size(); ++i)
+			m_solution[0].push_back(&m_pop->at(i).phenotype());
+		ofec_demo::g_buffer->appendAlgBuffer(m_id_alg);
+	}
+#endif
+
+	void MOEAD_DE::initPop() {
+		auto size_var = GET_CONOP(m_id_pro).numVariables();
+		auto size_obj = GET_CONOP(m_id_pro).numObjectives();
+		m_pop.reset(new PopMOEAD_DE(m_pop_size, m_id_pro));
+		m_pop->initialize_(m_id_pro, m_id_rnd);
+		m_pop->evaluate(m_id_pro, m_id_alg);
+	}
+
+	void MOEAD_DE::run_() {
+		initPop();
+#ifdef OFEC_DEMO
+		updateBuffer();
+#endif
+		while (!terminating()) {
+			m_pop->evolve(m_id_pro,m_id_alg,m_id_rnd);
+#ifdef OFEC_DEMO
+			updateBuffer();
+#endif
+		}
+	}
+
+	PopMOEAD_DE::PopMOEAD_DE(size_t size_pop, int id_pro) :
+		PopMODE<>(size_pop,id_pro), MOEAD<IndDE>(id_pro) { }
+
+	void PopMOEAD_DE::initialize_(int id_pro, int id_rnd) {
+		Population<IndDE>::initialize(id_pro,id_rnd);
+		MOEAD<IndDE>::initialize(this->m_inds, id_pro);
+	}
+
+	int PopMOEAD_DE::evolve(int id_pro, int id_alg, int id_rnd) {
+		int tag = kNormalEval;
 		std::vector<int> perm(this->m_inds.size());
 		for (int i(0); i < perm.size(); ++i) {
 			perm[i] = i;
 		}
-		global::ms_global->m_uniform[caller::Algorithm]->shuffle(perm.begin(), perm.end());
-		for (int i = 0; i < this->m_inds.size(); i++){
+		GET_RND(id_rnd).uniform.shuffle(perm.begin(), perm.end());
+		for (int i = 0; i < this->m_inds.size(); i++) {
 			int n = perm[i];
 			// or int n = i;
 			int type;
-			double rnd = global::ms_global->m_uniform[caller::Algorithm]->next();
+			double rnd = GET_RND(id_rnd).uniform.next();
 			// mating selection based on probability
-			if (rnd < m_realb)    
+			if (rnd < m_realb)
 				type = 1;   // neighborhood
-			else             
+			else
 				type = 2;   // whole population
 
 			// select the indexes of mating parents
 			std::vector<int> p;
-			matingselection(p, n, 2, type, this->m_inds.size());  // neighborhood selection
+			matingSelection(p, n, 2, type, this->m_inds.size(), id_rnd);  // neighborhood selection
 
 			// produce a child Individual
-			DE::individual child;
+			ofec::IndDE child = *this->m_inds[0];
 			std::vector<size_t> index(3);
 			index[0] = n; index[1] = p[0]; index[2] = p[1];
-			this->cross_mutate(index, child);
-			tag = child.evaluate();
-			if (tag != EvalTag::Normal) break;
+			this->crossMutate(index, child, id_pro, id_rnd);
+			tag = child.evaluate(id_pro, id_alg);
+			if (tag != kNormalEval) break;
 			// update the reference points and other TypeIndivs in the neighborhood or the whole population
-			update_reference(child);
-			update_problem(this->m_inds, child, n, type);
+			updateReference(child, id_pro);
+			updateProblem(this->m_inds, child, n, type, id_pro, id_rnd);
 		}
+		m_iter++;
 		return tag;
-	}
-
-
-	MOEAD_DE::MOEAD_DE(const ParamMap &v) :algorithm(v.at("algorithm name")), m_pop(v.at("population size")) { }
-
-	void MOEAD_DE::initialize() {
-		m_pop.initialize();
-		m_pop.evaluate();
-	}
-
-	void MOEAD_DE::record() {
-		size_t evals = CONTINUOUS_CAST->evaluations();
-		Real IGD = CONTINUOUS_CAST->get_optima().IGD_to_PF(m_pop);
-		measure::get_measure()->record(global::ms_global.get(), evals, IGD);
-	}
-
-	void MOEAD_DE::run_() {
-		while (!terminating()) {
-			m_pop.evolve();			
-		}
 	}
 }

@@ -19,16 +19,13 @@
 
 #include "../classical/elliptic.h"
 
-namespace OFEC {
-	namespace CEC2005 {
-		class ShiftedRotatedHighCondElliptic final : public Elliptic
-		{
-		public:
-			ShiftedRotatedHighCondElliptic(const ParamMap &v);
-			ShiftedRotatedHighCondElliptic(const std::string &name, size_t num_vars);
-			void initialize();
+namespace ofec {
+	namespace cec2005 {
+		class ShiftedRotatedHighCondElliptic final : public Elliptic {
+		protected:
+			void initialize_() override;
 		};
 	}
-	using CEC2005_GOP_F03 = CEC2005::ShiftedRotatedHighCondElliptic;
+	using CEC2005_GOP_F03 = cec2005::ShiftedRotatedHighCondElliptic;
 }
 #endif // ! OFEC_F3_SHIFTED_ROTATED_HIGH_COND_ELLIPTIC_H

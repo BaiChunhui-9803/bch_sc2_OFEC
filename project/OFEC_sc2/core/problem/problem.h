@@ -24,24 +24,28 @@
 #include <memory>
 #include <set>
 #include <array>
+#include <list>
+#include <vector>
 
-#include "../algorithm/encoding.h"
+#include "encoding.h"
 #include "../../utility/typevar/typevar.h"
 
-namespace OFEC {
+namespace ofec {
 	class InstanceManager;
 
 	class Problem {
 		friend class InstanceManager;
 	public:
+		Problem() = default;
 		virtual ~Problem() = default;
 		void initialize();
-		void evaluate(SolBase &s, bool effective_eval = true);
+		void evaluate(SolBase &s,int id_alg, bool effective_eval = true) ;
 
 		/* Ready-only methods */
 		const std::string &name() const { return m_name; }
 		size_t numObjectives() const { return m_num_objs; }
 		size_t numConstraints() const { return m_num_cons; }
+		virtual size_t numVariables() const { return 0; }
 		bool isInitialized() const { return m_initialized; }
 		const std::set<ProTag> &tags() const { return m_tag; }
 		Real objectiveAccuracy() const { return m_objective_accuracy; }
@@ -51,7 +55,7 @@ namespace OFEC {
 		bool hasTag(ProTag tag) const { return m_tag.count(tag) > 0; }
 		OptMode optMode(size_t idx) const { return m_opt_mode[idx]; }
 		const std::vector<OptMode> &optMode() const { return m_opt_mode; }
-		bool isEqualityConstraint(size_t i) const { return m_constraint[i] == Constraint::Equality; }
+		bool isEqualityConstraint(size_t i) const { return m_constraint[i] == Constraint::kEquality; }
 		int idParamMap() const { return m_id_param; }
 
 		/* Write methods */
@@ -68,34 +72,42 @@ namespace OFEC {
 		virtual Real variableDistance(const VarBase &s1, const VarBase &s2) const = 0;
 		virtual bool boundaryViolated(const SolBase &) const { return false; }
 		virtual bool constraintViolated(const SolBase &) const { return false; }
-		virtual void validateSolution(SolBase &, Validation, int) {}
+		virtual void validateSolution(SolBase &, Validation, int) const {}
 		virtual void resizeObjective(size_t num_objs);
 		virtual void resizeConstraint(size_t num_cons);
-		virtual Real feasibleRatio() { return 1.0; }
+		virtual Real feasibleRatio()const { return 1.0; }
 		virtual void updateParameters();
-		virtual EvalTag updateEvalTag(SolBase &s, int id_alg, bool effective_eval) { return EvalTag::Normal; }
+		virtual int updateEvalTag(SolBase &s, int id_alg, bool effective_eval) { return EvalTag::kNormalEval; }
+#ifdef OFEC_DEMO
+		virtual void appendBuffer(int id_alg, bool effective_eval)const {}
+#endif
+		virtual bool isOptimaObjGiven() const { return false; }
+		virtual bool isOptimaVarGiven() const { return false; }
+		virtual bool isSolved(const std::list<std::unique_ptr<SolBase>> &candidates) const { return false; }
+		virtual size_t numOptimaFound(const std::list<std::unique_ptr<SolBase>> &candidates) const { return 0; }
+		virtual void updateCandidates(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const {}		
 
-		virtual bool isOptimaGiven() const { return false; }
-		virtual void updateCandidates(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const = 0;
-		virtual size_t numOptimaFound(const std::list<std::unique_ptr<SolBase>> &candidates) const = 0;
-
+		virtual void showInfomations(int id_alg) {}
+		virtual void printfSolution(int id_alg,const SolBase& sol) {}
 	protected:
 		virtual void initialize_();
 		virtual void evaluate_(SolBase &s, bool effective) = 0;
-		//void copy(const Problem &); // copy non-memory related parameters
+		virtual void copy(const Problem &); // copy non-memory related parameters
+		virtual void updateCurState(int id_alg, bool effective_eval) {}
 
 	protected:
 		std::string m_name;
-		int m_id_pro;
-		int m_id_rnd;
-		int m_id_param;
+		int m_id_pro = -1;
+		int m_id_rnd = -1;
+		int m_id_param = -1;
+
 		size_t m_num_objs;
 		size_t m_num_cons;
 		std::vector<OptMode> m_opt_mode;
 		std::vector<Constraint> m_constraint;
 		std::set<ProTag> m_tag;
 		ParamMap m_params;		// To record the parameters of the current problem
-		size_t m_total_eval;
+		size_t m_total_eval = 0;
 		Real m_objective_accuracy;
 		Real m_variable_accuracy;
 		Real m_variable_niche_radius;  // for selecting candidate solutions

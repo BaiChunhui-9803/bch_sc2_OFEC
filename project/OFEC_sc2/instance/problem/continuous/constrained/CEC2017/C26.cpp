@@ -1,33 +1,27 @@
 #include "C26.h"
+#include "../../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2017 {
-		C26::C26(const ParamMap &v) :
-			C26((v.at("problem name")), (v.at("number of variables")), 1) {
-			
-		}
-		C26::C26(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-			function(name, size_var, size_obj) {
-			
-		}
 
-		void C26::initialize() {
-			m_variable_monitor = true;
+		void C26::initialize_() {
+			Function::initialize_();
+			auto& v = GET_PARAM(m_id_param);
+			resizeVariable(std::get<int>(v.at("number of variables")));
 			setDomain(-100., 100.);
 			setInitialDomain(-100., 100.);
-			m_constraint_type.resize(2);
-			m_constraint_type[0] = constraint_type::Inequality;
-			m_constraint_type[1] = constraint_type::Equality;
-			 
-			
+			m_num_cons = 2;
+			m_constraint.resize(2);
+			m_constraint[0] = Constraint::Inequality;
+			m_constraint[1] = Constraint::Equality;
+
 			loadTranslation("/instance/problem/continuous/constrained/CEC2017/data/");  //data path
-			
+
 			loadRotation("/instance/problem/continuous/constrained/CEC2017/data/");
 			setOriginalGlobalOpt(m_translation.data());
 			m_optima = m_original_optima;
-			m_initialized = true;
 		}
-		void C26::evaluate_obj_nd_con(Real *x, std::vector<Real>& obj, std::vector<Real> &con) {
+		void C26::evaluateObjAndCon(Real *x, std::vector<Real>& obj, std::vector<Real> &con) {
 			
 			for (size_t i = 0; i < m_num_vars; ++i)
 				x[i] -= m_translation[i];

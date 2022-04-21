@@ -1,7 +1,8 @@
 #include <cmath>
 #include "newran.h"
 
-namespace OFEC {
+namespace ofec {
+
 
 	//**************************** utilities ******************************
 	inline double square(double x) { return x * x; }
@@ -69,10 +70,14 @@ namespace OFEC {
 
 		//iseed = 2147483648L * s;         // for Mother
 		m_motherseed = s;
-		m_seed = (long)(s * 2147483648L);
-		for (int i = 0; i < 128; i++) m_buffer[i] = raw();
-
 		m_name = "random";
+		initialize();
+	}
+
+	void RandBase::initialize() {
+		m_seed = (long)(m_motherseed * 2147483648L);
+		for (int i = 0; i < 128; i++)
+			m_buffer[i] = raw();
 	}
 
 
@@ -130,8 +135,8 @@ namespace OFEC {
 		if (m_not_ready) build(false);
 		do {
 			double r1 = RandBase::next();
-			ir = (int)(r1*m_xi); double sxi = m_sx[ir];
-			ak = sxi + (m_sx[ir + 1] - sxi)*RandBase::next();
+			ir = (int)(r1 * m_xi); double sxi = m_sx[ir];
+			ak = sxi + (m_sx[ir + 1] - sxi) * RandBase::next();
 			y = m_sfx[ir] * RandBase::next();
 		} while (y >= m_sfx[ir + 1] && y >= density(ak));
 		return ak;
@@ -144,8 +149,8 @@ namespace OFEC {
 			s = 1.0;
 			double r1 = RandBase::next();
 			if (r1 > 0.5) { s = -1.0; r1 = 1.0 - r1; }
-			ir = (int)(r1*m_xi); double sxi = m_sx[ir];
-			ak = sxi + (m_sx[ir + 1] - sxi)*RandBase::next();
+			ir = (int)(r1 * m_xi); double sxi = m_sx[ir];
+			ak = sxi + (m_sx[ir + 1] - sxi) * RandBase::next();
 			y = m_sfx[ir] * RandBase::next();
 		} while (y >= m_sfx[ir + 1] && y >= density(ak));
 		return s * ak;
@@ -202,9 +207,9 @@ namespace OFEC {
 		if (m_not_ready) build();
 		do {
 			double r1 = RandBase::next();
-			int ir = (int)(r1*m_xi); double sxi = m_sx[ir];
+			int ir = (int)(r1 * m_xi); double sxi = m_sx[ir];
 			ir1 = (ir == ic) ? 120 : ir + 1;
-			ak = sxi + (m_sx[ir1] - sxi)*RandBase::next();
+			ak = sxi + (m_sx[ir1] - sxi) * RandBase::next();
 			y = m_sfx[ir] * RandBase::next();
 		} while (y >= m_sfx[ir1] && y >= density(ak));
 		return ak;
@@ -273,7 +278,7 @@ namespace OFEC {
 	double Levy::density(double x) const {
 		if (x <= 0.0) return 0.0;
 		double y;
-		y = std::sqrt(0.5*m_sc / 3.14159265358979323846)*exp(-0.5*m_sc / x) / pow(x, 1.5);
+		y = std::sqrt(0.5 * m_sc / 3.14159265358979323846) * exp(-0.5 * m_sc / x) / pow(x, 1.5);
 		return (std::fabs(x) > 1.0e15) ? 0 : y;
 	}
 
@@ -302,7 +307,7 @@ namespace OFEC {
 	double Gamma::Gamma2::density(double x) const                // gamma density function
 	{
 		if (x <= 0.0) return 0.0;
-		double l = (alpha - 1.0)*log(x) - x - ln_gam;
+		double l = (alpha - 1.0) * log(x) - x - ln_gam;
 		return  (l < -40.0) ? 0.0 : exp(l);
 	}
 
@@ -343,13 +348,26 @@ namespace OFEC {
 				-1.231739516,0.120858003e-2,-0.536382e-5 };
 
 			double x = xx - 1.0; double tmp = x + 5.5;
-			tmp -= (x + 0.5)*log(tmp); double ser = 1.0;
+			tmp -= (x + 0.5) * log(tmp); double ser = 1.0;
 			for (int j = 0; j <= 5; j++) { x += 1.0; ser += cof[j] / x; }
-			return -tmp + log(2.50662827465*ser);
+			return -tmp + log(2.50662827465 * ser);
 		}
 	}
 
+	Random::Random(Real seed) :
+		uniform(seed),
+		normal(seed),
+		cauchy(seed),
+		levy(1.4, seed),
+		gamma(0.5, seed) {}
 
+	void Random::initialize() {
+		uniform.initialize();
+		normal.initialize();
+		cauchy.initialize();
+		levy.initialize();
+		gamma.initialize();
+	}
 }
 
 

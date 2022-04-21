@@ -4,7 +4,7 @@
 #include "peak_boundary.h"
 #include <climits>
 
-namespace OFEC {
+namespace ofec {
 	class HibernatedArea {
 	protected:
 		std::vector<PeakBoundary> m_found_optimums;

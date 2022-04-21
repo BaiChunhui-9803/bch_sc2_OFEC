@@ -23,111 +23,99 @@
 #ifndef OFEC_NSGAII_H
 #define OFEC_NSGAII_H
 
-#include "../../../../utility/nondominated_sorting/fast_sort.h"
+#include "../../../../../utility/nondominated_sorting/fast_sort.h"
 
-namespace OFEC {
-
-	template<typename Individual>
+namespace ofec {
 	class NSGAII {
-	public:
-		using objective_type = typename Individual::solution_type::objective_encoding;
-	public:
-		NSGAII(size_t num_obj, const std::vector<optimization_mode>& opt_mode);
-		void survivor_selection(std::vector<std::unique_ptr<Individual>> &parent, std::vector<Individual> &offspring);
-		void nondominated_sorting(std::vector<Individual>& offspring);
-	private:		
-		void eval_dens(std::vector<std::unique_ptr<Individual>>& parent, std::vector<Individual>& offspring);
+	protected:
 		size_t m_num_obj;
-		std::vector<optimization_mode> m_opt_mode;
-	};
+		std::vector<OptMode> m_opt_mode;
 
-	template<typename Individual>
-	NSGAII<Individual>::NSGAII(size_t num_obj, const std::vector<optimization_mode>& opt_mode) :
-		m_num_obj(num_obj),
-		m_opt_mode(opt_mode) {
-	}
+	public:
+		NSGAII(size_t num_obj, const std::vector<OptMode> &opt_mode): 
+			m_num_obj(num_obj),
+			m_opt_mode(opt_mode) {}
 
-	template<typename Individual>
-	void NSGAII<Individual>::survivor_selection(std::vector<std::unique_ptr<Individual>>& parent, std::vector<Individual>& offspring) {
-		nondominated_sorting(offspring);
-		eval_dens(parent, offspring);
-	}
+		template<typename TPop, typename TPopCmbnd>
+		void survivorSelection(TPop &pop, TPopCmbnd &pop_combined) {
+			nondominatedSorting(pop_combined);
+			evalDens(pop, pop_combined);
+		}
 
-	template<typename Individual>
-	void NSGAII<Individual>::nondominated_sorting(std::vector<Individual>& offspring) {
-		std::vector<std::vector<objective_type>*> objs;
-		for (auto& i : offspring)
-			objs.emplace_back(&i.objective());
-		std::vector<int> rank;
-		NS::fast_sort<objective_type>(objs, rank, m_opt_mode);
-		for (size_t i = 0; i < offspring.size(); ++i)
-			offspring[i].set_rank(rank[i]);
-	}
+	protected:
+		template<typename TPopCmbnd>
+		void nondominatedSorting(TPopCmbnd &pop_combined) {
+			std::vector<std::vector<Real> *> objs;
+			for (size_t i = 0; i < pop_combined.size(); ++i)
+				objs.emplace_back(&pop_combined[i].objective());
+			std::vector<int> rank;
+			nd_sort::fastSort<Real>(objs, rank, m_opt_mode);
+			for (size_t i = 0; i < pop_combined.size(); ++i)
+				pop_combined[i].setRank(rank[i]);
+		}
 
-	template<typename Individual>
-	void NSGAII<Individual>::eval_dens(std::vector<std::unique_ptr<Individual>>& parent, std::vector<Individual>& offspring) {
-		std::vector<Individual*> pop;
-		for (auto& i : offspring)
-			pop.emplace_back(&i);
-		int pops = 0;  //indicate parent population size be 0
-		int size = pop.size();
-		int rank = 0;
-		while (true) {
-			int count = 0;
-			for (size_t i = 0; i < size; i++)
-				if (pop[i]->rank() == rank)
-					count++;
-			int size2 = pops + count;
-			if (size2 > parent.size()) {
-				break;
+		template<typename TPop, typename TPopCmbnd>
+		void evalDens(TPop &pop, TPopCmbnd &pop_combined) {
+			int pops = 0;  //indicate parent population size be 0
+			int size = pop_combined.size();
+			int rank = 0;
+			while (true) {
+				int count = 0;
+				for (size_t i = 0; i < size; i++)
+					if (pop_combined[i].rank() == rank)
+						count++;
+				int size2 = pops + count;
+				if (size2 > pop.size()) {
+					break;
+				}
+				for (size_t i = 0; i < size; i++)
+					if (pop_combined[i].rank() == rank)
+					{
+						pop[pops] = pop_combined[i];
+						++pops;
+					}
+				rank++;
+				if (pops >= pop.size()) break;
 			}
-			for (size_t i = 0; i < size; i++)
-				if (pop[i]->rank() == rank)
-				{
-					*parent[pops] = offspring[i];
+			if (pops < pop.size()) {
+				std::vector<int> list;
+				// save the individuals in the overflowed front
+				for (size_t i = 0; i < size; i++)
+					if (pop_combined[i].rank() == rank)
+						list.push_back(i);
+				int s2 = list.size();
+				std::vector<Real> density(s2);
+				std::vector<Real> obj(s2);
+				std::vector<int> idx(s2);
+				std::vector<int> idd(s2);
+				for (size_t i = 0; i < s2; i++) {
+					idx[i] = i;
+					density[i] = 0;
+				}
+				for (size_t j = 0; j < m_num_obj; j++) {
+					for (size_t i = 0; i < s2; i++) {
+						idd[i] = i;
+						obj[i] = pop_combined[list[i]].objective()[j];
+					}
+					mergeSort(obj, s2, idd, true, 0, s2 - 1, s2);
+					density[idd[0]] += -1.0e+30;
+					density[idd[s2 - 1]] += -1.0e+30;
+					for (int k = 1; k < s2 - 1; k++)
+						density[idd[k]] += -(obj[idd[k]] - obj[idd[k - 1]] + obj[idd[k + 1]] - obj[idd[k]]);
+				}
+				idd.clear();
+				obj.clear();
+				int s3 = pop.size() - pops;
+				mergeSort(density, s2, idx, true, 0, s2 - 1, s3);
+				for (size_t i = 0; i < s3; i++) {
+					pop[pops] = pop_combined[list[idx[i]]];
 					++pops;
 				}
-			rank++;
-			if (pops >= parent.size()) break;
+				density.clear();
+				idx.clear();
+				list.clear();
+			}
 		}
-		if (pops < parent.size()) {
-			std::vector<int> list;
-			// save the individuals in the overflowed front
-			for (size_t i = 0; i < size; i++)
-				if (pop[i]->rank() == rank)
-					list.push_back(i);
-			int s2 = list.size();
-			std::vector<Real> density(s2);
-			std::vector<Real> obj(s2);
-			std::vector<int> idx(s2);
-			std::vector<int> idd(s2);
-			for (size_t i = 0; i < s2; i++) {
-				idx[i] = i;
-				density[i] = 0;
-			}
-			for (size_t j = 0; j < m_num_obj; j++) {
-				for (size_t i = 0; i < s2; i++) {
-					idd[i] = i;
-					obj[i] = pop[list[i]]->objective()[j];
-				}
-				merge_sort(obj, s2, idd, true, 0, s2 - 1, s2);
-				density[idd[0]] += -1.0e+30;
-				density[idd[s2 - 1]] += -1.0e+30;
-				for (int k = 1; k < s2 - 1; k++)
-					density[idd[k]] += -(obj[idd[k]] - obj[idd[k - 1]] + obj[idd[k + 1]] - obj[idd[k]]);
-			}
-			idd.clear();
-			obj.clear();
-			int s3 = parent.size() - pops;
-			merge_sort(density, s2, idx, true, 0, s2 - 1, s3);
-			for (size_t i = 0; i < s3; i++) {
-				*parent[pops] = offspring[list[idx[i]]];
-				++pops;
-			}
-			density.clear();
-			idx.clear();
-			list.clear();
-		}
-	}
+	};
 }
 #endif //!OFEC_NSGAII_H

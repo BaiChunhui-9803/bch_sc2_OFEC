@@ -19,15 +19,14 @@
 #include "composition.h"
 #include "../metrics_gop.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class RotatedHybridHighConditionNumberMatrix final : public Composition, public MetricsGOP {
 		protected:
-			void initialize_() override;
 			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-			void setFunction();
+			void setFunction() override;
 		};
 	}
-	using CEC2005_GOP_F22 = CEC2005::RotatedHybridHighConditionNumberMatrix;
+	using CEC2005_GOP_F22 = cec2005::RotatedHybridHighConditionNumberMatrix;
 }
 #endif // !OFEC_F22_ROTATED_HYBRID_HIGH_CONDITION_NUMBER_MATRIX_H

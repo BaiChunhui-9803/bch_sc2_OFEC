@@ -29,7 +29,7 @@
 #include "problem/problem.h"
 #include "../utility/factory.h"
 
-namespace OFEC {
+namespace ofec {
 
 	extern std::map<std::string, std::set<std::string>> g_alg_for_pro;
 	extern std::set<std::string> g_param_omit;
@@ -37,8 +37,8 @@ namespace OFEC {
 	extern std::string g_working_dir;
 	extern std::mutex g_cout_mutex;
 
-	extern factory<Problem> g_reg_problem;
-	extern factory<Algorithm> g_reg_algorithm;
+	extern Factory<Problem> g_reg_problem;
+	extern Factory<Algorithm> g_reg_algorithm;
 }
 #endif // !OFEC_GLOBAL_H
 

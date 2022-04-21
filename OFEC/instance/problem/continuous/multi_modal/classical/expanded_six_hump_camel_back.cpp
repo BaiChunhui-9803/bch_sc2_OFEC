@@ -1,55 +1,59 @@
 #include "expanded_six_hump_camel_back.h"
+#include "../../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
+	void ExpandedSixHumpCamelBack::initialize_() {
+		Continuous::initialize_();
+		resizeObjective(1);
+		m_opt_mode[0] = OptMode::kMinimize;
 
-	expanded_six_hump_camel_back::expanded_six_hump_camel_back(const ParamMap &v) :
-		expanded_six_hump_camel_back((v.at("problem name")), (v.at("number of variables")), 1) {
+		auto &v = GET_PARAM(m_id_param);
+		resizeVariable(std::get<int>(v.at("number of variables")));
+		if (m_num_vars % 2)
+			throw MyExcept("Number of variables of the expanded six-hump camel back function must be an even.");
+		for (size_t j = 0; j < m_num_vars / 2; j++) {
+			m_domain.setRange(-2, 2, j * 2);
+			m_domain.setRange(-0.5, 2, j * 2 + 1);
+		}
+		//setDomain(-2., 2.);
 
-		
-	}
-	expanded_six_hump_camel_back::expanded_six_hump_camel_back(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-		function(name, size_var, size_obj) {
-		
-	}
-
-	void expanded_six_hump_camel_back::initialize() {
-		setDomain(-40., 40.);
-		setInitialDomain(-40., 40.);
-		
+		// 2^(Dim/2) gopt 
+		m_optima.clear();
+		size_t num_opts = (int)pow(2, m_num_vars / 2);
+		VarVec<Real> opt_var(m_num_vars);
+		std::vector<Real> opt_obj(1);
+		std::vector<int> binary_code(m_num_vars);
+		std::vector<std::vector<Real>> binary_value = { { 0.0,0.0 }, {-0.179684,1.425312} };
+		for (size_t i = 0; i < num_opts; i++) {
+			int num = i;
+			size_t j = 0;
+			while (num != 0) {
+				binary_code[j++] = num % 2;
+				num /= 2;
+			}
+			for (j = 0; j < m_num_vars / 2; j++) {
+				opt_var[j * 2] = binary_value[binary_code[j]][0];
+				opt_var[j * 2 + 1] = binary_value[binary_code[j]][1];
+			}
+			m_optima.appendVar(opt_var);
+			evaluateObjective(opt_var.data(), opt_obj);
+			m_optima.appendObj(opt_obj);
+		}
+		m_optima.setObjectiveGiven(true);
+		m_optima.setVariableGiven(true);
 		m_variable_accuracy = 0.01;
 		m_objective_accuracy = 1.e-4;
-		m_obj_minmax_monitored = true;
-		// 2^(Dim/2) gopt 
-		size_t num = (int)pow(2, m_num_vars / 2);
-		
-		std::vector<std::vector<Real>> obj_data(num, std::vector<Real>(1, 0));
-
-		for (auto &i : obj_data) {
-			m_original_optima.append(i[0]);
-		}
-		m_optima = m_original_optima;
-		m_initialized = true;
 	}
-	EvalTag expanded_six_hump_camel_back::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		if (m_translated)
-			translate(x);
-		if (m_scaled)
-			scale(x);
-		if (m_rotated)
-			rotate(x);
-		if (m_translated)
-			translateOrigin(x);
+
+	void ExpandedSixHumpCamelBack::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		size_t i;
 		obj[0] = 0.0;
-	
-		for (i = 0; i<m_num_vars - 1; i += 2)
-		{
+		for (i = 0; i<m_num_vars - 1; i += 2) {
 			x[i] += 0.089842;
 			x[i + 1] -= 0.712656;
 			obj[0] += ((4.0 - 2.1*pow(x[i], 2.0) + pow(x[i], 4.0) / 3.0)*pow(x[i], 2.0) + x[i] * x[i + 1] + ((-4.0 + 4.0*pow(x[i + 1], 2.0))*pow(x[i + 1], 2.0)))*4.0;
 		}
 		obj[0] += 4.126514*m_num_vars / 2.0;
-		return EvalTag::Normal;
 	}
 
 }

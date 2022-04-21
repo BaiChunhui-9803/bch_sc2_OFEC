@@ -6,10 +6,11 @@ updated Jun 22, 2019 by Long Xiao
 #ifndef AHC_v2_H
 #define AHC_v2_H
 
+
 #include "../../../../../problem/realworld/DVRP/dynamic_vrp.h"
 #include "../../../../../../core/global.h"
 
-namespace OFEC {
+namespace ofec {
 	class AHC_v2 {
 	public:
 		struct Clustering_result {

@@ -15,34 +15,25 @@
 #include "ackley.h"
 #include "../../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
 	void Ackley::initialize_() {
 		Function::initialize_();
+		m_objective_accuracy = 1e-8;
 		auto &v = GET_PARAM(m_id_param);
 		resizeVariable(std::get<int>(v.at("number of variables")));
+		m_variable_niche_radius = 1e-4 * 32.768 * m_num_vars;
 		setDomain(-32.768, 32.768);
-		m_opt_mode[0] = OptMode::Minimize;		
+		m_opt_mode[0] = OptMode::kMinimize;		
 		setOriginalGlobalOpt();
-		setGlobalOpt();
+		m_optima = m_original_optima;
 	}
 
-	void Ackley::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		if (m_translated)
-			translate(x);
-		if (m_scaled)
-			scale(x);
-		if (m_rotated)
-			rotate(x);
-		if (m_translated)
-			translateOrigin(x);
-
+	void Ackley::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 		Real s1 = 0, s2 = 0;
-
 		for (int i = 0; i < m_num_vars; i++) {
 			s1 += x[i] * x[i];
 			s2 += cos(2 * OFEC_PI*x[i]);
 		}
-
 		obj[0] = -20 * exp(-0.2*sqrt(s1 / m_num_vars)) - exp(s2 / m_num_vars) + 20 + OFEC_E + m_bias;
 	}
 	

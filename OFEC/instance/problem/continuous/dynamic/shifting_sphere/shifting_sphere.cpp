@@ -6,14 +6,14 @@
 #endif // OFEC_DEMO
 
 
-namespace OFEC {
+namespace ofec {
 	void ShfitingSphere::initialize_() {
 		Sphere::initialize_();
 		auto &v = GET_PARAM(m_id_param);
 		m_change_freq = std::get<int>(v.at("change frequency"));
 	}
 
-	EvalTag ShfitingSphere::updateEvalTag(SolBase &s, int id_alg, bool effective_eval) {
+	int ShfitingSphere::updateEvalTag(SolBase &s, int id_alg, bool effective_eval) {
 		if (id_alg > -1 && GET_ALG(id_alg).numEffectiveEvals() % m_change_freq == 0 && GET_ALG(id_alg).numEffectiveEvals() > 0 && effective_eval) {
 			std::vector<Real> rand_trans(m_num_vars);
 			for (size_t j = 0; j < m_num_vars; j++) {
@@ -26,7 +26,7 @@ namespace OFEC {
 #ifdef OFEC_DEMO
 			Demo::g_buffer->appendProBuffer(m_id_pro);
 #endif
-			return EvalTag::ChangeNextEval;
+			return kChangeNextEval;
 		}
 		else
 			return Continuous::updateEvalTag(s, id_alg, effective_eval);

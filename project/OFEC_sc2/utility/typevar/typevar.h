@@ -24,11 +24,12 @@
 #include "../../core/definition.h"
 #include <ostream>
 
-namespace OFEC {
+namespace ofec {
 	using TypeVar = std::variant<bool, int, char, Real, std::string>;
 
 	std::ostream &operator<<(std::ostream &os, const TypeVar &v);
 
+	//class ParamMap
 	using ParamMap = std::map<std::string, TypeVar>;
 }
 

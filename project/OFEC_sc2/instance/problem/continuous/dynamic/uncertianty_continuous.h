@@ -22,23 +22,25 @@
 // Created: 11 May 2011
 // modified: 30 July 2018
 // modified: 10 June 2021 by DYY
-#ifndef DYNAMICCONTINUOUS_H
-#define DYNAMICCONTINUOUS_H
+
+#ifndef OFEC_UNCERTAIN_DYNAMIC_CONT_H
+#define OFEC_UNCERTAIN_DYNAMIC_CONT_H
 
 #include "../../../../core/problem/continuous/continuous.h"
 #include "../../../../core/problem/uncertainty/dynamic.h"
 #include "../../../../core/problem/uncertainty/noisy.h"
 
-namespace OFEC {
-#define CAST_UNCERTIANTY_CONT dynamic_cast<UncertaintyContinuous*>(global::ms_global->m_problem.get())
+namespace ofec {
+#define GET_DYNCONOP(id_pro) dynamic_cast<UncertaintyContinuous&>(GET_PRO(id_pro))
 
-	class UncertaintyContinuous : public Dynamic, public Noisy,public Continuous{
+	class UncertaintyContinuous : public Dynamic, public Noisy, public Continuous {
 	public:
 		enum ChangeType { CT_SmallStep = 0, CT_LargeStep, CT_Random, CT_Recurrent, CT_Chaotic, CT_RecurrentNoisy };
 		struct Change {
 			ChangeType type;
 			int counter;
 		};
+
 	protected:
 		const static std::vector<std::string> ms_type;
 
@@ -61,11 +63,11 @@ namespace OFEC {
 		int m_min_peaks;
 
 		int m_init_peaks, m_init_dimensions;
-		Real m_alpha, m_max_alpha;              // to control step severity
+		Real m_alpha, m_max_alpha;              // to control Step severity
 		Real m_chaotic_constant;
 
 		// features below added on NOV 22 2012
-		int m_mode;		// for the number of peaks change; 1: periodic with fixed step, 2: periodic with random step, 3: chaotic change
+		int m_mode;		// for the number of peaks change; 1: periodic with fixed Step, 2: periodic with random Step, 3: chaotic change
 
 
 		std::vector<VarVec<Real>> m_peak;					    	// positions of local or global optima(local optima in Rotation_DBG,
@@ -97,99 +99,76 @@ namespace OFEC {
 		int m_num_peak_tracked;
 		std::vector<bool> m_tracked;
 		std::vector<Real> m_time_linkage;
-	
-	
+
+
 	public:
-
-		UncertaintyContinuous(const std::string& name,size_t num_peak, size_t num_vars, size_t num_objs = 1, size_t num_cons = 0);
-		
-
+		UncertaintyContinuous() = default;
+		virtual ~UncertaintyContinuous() = default;
+		virtual void resizeVariable(size_t num_vars);
 
 		void setType(ChangeType rT);
 		void setFlagNumPeaksChange(bool rPC) {
 			m_flag_num_peak_change = rPC;
 			m_params["Flag number of peaks change"] = m_flag_num_peak_change;
+		}
+		bool getFlagNumPeaksChange() { return m_flag_num_peak_change; }
+		void setFlagSynchronize(bool rFlag) { m_synchronize = rFlag; }
+		void setRecurrentNoisySeverity(Real rSeverity) { m_recurrent_noisy_severity = rSeverity; }
 
-		}
-		bool getFlagNumPeaksChange() {
-			return m_flag_num_peak_change;
-		}
-		void setFlagSynchronize(bool rFlag) {
-			m_synchronize = rFlag;
-		}
-		void setRecurrentNoisySeverity(Real rSeverity) {
-			m_recurrent_noisy_severity = rSeverity;
-		}
+		void setAlpha(Real rAlpha) { m_alpha = rAlpha; }
+		void setMaxAlpha(Real rMaxAlpha) { m_max_alpha = rMaxAlpha; }
+		void setChaoticConstant(Real rValue) { m_chaotic_constant = rValue; }
 
-		void setAlpha(Real rAlpha) {
-			m_alpha = rAlpha;
-		};
-		void setMaxAlpha(Real rMaxAlpha) {
-			m_max_alpha = rMaxAlpha;
-		};
-		void setChoaticConstant(Real rValue) {
-			m_chaotic_constant = rValue;
-		}
-		ChangeType getType() const {
-			return m_change.type;
-		};
-
-		bool getFlagSynchronizeChange()const {
-			return m_synchronize;
-		};
-
+		ChangeType getType() const { return m_change.type; }
+		bool getFlagSynchronizeChange()const { return m_synchronize; }
 		void setNumPeakChangeMode(int mode);
 		int getNumPeakChangeMode();
-		int getNumPeak()const {
-			return m_num_peaks;
-		}
+		int getNumPeak()const { return m_num_peaks; }
 
 		virtual void change();
 		Real getRecurrentNoise(int x, Real min, Real max, Real amplitude, Real angle, Real noisy_severity = 1.);
 		Real chaoticStep(Real x, Real min, Real max, Real scale = 1.0);
-		bool predictChange(int evalsMore);
+		bool predictChange(int eff_evals, int evalsMore);
 
-		void set_num_change(Real rRatio);
-		void set_height_severity(const Real rS);
-		void set_width_severity(const Real rS);
-		void set_height(const Real* h);
-		void set_location(const std::vector<std::vector<Real>>&);
-		void set_initial_location(const std::vector<std::vector<Real>>&);
-		virtual void set_width(const Real w);
-		int get_num_visible_peak();
-		bool is_visible(int rIdx);
-		bool is_tracked(Real* gen, Real obj);// is any peak tracked for the first time
-		int get_num_peak_found();
+		void setNumChange(Real rRatio);
+		void setHeightSeverity(const Real rS);
+		void setWidthSeverity(const Real rS);
+		void setHeight(const Real *h);
+		void setLocation(const std::vector<std::vector<Real>> &);
+		void setInitialLocation(const std::vector<std::vector<Real>> &);
+		virtual void setWidth(const Real w);
+		int getNumVisiblePeak();
+		bool isVisible(int rIdx);
+		bool isTracked(Real *gen, Real obj);// is any peak tracked for the first time
+		int getNumPeakFound();
 
 		//15-07-2013
 		bool isGloOptTracked();
-		const std::vector<Real>& getNearestPeak(const std::vector<Real>&);
+		const std::vector<Real> &getNearestPeak(const std::vector<Real> &);
+
+		virtual void updateParameters() override;
+		virtual int updateEvalTag(SolBase &s, int id_alg, bool effective_eval)override;
+		void updateCandidates(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const override;
 
 	protected:
+		virtual void initialize_() override;
 		virtual void changeRandom() {};
 		virtual void changeSmallStep() {};
 		virtual void changeLargeStep() {};
 		virtual void changeRecurrent() {};
 		virtual void changeChaotic() {};
 		virtual void changeRecurrentNoisy() {};
-
-		virtual void changeVarMem();
 		virtual void changeNumPeak() {};
 
-
 	protected:
-		EvalTag evaluate_(SolBase& s, bool effective);
-		void calculate_global_optima();
-		void update_num_change();
-		void update_num_visable_peak();
-		void add_noise(Real *x);
-		void update_time_linkage();
-		void move_peak( int idx);
-		void copy(const Problem&);
-		void updateParameters();
-		void update_pre_peak();
-
-
+		void calculateGlobalOptima();
+		void updateNumChange();
+		void updateNumVisablePeak();
+		void addNoise(Real *x);
+		void updateTimeLinkage();
+		void movePeak(int idx);
+		void copy(const Problem &);
+		void updatePrePeak();
 	};
 }
 #endif // DYNAMICCONTINUOUS_H

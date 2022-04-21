@@ -13,22 +13,22 @@
 #include <utility>
 #include "math_aux.h"
 
-namespace OFEC {
-	class ref_point {
+namespace ofec {
+	class RefPoint {
 	public:
-		explicit ref_point(size_t s) : mv_position_(s), m_member_size_(0) {}
-		ref_point() {}
-		~ref_point();
+		explicit RefPoint(size_t s) : mv_position_(s), m_member_size_(0) {}
+		RefPoint() {}
+		~RefPoint();
 		const std::vector<Real>& pos() const { return mv_position_; }
 		std::vector<Real>& pos() { return mv_position_; }
-		size_t member_size() const { return m_member_size_; }
-		bool has_potential_member() const { return !mv_potential_members_.empty(); }
+		size_t memberSize() const { return m_member_size_; }
+		bool hasPotentialMember() const { return !mv_potential_members_.empty(); }
 		void clear();
-		void add_member();
-		void add_potential_member(size_t member_ind, Real distance);
-		int find_closest_member() const;
-		int random_member() const;
-		void remove_potential_member(size_t member_ind);
+		void addMember();
+		void addPotentialMember(size_t member_ind, Real distance);
+		int findClosestMember() const;
+		int randomMember(int id_rnd) const;
+		void removePotentialMember(size_t member_ind);
 	private:
 		std::vector<Real> mv_position_;
 		// pair<indices of individuals in the population, distance>
@@ -39,17 +39,17 @@ namespace OFEC {
 
 	namespace reference_point {
 
-		void generate_recursive(std::vector<ref_point> *rps, ref_point *pt, size_t num_objs, size_t left, size_t total, size_t element);
+		void generateRecursive(std::vector<RefPoint>* rps, RefPoint* pt, size_t num_objs, size_t left, size_t total, size_t element);
 
 		// GenerateReferencePoints():
 		// Given the number of objectives (M) and the number of divisions (p), generate the set of 
 		// reference points. Check Section IV-B and equation (3) in the original paper.
-		void generate_ref_points(std::vector<ref_point> *rps, size_t M, const std::vector<size_t> &p);
+		void generateRefPoints(std::vector<RefPoint>* rps, size_t M, const std::vector<size_t>& p);
 
 		// Associate():
 		// Associate individuals in the population with reference points.
 		// Check Algorithm 3 in the original paper.
-		void associate(std::vector<ref_point> *prps, const std::vector<std::vector<Real> > &conv_obj, const std::vector<std::vector<int> > &fronts);
+		void associate(std::vector<RefPoint>* prps, const std::vector<std::vector<Real> >& conv_obj, const std::vector<std::vector<int> >& fronts);
 	}
 }
 

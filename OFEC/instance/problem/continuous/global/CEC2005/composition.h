@@ -23,11 +23,10 @@ KanGAL report, 2005005, 2005.
 #include "../../../../../core/problem/continuous/continuous.h"
 #include "../../../../../core/problem/continuous/function.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class Composition : virtual public Continuous {
 		public:
-			//Composition(const std::string &name, size_t num_vars);
 			~Composition();
 			size_t numFunctions();
 			Function* getFunction(size_t num);
@@ -47,9 +46,10 @@ namespace OFEC {
 		protected:
 			size_t m_num_function;                // number of basic functions, for hybrid functions
 			std::vector<Function*> m_function;    // the functions
+			std::vector<int> m_param_ids;		  // param id of functions
 			std::vector<Real> m_height;
 			std::vector<Real> m_fmax;
-			Real m_height_normalize_severity = 2000;   // constant number for noralizing all basic function with similar height
+			Real m_height_normalize_severity;   // constant number for noralizing all basic function with similar height
 			std::vector<Real> m_converge_severity;     // severity of converge range for each function
 			std::vector<Real> m_stretch_severity;      // severity of stretching original function, greater than 1 for stretch
 

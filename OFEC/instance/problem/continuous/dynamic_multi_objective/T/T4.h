@@ -22,7 +22,7 @@
 
 #include "../DMOPs.h"
 
-namespace OFEC {
+namespace ofec {
     namespace DMOP {
         class T4 final : public DMOPs {
         public:

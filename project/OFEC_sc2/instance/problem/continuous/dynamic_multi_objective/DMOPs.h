@@ -6,7 +6,7 @@
 #include "../../../../utility/matrix.h"
 #include "../../../../utility/vector.h"
 
-namespace OFEC {
+namespace ofec {
 	class DMOPs :public continuous {
 	public:
 		DMOPs(const std::string &name, size_t size_var, size_t obj);

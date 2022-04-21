@@ -1,4 +1,4 @@
-//Register rotated_rosenbrock "Classic_rosenbrock_rotated" GOP,ConOP,SOP
+//Register RotatedRosenbrock "Classic_Rosenbrock_rotated" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -16,20 +16,13 @@
 #ifndef OFEC_ROTATED_ROSENBROCK_H
 #define OFEC_ROTATED_ROSENBROCK_H
 
-#include "../../../../../instance/problem/continuous/global/classical/rosenbrock.h"
-namespace OFEC {
+#include "rosenbrock.h"
 
-	class rotated_rosenbrock : public rosenbrock
-	{
-	public:
-		rotated_rosenbrock(const ParamMap &v);
-		rotated_rosenbrock(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class RotatedRosenbrock : public Rosenbrock {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
 	};
-
 }
 #endif // !OFEC_ROTATED_ROSENBROCK_H
 

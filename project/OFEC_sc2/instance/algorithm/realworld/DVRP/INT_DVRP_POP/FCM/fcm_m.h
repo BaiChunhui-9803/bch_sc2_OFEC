@@ -13,7 +13,7 @@
 #include "../../../../../../core/global.h"
 
 
-namespace OFEC {
+namespace ofec {
 		class fcm_m
 		{
 		public:

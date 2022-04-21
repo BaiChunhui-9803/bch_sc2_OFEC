@@ -4,8 +4,9 @@
 #include "../core/algorithm/algorithm.h"
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 
-namespace OFEC {
+namespace ofec {
 	bool abbrToParameter(const std::string& argvs, ParamMap& params) {
 		params.clear();
 		std::string letter;
@@ -76,12 +77,14 @@ namespace OFEC {
 	void runAlg(int id_alg) {
 		{
 			std::unique_lock<std::mutex> lock(g_cout_mutex);
-			std::cout << "------------ Start run: Alg ID " << id_alg << std::endl;
+			std::cout << "Alg ID " << std::right << std::setw(2) << id_alg << " started." << std::endl;
 		}
 		GET_ALG(id_alg).run();
 		{
 			std::unique_lock<std::mutex> lock(g_cout_mutex);
-			std::cout << "++++++++++++ Finish run: Alg ID " << id_alg << std::endl;
+			std::cout << "Alg ID " 
+				<< std::right << std::setw(2) << id_alg << " Terminated. "
+				<< std::right << std::setw(7) << GET_ALG(id_alg).numEffectiveEvals() << " FEs Costed." << std::endl;
 		}
 	}
 }

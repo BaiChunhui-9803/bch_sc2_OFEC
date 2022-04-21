@@ -1,6 +1,6 @@
 #include "fcm_twl_v2.h"
 
-namespace OFEC {
+namespace ofec {
 	fcm_twl_v2::fcm_twl_v2(Real fuzziness, int num_cluster, Real error, const std::vector<size_t>& Data_points) :m_fuzziness(fuzziness), m_num_clusters(num_cluster), m_error(error), m_data_points(Data_points)
 	{
 		m_num_data_points = m_data_points.size();

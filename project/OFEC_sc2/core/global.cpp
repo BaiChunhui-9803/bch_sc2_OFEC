@@ -1,8 +1,8 @@
 #include "global.h"
 
-namespace OFEC {
-	factory<Problem> g_reg_problem;
-	factory<Algorithm> g_reg_algorithm;
+namespace ofec {
+	Factory<Problem> g_reg_problem;
+	Factory<Algorithm> g_reg_algorithm;
 
 	std::map<std::string, std::set<std::string>> g_alg_for_pro;
 	std::set<std::string> g_param_omit;

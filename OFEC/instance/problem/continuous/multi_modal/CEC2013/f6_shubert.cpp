@@ -1,31 +1,31 @@
 #include  "f6_shubert.h"
 #include "../../../../../core/instance_manager.h"
 
-namespace OFEC::CEC2013 {
+namespace ofec::cec2013 {
 	void Shubert::initialize_() {
-		Function::initialize_();
+		Continuous::initialize_();
+		resizeObjective(1);
+		m_opt_mode[0] = OptMode::kMaximize;
+		
 		auto &v = GET_PARAM(m_id_param);
 		resizeVariable(std::get<int>(v.at("number of variables")));
 		if (m_num_vars != 2 && m_num_vars != 3)
-			throw MyExcept("numDim of F6_shuubert should be 2 or 3");
+			throw MyExcept("number of variables of F6_shubert should be 2 or 3");
 		setDomain(-10, 10);
-		m_opt_mode[0] = OptMode::Maximize;
-		m_objective_accuracy = v.count("objective accuracy") > 0 ? std::get<Real>(v.at("objective accuracy")) : (OFEC::Real)1.e-4;
+		m_objective_accuracy = v.count("objective accuracy") > 0 ? std::get<Real>(v.at("objective accuracy")) : (ofec::Real)1.e-4;
 		m_variable_niche_radius = 0.5;
 
+		m_optima.clear();
 		size_t num_global_optima = m_num_vars * (size_t)pow(3, m_num_vars);
 		if (m_num_vars == 2) {
-			for (size_t i = 0; i < num_global_optima; ++i) {
-				m_original_optima.appendObj(186.7309088);
-			}
+			for (size_t i = 0; i < num_global_optima; ++i)
+				m_optima.appendObj(186.7309088);
 		}
 		else {
-			for (size_t i = 0; i < num_global_optima; ++i) {
-				m_original_optima.appendObj(2709.093505);
-			}
+			for (size_t i = 0; i < num_global_optima; ++i)
+				m_optima.appendObj(2709.093505);
 		}
 		m_optima.setObjectiveGiven(true);
-		m_optima = m_original_optima;
 	}
 
 	void Shubert::evaluateObjective(Real *x, std::vector<Real> &obj) {

@@ -20,18 +20,12 @@
 #define OFEC_F5_SR_SCHWEFEL_H
 
 #include "../classical/schwefel.h"
-namespace OFEC {
-	namespace CEC2015 {
-		class F5_SR_schwefel final : public schwefel
-		{
-		public:
-			F5_SR_schwefel(const ParamMap &v);
-			F5_SR_schwefel(const std::string &name, size_t size_var, size_t size_obj);
-			void initialize();
-		protected:
-			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
 
-		private:
+namespace ofec {
+	namespace CEC2015 {
+		class F5_SR_schwefel final : public Schwefel {
+		protected:
+			void initialize_() override;
 		};
 	}
 	using CEC2015_GOP_F05 = CEC2015::F5_SR_schwefel;

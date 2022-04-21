@@ -14,27 +14,19 @@
 #include "scaffer_F6.h"
 #include "../../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
 	void ScafferF6::initialize_() {
 		Function::initialize_();
-		auto &v = GET_PARAM(m_id_param);
-		resizeVariable(std::get<int>(v.at("number of variables")));
+		m_opt_mode[0] = OptMode::kMinimize;
+		resizeVariable(std::get<int>(GET_PARAM(m_id_param).at("number of variables")));
+		m_variable_niche_radius = 1e-4 * 100 * m_num_vars;
 		setDomain(-100., 100.);
-		m_opt_mode[0] = OptMode::Minimize;
 		setOriginalGlobalOpt();
-		setGlobalOpt();
-		m_variable_accuracy = 1.0e-2;
+		m_optima = m_original_optima;
+		m_objective_accuracy = 1e-8;
 	}
 
-	void ScafferF6::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		if (m_translated)
-			translate(x);
-		if (m_scaled)
-			scale(x);
-		if (m_rotated)
-			rotate(x);
-		if (m_translated)
-			translateOrigin(x);
+	void ScafferF6::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 		Real fitness = 0;
 		for (size_t i = 0; i < m_num_vars-1; ++i) {
 			fitness += 0.5 + (sin(sqrt(x[i] * x[i] + x[i+1] * x[i+1]))*sin(sqrt(x[i] * x[i] + x[i+1] * x[i+1])) - 0.5) / ((1 + 0.001*(x[i] * x[i] + x[i+1] * x[i+1]))*(1 + 0.001*(x[i] * x[i] + x[i+1] * x[i+1])));

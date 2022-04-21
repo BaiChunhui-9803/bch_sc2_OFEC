@@ -1,7 +1,7 @@
 #include "custom_method.h"
 #include "../core/global.h"
 
-namespace OFEC {
+namespace ofec {
 
 	void registerParamAbbr() {
 		// ******* user-defined parameters ***
@@ -22,7 +22,9 @@ namespace OFEC {
 		g_param_abbr.insert({ "C1","accelerator1" });
 		g_param_abbr.insert({ "C2","accelerator2" });
 		g_param_abbr.insert({ "NAS","number of atomspaces" });
-
+		g_param_abbr.insert({ "NSSP","number of subspaces" });
+		g_param_abbr.insert({ "MSS","max subpop size" });// by pengmai
+		g_param_abbr.insert({ "DD","diversity degree" });// by pengmai
 		// ******* default parameters ********
 		g_param_abbr.insert({ "AID","algId" });
 		g_param_abbr.insert({ "al","alpha" });
@@ -32,7 +34,7 @@ namespace OFEC {
 		g_param_abbr.insert({ "CDBGFID","comDBGFunID" });
 		g_param_abbr.insert({ "CF","changeFre" });
 		g_param_abbr.insert({ "CoF","convFactor" });
-		g_param_abbr.insert({ "CR","changeRatio" });
+		g_param_abbr.insert({ "CPR","changePeakRatio" });
 		g_param_abbr.insert({ "CT","changeType" });
 		g_param_abbr.insert({ "CT2","changeType2" });
 		g_param_abbr.insert({ "CTH","convThreshold" });
@@ -62,11 +64,13 @@ namespace OFEC {
 		g_param_abbr.insert({ "IT3","interTest3" });
 		g_param_abbr.insert({ "IT4","interTest4" });
 		g_param_abbr.insert({ "JH","jumpHeight" });
+		g_param_abbr.insert({ "KF","kFactor" });
+		g_param_abbr.insert({ "LF","lFactor" });
 		g_param_abbr.insert({ "ME","maximum evaluations" });
 		g_param_abbr.insert({ "MI","maxIter" });
 		g_param_abbr.insert({ "MNPS","minNumPopSize" });
 		g_param_abbr.insert({ "MP","mutProbability" });
-		g_param_abbr.insert({ "MSDE","mutationSchemeDE" });
+		g_param_abbr.insert({ "MSDE","mutation strategy" });
 		g_param_abbr.insert({ "MSI","maxSucIter" });
 		g_param_abbr.insert({ "NB","numBox" });
 		g_param_abbr.insert({ "NC","numChange" });
@@ -75,7 +79,7 @@ namespace OFEC {
 		g_param_abbr.insert({ "NF","noiseFlag" });
 		g_param_abbr.insert({ "NGO","numGOpt" });
 		g_param_abbr.insert({ "NNCus","numNewCus" });
-		g_param_abbr.insert({ "NO","numObj" });
+		g_param_abbr.insert({ "NO","number of objectives" });
 		g_param_abbr.insert({ "NP","numPeak" });
 		g_param_abbr.insert({ "NPR","numParetoRegion" });
 		g_param_abbr.insert({ "NR","number of runs" });

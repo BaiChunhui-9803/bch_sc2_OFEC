@@ -1,6 +1,6 @@
 #include "F1_rotated_bent_cigar.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F1_rotated_bent_cigar::F1_rotated_bent_cigar(const ParamMap &v) : F1_rotated_bent_cigar(v.at("problem name"), v.at("number of variables"), 1){
 					
@@ -22,9 +22,9 @@ namespace OFEC {
 			setGlobalOpt();
 			m_initialized = true;
 		}
-		EvalTag F1_rotated_bent_cigar::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F1_rotated_bent_cigar::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			bent_cigar::evaluateObjective(x, obj);
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

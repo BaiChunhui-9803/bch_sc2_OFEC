@@ -1,6 +1,6 @@
 #include "dMOP3.h"
 
-namespace OFEC {
+namespace ofec {
 	dMOP3::dMOP3(param_map & v) : dMOP3(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -31,7 +31,7 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag dMOP3::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int dMOP3::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		size_t r = std::ceil(m_num_vars * global::ms_global->m_uniform[caller::Problem]->next());
 		Real t = get_time();
 		Real Ht = 0.75*std::sin(0.5*OFEC_PI*t) + 1.25;
@@ -56,6 +56,6 @@ namespace OFEC {
 			else
 				obj[m] = gt * (1 - std::sqrt(obj[0] / gt));
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

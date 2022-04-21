@@ -1,6 +1,6 @@
 #include "F6_SR_expanded_himmelblau.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F6_SR_expanded_himmelblau::F6_SR_expanded_himmelblau(const ParamMap &v) :
 			F6_SR_expanded_himmelblau((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -30,7 +30,7 @@ namespace OFEC {
 			evaluate_optima();
 			m_initialized = true;
 		}
-		EvalTag F6_SR_expanded_himmelblau::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F6_SR_expanded_himmelblau::evaluateObjective(Real *x, std::vector<Real> &obj) {
 
 			size_t i;
 
@@ -48,7 +48,7 @@ namespace OFEC {
 				obj[0] += pow((x[i] * x[i] + x[i + 1] - 11.0), 2.0) + pow((x[i] + x[i + 1] * x[i + 1] - 7.0), 2.0);
 			}
 			obj[0] += m_bias;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

@@ -4,7 +4,7 @@
 #include "../utility/nondominated_sorting/filter_sort.h"
 #include <iostream>
 
-using namespace OFEC;
+using namespace ofec;
 
 TEST_CASE("fast noodominated sorting", "[FNS]") {
 	std::vector<std::vector<int>> int_2d_array{ {2,4},{4,8},{6,12},{3,3},{6,6},{9,9},{4,2},{8,4},{12,6} };

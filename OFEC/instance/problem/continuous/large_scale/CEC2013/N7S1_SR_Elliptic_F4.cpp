@@ -1,6 +1,6 @@
 
 #include "N7S1_SR_Elliptic_F4.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		N7S1_SR_Elliptic_F4::N7S1_SR_Elliptic_F4(const ParamMap &v) : 
 			N7S1_SR_Elliptic_F4((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -57,7 +57,7 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag N7S1_SR_Elliptic_F4::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int N7S1_SR_Elliptic_F4::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			size_t    i;
 			Real result(0.);
 			for (i = 0; i < m_num_vars; ++i) {
@@ -82,7 +82,7 @@ namespace OFEC {
 			result += elliptic(z, m_num_vars - c);
 			delete[] z;
 			obj[0] = result;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

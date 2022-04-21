@@ -119,7 +119,7 @@ typedef struct
   cmaes_readpara_t sp;
   cmaes_random_t rand; /* random number generator */
 
-  double sigma;  /* step size */
+  double sigma;  /* Step size */
 
   double *rgxmean;  /* mean x vector, "parent" */
   double *rgxbestever; 

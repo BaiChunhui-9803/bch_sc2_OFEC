@@ -1,87 +1,65 @@
-#include "./GL_cont.h"
-#include "./adaptor_cont.h"
+#include "gl_cont.h"
+#include "../../../record/rcr_vec_real.h"
+#include "../../../../core/problem/continuous/continuous.h"
 
 #ifdef OFEC_DEMO
-#include "../../../../../ui/buffer/continuous/buffer_cont.h"
-extern unique_ptr<Demo::scene> Demo::msp_buffer;
+#include <core/global_ui.h>
 #endif
 
-namespace OFEC {
-	GL_cont_pop::GL_cont_pop(size_t size_pop, size_t size_var) : GL<individual<>>(size_pop, size_var)	{}
-
-	void GL_cont_pop::initialize() {
-		m_adaptor.reset(new adaptor_cont(m_alpha, CONTINUOUS_CAST->variable_size(), m_inds.size()));
-		population<individual<>>::initialize();
-		initialize_memory();
-		initialize_curpop();
+namespace ofec {
+	void ContGL::initialize_() {
+		Algorithm::initialize_();
+		auto &v = GET_PARAM(m_id_param);
+		m_pop_size = std::get<int>(v.at("population size"));
+		m_update_scheme = v.count("update scheme") > 0 ? UpdateScheme(std::get<int>(v.at("update scheme"))) : UpdateScheme::bsf;
+		m_alpha = v.count("alpha") > 0 ? std::get<Real>(v.at("alpha")) : 0.5;
+		m_beta = v.count("beta") > 0 ? std::get<Real>(v.at("beta")) : 3.0;
+		m_gamma = v.count("gamma") > 0 ? std::get<Real>(v.at("gamma")) : 6.0;
+		m_pop.clear();
+		if (ID_RCR_VALID(m_id_rcr))
+			m_keep_candidates_updated = true;
 	}
 
-	void GL_cont_pop::initialize_curpop() {
-		for (int i = 0; i < this->size(); i++) {
-			m_offspring.push_back(*this->m_inds[i]);
-		}
-	}
-
-	EvalTag GL_cont_pop::evolve() {
-		dynamic_cast<adaptor_cont*>(m_adaptor.get())->update_step(m_inds);
-		m_adaptor->create_solution(m_inds, m_offspring);
-		EvalTag rf = update();
-		for (auto& i : m_inds)
-			if (i->is_improved())
-				update_best(*i);
-		update_memory();
-		m_iter++;
-		return rf;
-	}
-
-	GL_cont::GL_cont(param_map& v) : algorithm(v.at("algorithm name")), m_pop(v.at("population size"), CONTINUOUS_CAST->variable_size()) {
-		if (v.find("updateSchemeProbabilityLearning") != v.end())
-			m_pop.set_update_scheme(v.at("updateSchemeProbabilityLearning"));
-		if (v.find("alpha") != v.end()) m_pop.set_alpha(v.at("alpha"));
-		if (v.find("beta") != v.end()) m_pop.set_beta(v.at("beta"));
-		if (v.find("gamma") != v.end()) m_pop.set_gamma(v.at("gamma"));
-		if (CONTINUOUS_CAST->has_tag(problem_tag::GOP))
-			CONTINUOUS_CAST->set_eval_monitor_flag(true);
-	}
-
-	void GL_cont::initialize() {
-		m_pop.initialize();
-		m_pop.evaluate();
+	void ContGL::run_() {
+		m_pop.resize(m_pop_size, m_id_pro);
+		m_pop.setAlpha(m_alpha);
+		m_pop.setBeta(m_beta);
+		m_pop.setGamma(m_gamma);
+		m_pop.setUpdateScheme(m_update_scheme);
+		m_pop.initialize(m_id_pro, m_id_rnd);
+		m_pop.evaluate(m_id_pro, m_id_alg);
 #ifdef OFEC_DEMO
-		vector<vector<Solution<>*>> pops(1);
-		for (size_t i = 0; i < m_pop.size(); ++i)
-			pops[0].emplace_back(&m_pop[i].solut());
-		dynamic_cast<Demo::buffer_cont*>(Demo::msp_buffer.get())->updateBuffer_(&pops);
+		updateBuffer();
 #endif
-	}
-
-	void GL_cont::run_() {
 		while (!terminating()) {
-			m_pop.evolve();
+			m_pop.evolve(m_id_pro, m_id_alg, m_id_rnd);
 #ifdef OFEC_DEMO
-			vector<vector<Solution<>*>> pops(1);
-			for (size_t i = 0; i < m_pop.size(); ++i)
-				pops[0].emplace_back(&m_pop[i].solut());
-			dynamic_cast<Demo::buffer_cont*>(Demo::msp_buffer.get())->updateBuffer_(&pops);
+			updateBuffer();
 #endif
 		}
 	}
 
-	void GL_cont::record() {
-		if (CONTINUOUS_CAST->has_tag(problem_tag::MMOP)) {
-			// ******* Multi-Modal Optimization *******
-			size_t evals = CONTINUOUS_CAST->evaluations();
-			size_t num_opt_found = CONTINUOUS_CAST->num_optima_found();
-			size_t num_opt_known = CONTINUOUS_CAST->get_optima().number_objective();
-			Real peak_ratio = (Real)num_opt_found / (Real)num_opt_known;
-			Real success_rate = CONTINUOUS_CAST->solved() ? 1 : 0;
-			measure::get_measure()->record(global::ms_global.get(), evals, peak_ratio, success_rate);
+	void ContGL::record() {
+		std::vector<Real> entry;
+		entry.push_back(m_effective_eval);
+		if (GET_PRO(m_id_pro).hasTag(ProTag::kMMOP)) {
+			size_t num_optima_found = GET_PRO(m_id_pro).numOptimaFound(m_candidates);
+			size_t num_optima = GET_CONOP(m_id_pro).getOptima().numberObjectives();
+			entry.push_back(num_optima_found);
+			entry.push_back(num_optima_found == num_optima ? 1 : 0);
 		}
-		else {
-			// ******* Global Optimization ************
-			size_t evals = CONTINUOUS_CAST->evaluations();
-			Real err = std::fabs(problem::get_sofar_best<Solution<>>(0)->objective(0) - CONTINUOUS_CAST->get_optima().objective(0).at(0));
-			measure::get_measure()->record(global::ms_global.get(), evals, err);
-		}
+		else
+			entry.push_back(m_candidates.front()->objectiveDistance(GET_CONOP(m_id_pro).getOptima().objective(0)));
+		dynamic_cast<RecordVecReal &>(GET_RCR(m_id_rcr)).record(m_id_alg, entry);
 	}
+
+#ifdef OFEC_DEMO
+	void ContGL::updateBuffer() {
+		m_solution.clear();
+		m_solution.resize(1);
+		for (size_t i = 0; i < m_pop.size(); ++i)
+			m_solution[0].push_back(&m_pop[i]);
+		Demo::g_buffer->appendAlgBuffer(m_id_alg);
+	}
+#endif
 }

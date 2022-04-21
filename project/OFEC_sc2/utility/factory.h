@@ -27,46 +27,46 @@
 #include "myexcept.h"
 #include "../core/definition.h"
 
-namespace OFEC {
-	template<typename Base>
-	struct factory {
-		template<typename T>
+namespace ofec {
+	template<typename TBase>
+	struct Factory {
+		template<typename TDerived>
 		struct register_ {
 			register_(const std::string& key, std::set<ProTag>&& tag) {
 				map_.emplace(
 					key,
 					make_pair([]() {
-						return new T();
+						return new TDerived();
 						},
 						std::forward<std::set<ProTag>>(tag))
 				);
 			}
 		};
 
-		static Base* produce(const std::string& key) {
+		static TBase* produce(const std::string& key) {
 			auto it = map_.find(key);
 			if (it == map_.end())
 				throw MyExcept("the key is not exist!");
 			return it->second.first();
 		}
 
-		static const std::map<std::string, std::pair<std::function<Base* ()>, std::set<ProTag>> >& get() {
+		static const std::map<std::string, std::pair<std::function<TBase*()>, std::set<ProTag>> >& get() {
 			return map_;
 		}
 
-		factory() = default;
+		Factory() = default;
 	private:
-		factory& operator=(const factory&) = delete;
-		factory& operator=(factory&&) = delete;
-		factory(const factory&) = delete;
-		factory(factory&&) = delete;
-		static std::map<std::string, std::pair<std::function<Base* ()>, std::set<ProTag>>> map_;
+		Factory& operator=(const Factory &) = delete;
+		Factory& operator=(Factory &&) = delete;
+		Factory(const Factory &) = delete;
+		Factory(Factory &&) = delete;
+		static std::map<std::string, std::pair<std::function<TBase* ()>, std::set<ProTag>>> map_;
 	};
 
-	template<typename Base>
-	std::map<std::string, std::pair<std::function<Base* ()>, std::set<ProTag>> > factory<Base>::map_;
+	template<typename TBase>
+	std::map<std::string, std::pair<std::function<TBase*()>, std::set<ProTag>> > Factory<TBase>::map_;
 
-#define REGISTER(Base, Derived, key, tag) factory<Base>::register_<Derived> reg_##Derived(key, tag)
+#define REGISTER(TBase, TDerived, key, tag) Factory<TBase>::register_<TDerived> reg_##TDerived(key, tag)
 }
 
 #endif

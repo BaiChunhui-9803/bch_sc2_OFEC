@@ -5,7 +5,7 @@
 #include "../../../../../core/algorithm/population.h"
 #include "../../../template/framework/dcmoea/dcmoea.h"
 
-namespace OFEC {
+namespace ofec {
 	class GA_DVRP {
 	public:
 		GA_DVRP();
@@ -17,6 +17,23 @@ namespace OFEC {
 	private:
 		Real m_cr; // crossover probability
 		Real m_mr; // mutation probability
+
+
 	};
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
 #endif // !OFEC_GA_DVRP_H
+

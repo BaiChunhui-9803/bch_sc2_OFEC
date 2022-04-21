@@ -1,6 +1,6 @@
 #include "T4.h"
 
-namespace OFEC {
+namespace ofec {
 	T4::T4(param_map & v) : T4(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -24,7 +24,7 @@ namespace OFEC {
 
 	}
 
-	EvalTag T4::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int T4::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -52,6 +52,6 @@ namespace OFEC {
 					obj[m] += pow(pow(x[i], 2) - x[i - 1], 2);
 			}
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

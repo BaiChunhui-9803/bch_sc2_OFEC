@@ -1,3 +1,13 @@
+//Register MOEA_F1 "MOEA_F1" MOP,ConOP
+//Register MOEA_F2 "MOEA_F2" MOP,ConOP
+//Register MOEA_F3 "MOEA_F3" MOP,ConOP
+//Register MOEA_F4 "MOEA_F4" MOP,ConOP
+//Register MOEA_F5 "MOEA_F5" MOP,ConOP
+//Register MOEA_F6 "MOEA_F6" MOP,ConOP
+//Register MOEA_F7 "MOEA_F7" MOP,ConOP
+//Register MOEA_F8 "MOEA_F8" MOP,ConOP
+//Register MOEA_F9 "MOEA_F9" MOP,ConOP
+
 /*************************************************************************
 * Project: Library of Open Frameworks for Evolutionary Computation (OFEC)
 *************************************************************************
@@ -23,29 +33,38 @@
 #ifndef MOEA_FBASE_H
 #define MOEA_FBASE_H
 
-#include "../../../../../core/problem/continuous/continuous.h"
+#include "../metrics_mop.h"
 
-namespace OFEC {
-	class MOEA_FBase : public continuous {
-	public:
-		void initialize();
+namespace ofec {
+	class MOEA_F : public MetricsMOP {
 	protected:
-		MOEA_FBase(const std::string &name, size_t size_var, size_t size_obj);
+		void initialize_() override;
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
+
 		int getDtype() const { return m_dtype; }
 		int getPtype() const { return m_ptype; }
 		int getLtype() const { return m_ltype; }
 		// control the PF shape
-		void alphafunction(Real alpha[], const Real *x, int dim, int type);
+		void alphaFunction(Real alpha[], const Real *x, int dim, int type);
 		// control the distance
-		Real betafunction(const std::vector<Real> & x, int type);
+		Real betaFunction(const std::vector<Real> & x, int type);
 		// control the PS shape of 2-d instances
-		Real psfunc2(const Real &x, const Real &t1, size_t dim, int type, int css);
+		Real paretoSetFunc2(const Real &x, const Real &t1, size_t dim, int type, int css);
 		// control the PS shapes of 3-D instances
-		Real psfunc3(const Real &x, const Real &t1, const Real &t2, int dim, int type);
-		EvalTag calObjective(Real *x, std::vector <Real> &y_obj);
-		void LoadPF();
-		void evaluateObjective(Real *x, std::vector<Real> &obj) { return calObjective(x, obj); }
+		Real paretoSetFunc3(const Real &x, const Real &t1, const Real &t2, int dim, int type);
+		void LoadParetoFront();
+
 		int m_dtype, m_ptype, m_ltype;
 	};
+
+	using MOEA_F1 = MOEA_F;
+	using MOEA_F2 = MOEA_F;
+	using MOEA_F3 = MOEA_F;
+	using MOEA_F4 = MOEA_F;
+	using MOEA_F5 = MOEA_F;
+	using MOEA_F6 = MOEA_F;
+	using MOEA_F7 = MOEA_F;
+	using MOEA_F8 = MOEA_F;
+	using MOEA_F9 = MOEA_F;
 }
 #endif //MOEA_FBASE_H

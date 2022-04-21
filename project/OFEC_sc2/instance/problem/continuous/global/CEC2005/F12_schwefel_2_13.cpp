@@ -1,62 +1,42 @@
 #include "F12_schwefel_2_13.h"
-#include <numeric>
+#include "../../../../../core/instance_manager.h"
+#include "../../../../../core/global.h"
+#include <sstream>
 
-namespace OFEC {
-#pragma warning(disable:4996)
-	namespace CEC2005 {
-		Schwefel_2_13::Schwefel_2_13(const ParamMap &v) :
-			Schwefel_2_13((v.at("problem name")), (v.at("number of variables"))){
-			
-		}
-		Schwefel_2_13::Schwefel_2_13(const std::string &name, size_t num_vars) : 
-			Problem(name),
-			Function(name, num_vars), 
-			m_a(num_vars, std::vector<Real>(num_vars)), 
-			m_b(num_vars, std::vector<Real>(num_vars)),
-			m_alpha(num_vars) {}
-
-		void Schwefel_2_13::initialize() {
+namespace ofec {
+	namespace cec2005 {
+		void Schwefel_2_13::initialize_() {
+			Function::initialize_();
+			resizeVariable(std::get<int>(GET_PARAM(m_id_param).at("number of variables")));
+			m_a.assign(m_num_vars, std::vector<Real>(m_num_vars));
+			m_b.assign(m_num_vars, std::vector<Real>(m_num_vars));
+			m_alpha.resize(m_num_vars);		
 			setDomain(-OFEC_PI, OFEC_PI);
-			load_data("/instance/problem/continuous/global/CEC2005/data/");
+			loadData("/instance/problem/continuous/global/cec2005/data/");
 			setOriginalGlobalOpt();
 			setBias(-460);
-			m_translation.resize(m_num_vars);
-			for (size_t i = 0; i < m_num_vars; ++i) {
-				m_translation[i] = m_alpha[i];
-			}
+			m_translation = m_alpha;
 			setGlobalOpt(m_translation.data());
-			m_optima.setVariableGiven(true);
-			m_obj_minmax_monitored = true;
-			m_objective_accuracy = 1.0e-8;
-
-			m_initialized = true;
+			m_variable_niche_radius = 1e-4 * OFEC_PI * m_num_vars;
+			m_objective_accuracy = 1.0e-2;
 		}
 
-		void Schwefel_2_13::load_data(const std::string & path) {
-			std::string sa;
-			char astr[100];
-			sprintf(astr, "%d", (int)m_num_vars);
-			strcat(astr, "Dim.txt");
-			sa = astr;
+		void Schwefel_2_13::loadData(const std::string & path) {
+			std::stringstream suffix;
+			suffix << m_num_vars << "Dim.txt";
+	
+			std::string sa = suffix.str();
 			sa.insert(0, m_name + "_a_");
-
 			sa.insert(0, path);
 			sa.insert(0, g_working_dir);//probDataPath
 
-			std::string sb;
-			sprintf(astr, "%d", (int)m_num_vars);
-			strcat(astr, "Dim.txt");
-			sb = astr;
+			std::string sb = suffix.str();
 			sb.insert(0, m_name + "_b_");
 			sb.insert(0, path);
 			sb.insert(0, g_working_dir);//probDataPath
 
-			std::string salpha;
-			sprintf(astr, "%d", (int)m_num_vars);
-			strcat(astr, "Dim.txt");
-			salpha = astr;
+			std::string salpha = suffix.str();
 			salpha.insert(0, m_name + "_alpha_");
-
 			salpha.insert(0, path);
 			salpha.insert(0, g_working_dir);//probDataPath
 
@@ -136,11 +116,8 @@ namespace OFEC {
 			in_alpha.close();
 		}
 
-
-
-		EvalTag Schwefel_2_13::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		void Schwefel_2_13::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 			Real result = 0;
-
 			for (int i = 0; i < m_num_vars; ++i) {
 				Real A = 0;
 				Real B = 0;
@@ -151,7 +128,6 @@ namespace OFEC {
 				result += pow((A - B), 2.0);
 			}
 			obj[0] = result + m_bias;
-			return EvalTag::Normal;
 		}
 	}
 }

@@ -1,4 +1,4 @@
-//Register DE_nrand_1 "DE-nrand-1" ConOP,SOP,GOP,MMOP
+//Register DE_nrand_1 "DE/nrand/1" ConOP,SOP,GOP,MMOP
 
 /******************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -15,30 +15,29 @@
 *  see https://github.com/Changhe160/OFEC for more information
 *
 *********************************************************************************/
-// Created on 15th Aug, 2019 by Junchen Wang
 
 #ifndef OFEC_DE_NRAND_1_H
 #define OFEC_DE_NRAND_1_H
 
-#include "../../template/classic/de/de_pop.h"
+#include "de_nrand_1_pop.h"
 #include "../../../../core/algorithm/algorithm.h"
 
-namespace OFEC {
+namespace ofec {
 	class DE_nrand_1 : public Algorithm {
 	protected:
-		std::unique_ptr<PopDE<>> m_pop;
+		std::unique_ptr<PopNRand1DE> m_pop;
 		size_t m_pop_size;
 		Real m_f, m_cr;
 
 		void initialize_() override;
 		void run_() override;
 		virtual void initPop();
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
 
 	public:
 		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override;
-#endif
 	};
 }
 

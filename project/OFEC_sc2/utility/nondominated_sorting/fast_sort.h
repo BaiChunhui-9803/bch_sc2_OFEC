@@ -2,15 +2,13 @@
 #define FAST_NONDOMINATED_SORT_H
 
 #include "../functional.h"
-#include "../../core/definition.h"
-#include "../../core/global.h"
 #include <functional>
 #include <thread>
 
-namespace OFEC {
-	namespace NS {
+namespace ofec {
+	namespace nd_sort {
 		template<typename ObjectiveType>
-		int fast_sort(const std::vector<std::vector<ObjectiveType>*>& data, std::vector<int>& rank, const std::vector<OptMode>& opt_mode) {
+		int fastSort(const std::vector<std::vector<ObjectiveType>*>& data, std::vector<int>& rank, const std::vector<OptMode>& opt_mode) {
 			const std::size_t popsize(data.size());
 			if (popsize == 0) return 0;
 			if (rank.size() != popsize)
@@ -26,10 +24,10 @@ namespace OFEC {
 				for (int j = 0; j < popsize; j++) {
 					if (k != j) {
 						auto compare_result = objectiveCompare<ObjectiveType>(*data[j], *data[k], opt_mode);
-						if (compare_result == Dominance::Dominant) {//*data[j]>*data[k]
+						if (compare_result == Dominance::kDominant) {//*data[j]>*data[k]
 							rank_[k]++;
 						}
-						else if (compare_result == Dominance::Dominated) {//*data[k]>*data[j]
+						else if (compare_result == Dominance::kDominated) {//*data[k]>*data[j]
 							cset[k][count[k]] = j;
 							count[k]++;
 						}
@@ -70,10 +68,10 @@ namespace OFEC {
 				for (int j = 0; j < popsize; j++) {
 					if (k != j) {
 						auto compare_result = objectiveCompare<ObjectiveType>(*data[j], *data[k], opt_mode);
-						if (compare_result == Dominance::Dominant) {//*data[j]>*data[k]
+						if (compare_result == Dominance::kDominant) {//*data[j]>*data[k]
 							rank_[k]++;
 						}
-						else if (compare_result == Dominance::Dominated) {//*data[k]>*data[j]
+						else if (compare_result == Dominance::kDominated) {//*data[k]>*data[j]
 							cset[k][count[k]] = j;
 							count[k]++;
 						}
@@ -83,7 +81,7 @@ namespace OFEC {
 		}
 
 		template<typename ObjectiveType>
-		int fast_sort_p(const std::vector<std::vector<ObjectiveType>*>& data, std::vector<int>& rank, const std::vector<OptMode>& opt_mode, int num_task = -1) {
+		int fastSortP(const std::vector<std::vector<ObjectiveType>*>& data, std::vector<int>& rank, const std::vector<OptMode>& opt_mode, int num_task = -1) {
 			if (num_task == -1)
 				num_task = std::thread::hardware_concurrency();
 			const std::size_t popsize(data.size());
@@ -137,7 +135,7 @@ namespace OFEC {
 		}
 
 		template<typename Individual>
-		int fast_sort(const std::vector<Individual>& data, std::vector<int>& rank, std::function<Dominance(const Individual&, const Individual&)>& comp) {
+		int fastSort(const std::vector<Individual>& data, std::vector<int>& rank, std::function<Dominance(const Individual&, const Individual&)>& comp) {
 			const std::size_t popsize(data.size());
 			if (popsize == 0) return 0;
 			if (rank.size() != popsize)
@@ -153,10 +151,10 @@ namespace OFEC {
 				for (int j = 0; j < popsize; j++) {
 					if (k != j) {
 						auto compare_result = comp(data[j], data[k]);
-						if (compare_result == Dominance::Dominant) {//*data[j]>*data[k]
+						if (compare_result == Dominance::kDominant) {//*data[j]>*data[k]
 							rank_[k]++;
 						}
-						else if (compare_result == Dominance::Dominated) {//*data[k]>*data[j]
+						else if (compare_result == Dominance::kDominated) {//*data[k]>*data[j]
 							cset[k][count[k]] = j;
 							count[k]++;
 						}

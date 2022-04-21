@@ -1,4 +1,4 @@
-//Register one_max "OneMax" ONEMAX,ComOP,SOP
+//Register OneMax "OneMax" OneMax,ComOP,SOP
 
 /*************************************************************************
 * Project: Library of Open Frameworks for Evolutionary Computation (OFEC)
@@ -21,43 +21,34 @@
 #include "../../../../core/problem/problem.h"
 #include "../../../../core/problem/optima.h"
 
-namespace OFEC {
-#define CAST_one_max dynamic_cast<one_max*>(global::ms_global->m_problem.get());
+namespace ofec {
+#define GET_one_max(id_pro) dynamic_cast<OneMax&>(GET_PRO(id_pro))
 
-	class one_max : public problem {
+	class OneMax : public Problem {
 	protected:
-		optima<VarVec<int>, Real> m_optima;
+		size_t m_num_vars;
+		Optima<VarVec<int>> m_optima;
 		bool m_if_valid_check = true;
-	public:
-		one_max(param_map& v);
-		one_max(const std::string &name, int size_var);
-		~one_max() {};
-		EvalTag evaluate_(solution_base &s, caller call, bool effective, bool initialized);
-		bool is_valid(const solution_base &s);
-		void validate(solution_base &s) {};
-		void initialize_solution(solution_base &s) const override;
-		bool same(const solution_base &s1, const solution_base &s2) const override;
-		Real variable_distance(const solution_base &s1, const solution_base &s2) const override;
-		Real variable_distance(const variable_base &s1, const variable_base &s2) const override;
-		bool is_optima_given() override;
-		bool get_opt_obj(std::vector<Real> &opt) {
-			opt = m_optima.objective();
-			return true;
-		};
-		bool get_opt_obj(std::vector<std::vector<Real>> &value) {
-			value.clear();
-			for (unsigned i = 0; i<m_optima.number_objective(); i++)	
-				value.push_back(m_optima.objective(i));
-			return true;
 
-		}
-		const optima<VarVec<int>, Real>& get_optima()const {
-			return m_optima;
-		}
-		optima<VarVec<int>, Real>& get_optima() {
-			return m_optima;
-		}
-		void initialize();
+	public:
+		void initSolution(SolBase &s, int id_rnd) const override;
+		bool same(const SolBase &s1, const SolBase &s2) const override;
+		Real variableDistance(const SolBase &s1, const SolBase &s2) const override;
+		Real variableDistance(const VarBase &x1, const VarBase &x2) const override;
+		bool isOptimaObjGiven() const override { return m_optima.isObjectiveGiven(); }
+		bool isOptimaVarGiven() const override { return m_optima.isVariableGiven(); }
+		void updateCandidates(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const override;
+		size_t numOptimaFound(const std::list<std::unique_ptr<SolBase>> &candidates) const override;
+		int updateEvalTag(SolBase &s, int id_alg, bool effective_eval) override;
+
+		const Optima<VarVec<int>>& getOptima()const { return m_optima; }
+		Optima<VarVec<int>>& getOptima() { return m_optima; }
+		size_t numVariables() const override { return m_num_vars; }
+		bool isValid(const SolBase &s);
+
+	protected:
+		void initialize_();
+		void evaluate_(SolBase &s, bool effective) override;
 	};
 
 }

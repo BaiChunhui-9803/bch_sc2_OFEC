@@ -28,7 +28,7 @@
 #include "../DMOPs.h"
 //#include "../../dynamic/dynamic.h"
 
-namespace OFEC {
+namespace ofec {
 	class SDCMOP :public DMOPs {
 	public:
 		SDCMOP(const ParamMap &v);

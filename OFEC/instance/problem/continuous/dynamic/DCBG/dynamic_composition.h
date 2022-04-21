@@ -26,7 +26,7 @@
 #define COMPOSITIONDBG_H
 
 #include"../real_DBG.h"
-namespace OFEC {
+namespace ofec {
 	class composition_DBG final: public real_DBG
 	{
 	public:

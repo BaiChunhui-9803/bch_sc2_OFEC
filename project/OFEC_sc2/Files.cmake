@@ -29,10 +29,48 @@ source_group(core\\problem\\uncertainty FILES ${group_core_problem_uncertainty})
 source_group(core\\record FILES ${group_core_record})
 
 # instance
+FILE(GLOB head_instance_algorithm_combination instance/algorithm/combination/*.h)
+FILE(GLOB head_instance_algorithm_combination_aco instance/algorithm/combination/aco/*.h)
+FILE(GLOB head_instance_algorithm_combination_aco_acs instance/algorithm/combination/aco/acs/*.h)
+FILE(GLOB head_instance_algorithm_combination_aco_as instance/algorithm/combination/aco/as/*.h)
+FILE(GLOB head_instance_algorithm_combination_aco_mmas instance/algorithm/combination/aco/mmas/*.h)
+FILE(GLOB head_instance_algorithm_combination_aco_paco instance/algorithm/combination/aco/paco/*.h)
+FILE(GLOB head_instance_algorithm_combination_gl instance/algorithm/combination/gl/*.h)
+FILE(GLOB head_instance_algorithm_combination_gl_mp instance/algorithm/combination/gl/mp/*.h)
+FILE(GLOB head_instance_algorithm_combination_sequence_sp instance/algorithm/combination/sequence/sp/*.h)
+FILE(GLOB source_instance_algorithm_combination_sequence_sp instance/algorithm/combination/sequence/sp/*.cpp)
+FILE(GLOB head_instance_algorithm_combination_sequence_tsp instance/algorithm/combination/sequence/tsp/*.h)
+FILE(GLOB source_instance_algorithm_combination_sequence_tsp instance/algorithm/combination/sequence/tsp/*.cpp)
+FILE(GLOB head_instance_algorithm_constrained_dcnsgaii_de instance/algorithm/constrained/dcnsgaii_de/*.h)
+FILE(GLOB source_instance_algorithm_constrained_dcnsgaii_de instance/algorithm/constrained/dcnsgaii_de/*.cpp)
+
 FILE(GLOB head_instance_record instance/record/*.h)
 FILE(GLOB source_instance_record instance/record/*.cpp)
+FILE(GLOB head_instance_record_dynamic instance/record/dynamic/*.h)
+FILE(GLOB head_instance_record_dynamic instance/record/dynamic/*.cpp)
+
+
+set(group_instance_algorithm_combination_sequence_sp ${head_instance_algorithm_combination_sequence_sp} ${source_instance_algorithm_combination_sequence_sp})
+set(group_instance_algorithm_combination_sequence_tsp ${head_instance_algorithm_combination_sequence_tsp} ${source_instance_algorithm_combination_sequence_tsp})
+set(group_instance_algorithm_constrained_dcnsgaii_de ${head_instance_algorithm_constrained_dcnsgaii_de} ${source_instance_algorithm_constrained_dcnsgaii_de})
 set(group_instance_record ${head_instance_record} ${source_instance_record})
+set(group_instance_record_dynamic ${head_instance_record_dynamic} ${head_instance_record_dynamic})
+
+
+source_group(instance\\algorithm\\combination FILES ${head_instance_algorithm_combination})
+source_group(instance\\algorithm\\combination\\aco FILES ${head_instance_algorithm_combination_aco})
+source_group(instance\\algorithm\\combination\\aco\\acs FILES ${head_instance_algorithm_combination_aco_acs})
+source_group(instance\\algorithm\\combination\\aco\\as FILES ${head_instance_algorithm_combination_aco_as})
+source_group(instance\\algorithm\\combination\\aco\\mmas FILES ${head_instance_algorithm_combination_aco_mmas})
+source_group(instance\\algorithm\\combination\\aco\\paco FILES ${head_instance_algorithm_combination_aco_paco})
+source_group(instance\\algorithm\\combination\\gl FILES ${head_instance_algorithm_combination_gl})
+source_group(instance\\algorithm\\combination\\gl\\mp FILES ${head_instance_algorithm_combination_gl_mp})
+source_group(instance\\algorithm\\combination\\sequence\\sp FILES ${group_instance_algorithm_combination_sequence_sp})
+source_group(instance\\algorithm\\combination\\sequence\\tsp FILES ${group_instance_algorithm_combination_sequence_tsp})
+source_group(instance\\algorithm\\combination\\constrained\\dcnsgaii_de FILES ${group_instance_algorithm_constrained_dcnsgaii_de})
+
 source_group(instance\\record FILES ${group_instance_record})
+source_group(instance\\record\\dynamic FILES ${group_instance_record_dynamic})
 
 # result
 
@@ -88,7 +126,7 @@ source_group(utility\\nondominated_sorting FILES ${group_utility_nondominated_so
 source_group(utility\\random FILES ${group_utility_random})
 source_group(utility\\typevar FILES ${group_utility_typevar})
 
-add_executable(OFEC_sc2 
+add_executable(OFEC_sc2
 ${group_core}
 ${group_core_algorithm}
 ${group_core_problem}

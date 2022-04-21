@@ -1,4 +1,4 @@
-//Register waves "Classic_waves" MMOP,ConOP,SOP
+//Register Waves "Classic_waves" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -19,20 +19,13 @@
 #ifndef OFEC_WAVES_H
 #define OFEC_WAVES_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-	
-	class waves : public function
-	{
-	public:
-		waves(const ParamMap &v);
-		waves(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {	
+	class Waves : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
-	};
-	
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
+	};	
 }
 #endif // !OFEC_WAVES_H

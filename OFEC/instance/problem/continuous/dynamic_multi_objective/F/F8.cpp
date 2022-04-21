@@ -1,6 +1,6 @@
 #include "F8.h"
 
-namespace OFEC::DMOP {
+namespace ofec::DMOP {
 	F8::F8(param_map & v) : F8(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -47,7 +47,7 @@ namespace OFEC::DMOP {
 	}
 
 	//f1=x1, f2=g*h
-	EvalTag F8::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int F8::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		Real Gt = std::sin(0.5*OFEC_PI*t);
 		Real Ht = 1.25 + 0.75*std::sin(OFEC_PI*t);
@@ -59,6 +59,6 @@ namespace OFEC::DMOP {
 		obj[0] = (1 + g)*std::cos(0.5*OFEC_PI*x[1])*std::cos(0.5*OFEC_PI*x[0]);
 		obj[1] = (1 + g)*std::cos(0.5*OFEC_PI*x[1])*std::sin(0.5*OFEC_PI*x[0]);
 		obj[2] = (1 + g)*std::sin(0.5*OFEC_PI*x[1]);
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

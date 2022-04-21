@@ -19,16 +19,13 @@
 
 #include "../classical/sphere.h"
 
-namespace OFEC {
-	namespace CEC2005 {
-		class ShiftedSphere final : public Sphere
-		{
-		public:
-			ShiftedSphere(const ParamMap &v);
-			ShiftedSphere(const std::string &name, size_t num_vars);
-			void initialize();
+namespace ofec {
+	namespace cec2005 {
+		class ShiftedSphere final : public Sphere {
+		protected:
+			void initialize_() override;
 		};
 	}
-	using CEC2005_GOP_F01 = CEC2005::ShiftedSphere;
+	using CEC2005_GOP_F01 = cec2005::ShiftedSphere;
 }
 #endif // ! OFEC_F1_SHIFTED_SPHERE_H

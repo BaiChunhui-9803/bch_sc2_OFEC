@@ -16,7 +16,7 @@
 #include "real_DBG.h"
 #include "../../../../utility/functional.h"
 
-namespace OFEC {
+namespace ofec {
 
 	real_DBG::real_DBG(const std::string &name, int rDimNumber,  int rNumPeaks,  int numObj,  ChangeType rT,  bool rFlagDimChange,  bool rFlagNumPeakChange
 		,  int peakNumChangeMode,  bool flagNoise,  bool flagTimelinkage) :dynamic_continuous(name, rDimNumber, rNumPeaks, numObj)

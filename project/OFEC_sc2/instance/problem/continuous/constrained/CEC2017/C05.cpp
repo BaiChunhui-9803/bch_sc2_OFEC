@@ -1,33 +1,33 @@
 #include "C05.h"
+#include "../../../../../core/instance_manager.h"
+#include "../../../../../core/global.h"
 
-namespace OFEC {
+
+namespace ofec {
 	namespace CEC2017 {
-		C05::C05(const ParamMap &v) :
-			C05((v.at("problem name")), (v.at("number of variables")), 1) {
-			
-		}
-		C05::C05(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-			function(name, size_var, size_obj), m_mat1(size_var), m_mat2(size_var) {
-			
-		}
 
-		void C05::initialize() {
-			m_variable_monitor = true;
+		void C05::initialize_() {
+			Function::initialize_();
+			size_t size_var = std::get<int>(GET_PARAM(m_id_param).at("number of variables"));
+			resizeVariable(size_var);
+			m_mat1.resize(size_var, size_var);
+			m_mat2.resize(size_var, size_var);
+
 			setDomain(-10., 10.);
 			setInitialDomain(-10., 10.);
-			m_constraint_type.resize(2);
-			m_constraint_type[0] = constraint_type::Inequality;
-			m_constraint_type[1] = constraint_type::Inequality;
-			 
-			
+			m_num_cons = 2;
+			m_constraint.resize(2);
+			m_constraint[0] = Constraint::Inequality;
+			m_constraint[1] = Constraint::Inequality;
+
 			loadTranslation("/instance/problem/continuous/constrained/CEC2017/data/");  //data path
-			
+
 			load_rotation_C05("/instance/problem/continuous/constrained/CEC2017/data/");
 			setOriginalGlobalOpt(m_translation.data());
 			m_optima = m_original_optima;
-			m_initialized = true;
 		}
-		void C05::evaluate_obj_nd_con(Real *x, std::vector<Real>& obj, std::vector<Real> &con) {
+
+		void C05::evaluateObjAndCon(Real *x, std::vector<Real>& obj, std::vector<Real> &con) {
 			for (size_t i = 0; i < m_num_vars; ++i)
 				x[i] -= m_translation[i];
 
@@ -95,8 +95,11 @@ namespace OFEC {
 		}
 
 		void C05::set_rotation_C05() {
-			m_mat1.generate_rotation_classical(global::ms_global->m_normal[caller::Problem].get(), m_condition_number);
-			m_mat2.generate_rotation_classical(global::ms_global->m_normal[caller::Problem].get(), m_condition_number);
+			/*m_mat1.generate_rotation_classical(global::ms_global->m_normal[caller::Problem].get(), m_condition_number);
+			m_mat2.generate_rotation_classical(global::ms_global->m_normal[caller::Problem].get(), m_condition_number);*/
+
+			m_mat1.generate_rotation_classical(&GET_RND(m_id_rnd).normal, m_condition_number);
+			m_mat2.generate_rotation_classical(&GET_RND(m_id_rnd).normal, m_condition_number);
 		}
 		void C05::rotate(Real *x, size_t num) {
 			Real *x_ = new Real[m_num_vars];

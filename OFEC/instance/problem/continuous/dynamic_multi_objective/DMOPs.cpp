@@ -1,6 +1,6 @@
 #include "DMOPs.h"
 
-namespace OFEC {
+namespace ofec {
 	DMOPs::DMOPs(const std::string & name, size_t size_var, size_t size_obj) : problem(name, size_var, 2), continuous(name, size_var, 2) {
 
 	}

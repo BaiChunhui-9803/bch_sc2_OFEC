@@ -13,7 +13,7 @@
 // Created: 8 August 2017
 // Last modified:
 #include "ShiftedAckley_F3.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		ShiftedAckley_F3::ShiftedAckley_F3(const ParamMap &v) : 
 			ShiftedAckley_F3((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -47,13 +47,13 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag ShiftedAckley_F3::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int ShiftedAckley_F3::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			size_t    i;
 			for (i = 0; i < m_num_vars; ++i) {
 				mp_anotherz[i] = x[i] - mp_Ovector[i];
 			}
 			obj[0] = ackley(mp_anotherz, m_num_vars);
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

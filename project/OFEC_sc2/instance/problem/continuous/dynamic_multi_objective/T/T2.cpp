@@ -1,6 +1,6 @@
 #include "T2.h"
 
-namespace OFEC {
+namespace ofec {
 	T2::T2(param_map & v) : T2(v.at("problem name"), v.at("number of variables"),v.at("numobj")) { 
 
 	}
@@ -25,7 +25,7 @@ namespace OFEC {
 	}
 
 	//the number of objectives are dynamic
-	EvalTag T2::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int T2::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -55,6 +55,6 @@ namespace OFEC {
 			else
 				obj[m] = obj[m] * sin(0.5*x[0] * OFEC_PI);
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

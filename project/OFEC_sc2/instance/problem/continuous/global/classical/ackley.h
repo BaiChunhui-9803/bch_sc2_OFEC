@@ -1,4 +1,4 @@
-//Register Ackley "Classic_ackley" GOP,ConOP,SOP
+//Register Ackley "Classic_Ackley" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -19,11 +19,11 @@
 #include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_gop.h"
 
-namespace OFEC {
+namespace ofec {
 	class Ackley : public Function, public MetricsGOP {
 	protected:
 		void initialize_() override;
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
+		void evaluateOriginalObj(Real *x, std::vector<Real>& obj) override;
 	};	
 }
 #endif // !OFEC_FACKLEY_H

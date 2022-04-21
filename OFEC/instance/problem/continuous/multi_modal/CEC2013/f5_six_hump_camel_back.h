@@ -17,13 +17,12 @@
 #ifndef OFEC_F5_SIX_HUMP_CAMEL_BACK_H
 #define OFEC_F5_SIX_HUMP_CAMEL_BACK_H
 
-#include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_mmop.h"
 
-namespace OFEC {
-	namespace CEC2013 {
+namespace ofec {
+	namespace cec2013 {
 		// An inverted version of Six-hump Camel Back function
-		class SixHumpCamelBack final : public Function, public MetricsMMOP {
+		class SixHumpCamelBack final : public MetricsMMOP {
 		protected:
 			void initialize_() override;
 			void evaluateObjective(Real *x, std::vector<Real>& obj) override;

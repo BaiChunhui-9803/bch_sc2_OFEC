@@ -3,7 +3,7 @@
 #include "../utility/catch.hpp"
 #include "../run/register_problems/register_MMOPs.h"
 
-using namespace OFEC;
+using namespace ofec;
 
 TEST_CASE("CEC2013 Multi-Modal Benchmark Suit", "[CEC2013MMP]")
 {

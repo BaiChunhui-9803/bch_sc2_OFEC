@@ -19,16 +19,16 @@
 #include "composition.h"
 #include "../metrics_gop.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class RotatedHybridComposition2 final : public Composition, public MetricsGOP {
 		protected:
-			void initialize_() override;
+			bool loadTranslation(const std::string &path) override;
 			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-			void setFunction();
-			void setTranslation();
+			void setFunction() override;
+			void setTranslation() override;
 		};
 	}
-	using CEC2005_GOP_F18 = CEC2005::RotatedHybridComposition2;
+	using CEC2005_GOP_F18 = cec2005::RotatedHybridComposition2;
 }
 #endif // !OFEC_F18_ROTATED_HYBRID_COMPOSITION_H

@@ -7,7 +7,7 @@
 #include "../../../DCO/DCMOEA.h"
 #include "../INT_DVRP_POP/INIT_DVRP_POP.h"
 
-namespace OFEC {
+namespace ofec {
 	class MOLS_pop : public population<DCMOEA_ind<individual<DVRP::routes, Real>>>, DCMOEA<DCMOEA_ind<individual<DVRP::routes, Real>>> {
 	public:
 		using population<DCMOEA_ind<individual<DVRP::routes, Real>>>::individual_type;
@@ -15,7 +15,7 @@ namespace OFEC {
 		MOLS_pop(size_t size_pop);
 		void initialize();
 		individual_type &select_sol(size_t obj_id);
-		EvalTag evolve();
+		int evolve();
 		//MOLS
 		void LS(individual_type &offspring, size_t obj_id);
 		void updateA(individual_type offspring);

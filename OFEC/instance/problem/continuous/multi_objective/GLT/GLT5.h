@@ -1,20 +1,14 @@
 //Register GLT5 "MOP_GLT5" MOP,ConOP
 
-#ifndef GLT5_H
-#define GLT5_H
+#ifndef OFEC_GLT5_H
+#define OFEC_GLT5_H
 
+#include "glt.h"
 
-#include "GLT.h"
-
-namespace OFEC {
-	class GLT5 final : public GLT {
-	public:
-		GLT5(const ParamMap &v);
-		GLT5(const std::string &name, size_t size_var);
-		~GLT5() {}
-		void initialize();
-	private:
-		void evaluateObjective(Real *x, std::vector<Real> &obj);
+namespace ofec {
+	class GLT5 : public GLT {
+	protected:
+		void evaluateObjective(Real* x, std::vector<Real>& obj) override;
 	};
 }
 

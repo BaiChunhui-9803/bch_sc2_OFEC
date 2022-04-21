@@ -30,7 +30,7 @@ IEEE transactions on cybernetics, 44(1):40-53, 2013
 
 #include "../DMOPs.h"
 
-namespace OFEC {
+namespace ofec {
     namespace DMOP {
         class F7 final : public DMOPs {
         public:

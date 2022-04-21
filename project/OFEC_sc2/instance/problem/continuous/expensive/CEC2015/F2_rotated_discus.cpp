@@ -1,6 +1,6 @@
 #include "F2_rotated_discus.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F2_rotated_discus::F2_rotated_discus(const ParamMap &v) :F2_rotated_discus((v.at("problem name")), (v.at("number of variables")), 1) {
 
@@ -24,7 +24,7 @@ namespace OFEC {
 			setGlobalOpt();
 			m_initialized = true;
 		}
-		EvalTag F2_rotated_discus::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F2_rotated_discus::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			return discus::evaluateObjective(x, obj);
 		}
 	}

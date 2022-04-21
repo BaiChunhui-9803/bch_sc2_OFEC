@@ -1,22 +1,28 @@
 #include "five_uneven_peak_trap.h"
 #include "../../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
 		void FiveUnevenPeakTrap::initialize_() {
-			Function::initialize_();
+			Continuous::initialize_();
+			resizeObjective(1);
+			m_opt_mode[0] = OptMode::kMaximize;
 			auto &v = GET_PARAM(m_id_param);
 			resizeVariable(1);
 			setDomain(0, 30);
-			m_opt_mode[0] = OptMode::Maximize;
-			m_objective_accuracy = v.count("objective accuracy") > 0 ? std::get<Real>(v.at("objective accuracy")) : (OFEC::Real)1.e-4;
+			m_objective_accuracy = v.count("objective accuracy") > 0 ? std::get<Real>(v.at("objective accuracy")) : (ofec::Real)1.e-4;
 			m_variable_niche_radius = 0.01;
-	
-			std::vector<std::vector<Real>> obj_data(2, std::vector<Real>(1, 200));
-			for (auto &i : obj_data) {
-				m_original_optima.appendObj(i[0]);
+			m_optima.clear();
+			std::vector<Real> opt_x = { 0,30 };
+			for (Real x : opt_x) {
+				VarVec<Real> opt_var(1);
+				std::vector<Real> opt_obj(1);
+				opt_var[0] = x;
+				evaluateObjective(opt_var.data(), opt_obj);
+				m_optima.appendVar(opt_var);
+				m_optima.appendObj(opt_obj);
 			}
 			m_optima.setObjectiveGiven(true);
-			m_optima = m_original_optima;
+			m_optima.setVariableGiven(true);
 		}
 
 		void FiveUnevenPeakTrap::evaluateObjective(Real *x, std::vector<Real> &obj) {
@@ -46,6 +52,6 @@ namespace OFEC {
 				s = 80 * (x[0] - 27.5);
 			}
 
-			obj[0] = s + m_bias;
+			obj[0] = s;
 		}
 }

@@ -19,16 +19,14 @@
 
 #include "../classical/rosenbrock.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class ShiftedRosenbrock final : public Rosenbrock {
-		public:
-			ShiftedRosenbrock(const ParamMap &v);
-			ShiftedRosenbrock(const std::string &name, size_t num_vars);
-			void initialize();
+		protected:
+			void initialize_() override;
 		};
 	}
-	using CEC2005_GOP_F06 = CEC2005::ShiftedRosenbrock;
+	using CEC2005_GOP_F06 = cec2005::ShiftedRosenbrock;
 }
 #endif // ! OFEC_F6_SHIFTED_ROSENBROCK_H
 

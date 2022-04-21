@@ -6,8 +6,9 @@
 #include <core/global_ui.h>
 #endif
 
-namespace OFEC {
+namespace ofec {
 	void Algorithm::initialize() {
+		GET_RND(m_id_rnd).initialize();
 		initialize_();
 		if (m_obj_minmax_monitored) {
 			m_minmax_objective.resize(GET_PRO(m_id_pro).numObjectives());
@@ -23,7 +24,7 @@ namespace OFEC {
 		if (!m_initialized)
 			throw MyExcept("Algorithm not initialized.");
 		run_();
-		if (m_id_rcr > -1)
+		if (ID_RCR_VALID(m_id_rcr))
 			record();
 		m_term->setTerminatedTrue();
 	}
@@ -34,7 +35,7 @@ namespace OFEC {
 
 	bool Algorithm::terminating() {
 #ifdef OFEC_DEMO
-		if (Demo::g_term_alg)
+		if (ofec_demo::g_term_alg)
 #else 
 		if (solved())
 #endif
@@ -55,6 +56,10 @@ namespace OFEC {
 
 	void Algorithm::updateCandidates(const SolBase &sol) {
 		GET_PRO(m_id_pro).updateCandidates(sol, m_candidates);
+	}
+
+	void Algorithm::updateSolved() {
+		m_solved = GET_PRO(m_id_pro).isSolved(m_candidates);
 	}
 
 	void Algorithm::initialize_() {
@@ -89,6 +94,14 @@ namespace OFEC {
 			if (m_minmax_objective[obj_idx][1] < obj[obj_idx]) {
 				m_minmax_objective[obj_idx][0] = obj[obj_idx];
 			}
+		}
+	}
+	void Algorithm::clearObjMinMax()
+	{
+		m_minmax_objective.resize(GET_PRO(m_id_pro).numObjectives());
+		for (int obj_idx(0); obj_idx < GET_PRO(m_id_pro).numObjectives(); ++obj_idx) {
+			m_minmax_objective[obj_idx][0] = std::numeric_limits<Real>::max();
+			m_minmax_objective[obj_idx][1] = std::numeric_limits<Real>::min();
 		}
 	}
 }

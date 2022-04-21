@@ -22,7 +22,7 @@
 
 #include "../../../../../core/problem/continuous/function.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class CEC2015_function :public function {
 		public:

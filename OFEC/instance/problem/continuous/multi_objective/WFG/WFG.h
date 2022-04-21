@@ -21,12 +21,10 @@
 #ifndef WFG_H
 #define WFG_H
 
-#include "../../../../../core/problem/continuous/continuous.h"
-#include<cmath>
-#include<algorithm>
+#include"../metrics_mop.h"
 
-namespace OFEC {
-	class WFG : public continuous {
+namespace ofec {
+	class WFG : public MetricsMOP {
 	protected:
 		int m_k;				//position parameter(k) should be a multiple of M - 1, distance parameter(l) is N-k
 		Real m_D;				//distance parameter
@@ -34,38 +32,39 @@ namespace OFEC {
 		std::vector<Real> m_A;	//degeneracy constants(M-1)
 		std::vector<Real> m_h;	//shape function
 		
-	public:		
-		WFG(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+	protected:	
+		void initialize_() override;
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
+
 		void set_k(int k) { m_k = k; }
-		void load_PF();
-		void evaluateObjective(Real *x, std::vector<Real> &obj);
-		std::vector<Real> calculate_x(const std::vector<Real> &t_p);
+		void loadParetoFront();
+
+		std::vector<Real> calculateX(const std::vector<Real> &t_p);
 		std::vector<Real> normalise(Real *z);
 
-		virtual std::vector<Real> t1(const std::vector<Real> &y) { auto t = y; return std::move(t); }
-		virtual std::vector<Real> t2(const std::vector<Real> &y) { auto t = y; return std::move(t); }
-		virtual std::vector<Real> t3(const std::vector<Real> &y) { auto t = y; return std::move(t); }
-		virtual std::vector<Real> t4(const std::vector<Real> &y) { auto t = y; return std::move(t); }
-		virtual std::vector<Real> shape(const std::vector<Real> &y) { auto t = y; return std::move(t); }
+		virtual void t1(std::vector<Real> &y) {}
+		virtual void t2(std::vector<Real> &y) {}
+		virtual void t3(std::vector<Real> &y) {}
+		virtual void t4(std::vector<Real> &y) {}
+		virtual void shape(std::vector<Real> &y) {}
 
 		Real linear(const std::vector<Real> &x, int m);	//The linear shape function. (m is indexed from 1.)
 		Real convex(const std::vector<Real> &x, int m);	//The convex shape function. (m is indexed from 1.)		
 		Real concave(const std::vector<Real> &x, int m);	//The concave shape function. (m is indexed from 1.)		
 		Real mixed(const std::vector<Real> &x, int A, Real alpha);	//The mixed convex/concave shape function		
 		Real disc(const std::vector<Real> &x, int A, Real alpha, Real beta);	//The disconnected shape function
-		Real correct_to_01(const Real &a, Real epsilon = 1.0e-10);
+		Real correctTo01(const Real &a, Real epsilon = 1.0e-10);
 
 		std::vector<Real> subvector(const std::vector<Real> &v, int head, int tail);
 
-		Real b_poly(Real y, Real alpha);
-		Real b_flat(Real y, Real A, Real B, Real C);
-		Real b_param(Real y, Real u, Real A, Real B, Real C);
-		Real s_linear(Real y, Real A);
-		Real s_decept(Real y, Real A, Real B, Real C);
-		Real s_multi(Real y, int A, Real B, Real C);
-		Real r_sum(const std::vector<Real> &y, const std::vector<Real> &w);
-		Real r_nonsep(const std::vector<Real> &y, int A);
+		Real bPoly(Real y, Real alpha);
+		Real bFlat(Real y, Real A, Real B, Real C);
+		Real bParam(Real y, Real u, Real A, Real B, Real C);
+		Real sLinear(Real y, Real A);
+		Real sDecept(Real y, Real A, Real B, Real C);
+		Real sMulti(Real y, int A, Real B, Real C);
+		Real rSum(const std::vector<Real> &y, const std::vector<Real> &w);
+		Real rNonsep(const std::vector<Real> &y, int A);
 
 	};
 }

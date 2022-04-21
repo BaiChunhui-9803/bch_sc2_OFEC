@@ -31,7 +31,7 @@ In 2013 IEEE Symposium on Computational Intelligence in Dynamic and Uncertain 
 
 #include "../DMOPs.h"
 
-namespace OFEC {
+namespace ofec {
 	class HE3 final : public DMOPs {
 	public:
 		HE3(const ParamMap &v);

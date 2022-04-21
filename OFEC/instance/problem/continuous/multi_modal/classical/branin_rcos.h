@@ -1,4 +1,4 @@
-//Register branin_rcos "Classic_branin_rcos" MMOP,ConOP,SOP
+//Register BraninRCOS "Classic_Branin_RCOS" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -18,20 +18,14 @@
 #ifndef OFEC_BRANIN_RCOS_H
 #define OFEC_BRANIN_RCOS_H
 
-#include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
-	
-	class branin_rcos : public function
-	{
-	public:
-		branin_rcos(const ParamMap &v);
-		branin_rcos(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+#include "../metrics_mmop.h"
+
+namespace ofec {
+	class BraninRCOS : public MetricsMMOP {
 	protected:
+		void initialize_();
 		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
-	};
-	
+	};	
 }
 
 #endif // FBRANINRCOS_H

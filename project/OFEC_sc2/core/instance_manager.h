@@ -10,16 +10,7 @@
 #include "problem/problem.h"
 #include "../utility/random/newran.h"
 
-namespace OFEC {
-	struct Random {
-		Random(Real seed);
-		Uniform uniform;
-		Normal normal;
-		Cauchy cauchy;
-		Levy levy;
-		Gamma gamma;
-	};
-
+namespace ofec {
 	enum class MngrTag {
 		Success,
 		ProblemOccupied,
@@ -53,9 +44,8 @@ namespace OFEC {
 		std::list<size_t> m_shelved_ids_rcr;
 
 		mutable std::shared_mutex m_pro_mtx, m_alg_mtx, m_param_mtx, m_rnd_mtx, m_rcr_mtx;
-
+		
 	public:
-		~InstanceManager() {}
 		static std::unique_ptr<InstanceManager> ms_instance_manager;
 
 		int addRandom(Real seed);

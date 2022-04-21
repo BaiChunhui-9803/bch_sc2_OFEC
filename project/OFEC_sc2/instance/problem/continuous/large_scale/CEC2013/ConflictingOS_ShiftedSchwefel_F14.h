@@ -17,7 +17,7 @@
 #define CONFLICTINGOS_SHIFTEDSCHWEFEL_F14_H
 
 #include "function_CEC2013.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		class ConflictingOS_ShiftedSchwefel_F14 :public function_CEC2013 {
 		public:

@@ -23,14 +23,12 @@ In Evolutionary Computation, 2002. CEC'02. Proceedings of the 2002 Congress on (
 #ifndef ZDT_H
 #define ZDT_H
 
-#include "../../../../../core/problem/continuous/continuous.h"
+#include "../metrics_mop.h"
 
-namespace OFEC {
-	class ZDT :public continuous {
-	public:
-		void initialize();
+namespace ofec {
+	class ZDT : public MetricsMOP {
 	protected:
-		ZDT(const std::string &name, size_t size_var);
+		void initialize_() override;
 		void generateAdLoadPF();
 	};
 }

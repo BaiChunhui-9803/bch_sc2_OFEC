@@ -1,9 +1,9 @@
 #include "continuous.h"
 #include "../../../utility/functional.h"
-#include "../../algorithm/solution.h"
+#include "../solution.h"
 #include <set>
 
-namespace OFEC {
+namespace ofec {
 	void Continuous::initialize_() {
 		Problem::initialize_();
 		m_num_vars = 0;
@@ -39,16 +39,20 @@ namespace OFEC {
 		m_optima.resizeObjective(num_objs);
 	}
 
-	//void Continuous::copy(const Problem& rhs) {
-	//	Problem::copy(rhs);
-	//	auto& dcp = dynamic_cast<const Continuous&>(rhs);
-	//	m_variable_accuracy = dcp.m_variable_accuracy;
-	//	size_t num_vars = dcp.m_num_vars < m_num_vars ? dcp.m_num_vars : m_num_vars;
-	//	for (size_t i = 0; i < num_vars; ++i) {
-	//		m_domain[i] = dcp.m_domain[i];
-	//		m_initial_domain[i] = dcp.m_initial_domain[i];
-	//	}
-	//}
+	void Continuous::copy(const Problem& rhs) {
+		// virtual inherit class do not need to copy
+		//Problem::copy(rhs);
+		auto& dcp = dynamic_cast<const Continuous&>(rhs);
+		m_num_vars = dcp.m_num_vars;
+		size_t num_vars = dcp.m_num_vars < m_num_vars ? dcp.m_num_vars : m_num_vars;
+		for (size_t i = 0; i < num_vars; ++i) {
+			m_domain[i] = dcp.m_domain[i];
+			m_initial_domain[i] = dcp.m_initial_domain[i];
+		}
+		m_domain_update = dcp.m_domain_update;
+		m_domain_area = dcp.m_domain_area;
+		m_optima = dcp.m_optima;
+	}
 
 	bool Continuous::boundaryViolated(const SolBase &s) const {
 		const VarVec<Real> &x = dynamic_cast<const Solution<>&>(s).variable();
@@ -61,18 +65,18 @@ namespace OFEC {
 		return false;
 	}
 
-	void Continuous::validateSolution(SolBase& s, Validation mode, int id_rnd) {
+	void Continuous::validateSolution(SolBase& s, Validation mode, int id_rnd)const {
 		VarVec<Real>& x = dynamic_cast<Solution<>&>(s).variable();
 		switch (mode) {
-		case Validation::Ignore:
+		case Validation::kIgnore:
 			break;
-		case Validation::Reinitialize:
+		case Validation::kReinitialize:
 			for (size_t j = 0; j < m_num_vars; ++j) {
 				if (m_domain[j].limited)
 					x[j] = GET_RND(id_rnd).uniform.nextNonStd(m_domain[j].limit.first, m_domain[j].limit.second);
 			}
 			break;
-		case Validation::Remap:
+		case Validation::kRemap:
 			for (size_t j = 0; j < m_num_vars; ++j) {
 				Real l = m_domain[j].limit.first, u = m_domain[j].limit.second;
 				if (m_domain[j].limited) {
@@ -83,7 +87,7 @@ namespace OFEC {
 				}
 			}
 			break;
-		case Validation::SetToBound:
+		case Validation::kSetToBound:
 			for (size_t j = 0; j < m_num_vars; ++j) {
 				Real l = m_domain[j].limit.first, u = m_domain[j].limit.second;
 				if (m_domain[j].limited) {
@@ -143,14 +147,14 @@ namespace OFEC {
 	Real Continuous::variableDistance(const SolBase& s1, const SolBase& s2) const {
 		const VarVec<Real>& x1 = dynamic_cast<const Solution<>&>(s1).variable();
 		const VarVec<Real>& x2 = dynamic_cast<const Solution<>&>(s2).variable();
-		return euclidean_distance(x1.begin(), x1.end(), x2.begin());
+		return euclideanDistance(x1.begin(), x1.end(), x2.begin());
 
 	}
 
 	Real Continuous::variableDistance(const VarBase& s1, const VarBase& s2) const {
 		const auto& x1 = dynamic_cast<const VarVec<Real>&>(s1);
 		const auto& x2 = dynamic_cast<const VarVec<Real>&>(s2);
-		return euclidean_distance(x1.begin(), x1.end(), x2.begin());
+		return euclideanDistance(x1.begin(), x1.end(), x2.begin());
 	}
 
 	void Continuous::evaluate_(SolBase& s, bool effective) {
@@ -165,21 +169,25 @@ namespace OFEC {
 			evaluateObjAndCon(x_.data(), obj, con);
 	}
 
-	EvalTag Continuous::updateEvalTag(SolBase &s, int id_alg, bool effective_eval) {
+	int Continuous::updateEvalTag(SolBase &s, int id_alg, bool effective_eval) {
 		if (boundaryViolated(s) || constraintViolated(s))
-			return EvalTag::Infeasible;
-		else if (id_alg > -1 && GET_ALG(id_alg).solved())
+			return kInfeasible;
+		else if (ID_ALG_VALID(id_alg) && GET_ALG(id_alg).solved())
 #ifdef OFEC_DEMO
-			return EvalTag::Normal;
+			return kNormalEval;
 #else
-			return EvalTag::Terminate;
+			return kTerminate;
 #endif // OFEC_DEMO
 		else
-			return EvalTag::Normal;
+			return kNormalEval;
 	}
 
-	bool Continuous::isOptimaGiven() const {
-		return m_optima.isObjectiveGiven() || m_optima.isVariableGiven();
+	bool Continuous::isOptimaObjGiven() const {
+		return m_optima.isObjectiveGiven();
+	}
+
+	bool Continuous::isOptimaVarGiven() const {
+		return m_optima.isVariableGiven();
 	}
 
 	Real Continuous::domainArea() {

@@ -1,25 +1,7 @@
-#include "UF10.h"
+#include "uf10.h"
 
-namespace OFEC {
-	UF10::UF10(param_map & v) : UF10(v.at("problem name"), v.at("number of variables")) { //param_numDim = 30 is suggested
-
-	}
-	UF10::UF10(const std::string & name, size_t size_var) : problem(name, size_var, 3), UF(name, size_var, 3) {
-
-	}
-	void UF10::initialize() {
-		std::vector<std::pair<Real, Real>> r;
-		r.push_back(std::make_pair(0., 1.));
-		r.push_back(std::make_pair(0., 1.));
-		for (int i = 2; i < m_num_vars; ++i) {
-			r.push_back(std::make_pair(-2., 2.));
-		}
-		setInitialDomain(r);
-		setDomain(r);
-		load_PF();
-	}
-
-	EvalTag UF10::evaluateObjective(Real *x, std::vector<Real> &obj) {
+namespace ofec {
+	void UF10::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		int count1, count2, count3;
 		Real sum1, sum2, sum3, yj, hj;
 		sum1 = sum2 = sum3 = 0.0;
@@ -54,8 +36,5 @@ namespace OFEC {
 			obj[2] = sin(0.5*OFEC_PI*x[0]);
 		else
 			obj[2] = sin(0.5*OFEC_PI*x[0]) + 2.0*sum3 / (Real)count3;
-		return EvalTag::Normal;
-
 	}
-
 }

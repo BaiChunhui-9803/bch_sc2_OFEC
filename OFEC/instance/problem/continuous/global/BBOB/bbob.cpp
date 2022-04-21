@@ -1,7 +1,7 @@
 #include "bbob.h"
 #include "../../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
 	constexpr size_t NHIGHPEAKS21 = 101;
 	constexpr size_t NHIGHPEAKS22 = 21;
 	
@@ -20,13 +20,14 @@ namespace OFEC {
 		auto &v = GET_PARAM(m_id_param);
 		resizeVariable(std::get<int>(v.at("number of variables")));
 		resizeObjective(1);
-		m_opt_mode[0] = OptMode::Minimize;
+		m_opt_mode[0] = OptMode::kMinimize;
 		setDomain(-5, 5);
 		m_bias = compute_Fopt();
 		m_optima.appendObj(m_bias);
 		compute_Xopt();
 		m_optima.setVariableGiven(true);
 		m_optima.setObjectiveGiven(true);
+		m_objective_accuracy = 1e-8;
 
 		if (m_name == "BBOB_F01") {
 			m_fun = &BBOB::f1_sphere;

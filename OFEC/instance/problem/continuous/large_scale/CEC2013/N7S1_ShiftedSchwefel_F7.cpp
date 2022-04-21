@@ -1,6 +1,6 @@
 
 #include "N7S1_ShiftedSchwefel_F7.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		N7S1_ShiftedSchwefel_F7::N7S1_ShiftedSchwefel_F7(const ParamMap &v) : 
 			N7S1_ShiftedSchwefel_F7((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -56,7 +56,7 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag N7S1_ShiftedSchwefel_F7::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int N7S1_ShiftedSchwefel_F7::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			size_t    i;
 			Real result = 0.0;
 
@@ -84,7 +84,7 @@ namespace OFEC {
 			delete[]z;
 
 			obj[0] = result;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

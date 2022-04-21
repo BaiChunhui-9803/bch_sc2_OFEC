@@ -32,7 +32,7 @@ IEEE Transactions on evolutionary computation, 13(1), 103-127.
 #include "../DMOPs.h"
 //#include "../../../../../core/algorithm/population.h"
 
-namespace OFEC {
+namespace ofec {
 	class dMOP3 final : public DMOPs {
 	public:
 		dMOP3(const ParamMap &v);

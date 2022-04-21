@@ -15,16 +15,16 @@
 *-------------------------------------------------------------------------------
 * a cluser of individuals
 *********************************************************************************/
-#ifndef GROUP_H
-#define GROUP_H
+#ifndef OFEC_GROUP_H
+#define OFEC_GROUP_H
+
 #include<vector>
 #include<memory>
 #include"../functional.h"
 #include <map>
-
 #include"../../core/definition.h"		//
 
-namespace OFEC {
+namespace ofec {
 	template <typename Individual>
 	class Group {
 		std::map<int, Individual*> m_member;
@@ -79,15 +79,15 @@ namespace OFEC {
 			Dominance r = objectiveCompare(m_member[m_best]->objective(), 
 				g.m_member[g.m_best]->objective(), GET_PRO(id_pro).optMode());
 
-			if (Dominance::Dominated == r) {
+			if (Dominance::kDominated == r) {
 				m_best = g.m_best;
 				m_id = m_member.size() - g.size() + g.id();
 			}
 				
-			else if (Dominance::NonDominated==r){
+			else if (Dominance::kNonDominated==r){
 				int rank[2] = {0,0};
 				
-				if (GET_PRO(id_pro).optMode(0) == OptMode::Minimize) {
+				if (GET_PRO(id_pro).optMode(0) == OptMode::kMinimize) {
 					for (int i = 0; i < m_member[0]->objectiveSize(); ++i) {
 						if (m_member[m_best]->objective(i) < m_member[g.m_best]->objective(i))
 							rank[0]++;

@@ -1,4 +1,4 @@
-//Register NonContinuousRastrigin "Classic_rastrigin_non_continuous" GOP,ConOP,SOP
+//Register NonContinuousRastrigin "Classic_Rastrigin_non_continuous" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -19,11 +19,11 @@
 #include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_gop.h"
 
-namespace OFEC {
+namespace ofec {
 	class NonContinuousRastrigin : public Function, public MetricsGOP {
 	protected:
 		void initialize_() override;
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
+		void evaluateOriginalObj(Real *x, std::vector<Real>& obj) override;
 	};	
 }
 #endif // !OFEC_NONCONT_RASTRIGIN_H

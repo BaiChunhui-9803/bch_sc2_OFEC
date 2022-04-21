@@ -1,6 +1,6 @@
 #include "F9_shifted_rotated_scaffer_F6.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F9_shifted_rotated_scaffer_F6::F9_shifted_rotated_scaffer_F6(const ParamMap &v) :
 			F9_shifted_rotated_scaffer_F6((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -30,7 +30,7 @@ namespace OFEC {
 			setGlobalOpt(m_translation.data());
 			m_initialized = true;
 		}
-		EvalTag F9_shifted_rotated_scaffer_F6::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F9_shifted_rotated_scaffer_F6::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			return scaffer_F6::evaluateObjective(x, obj);
 		}
 	}

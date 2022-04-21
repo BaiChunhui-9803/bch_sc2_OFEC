@@ -1,6 +1,6 @@
 #include "T1.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace DMOP {
 		T1::T1(param_map& v) : T1(v.at("problem name"), v.at("number of variables")) { //param_numDim = 20 is suggested
 
@@ -26,7 +26,7 @@ namespace OFEC {
 		}
 
 		//the number of variables are dynamic
-		EvalTag T1::evaluateObjective(Real* x, std::vector<Real>& obj) {
+		int T1::evaluateObjective(Real* x, std::vector<Real>& obj) {
 			Real t = get_time();
 			if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 				m_optima.clear();
@@ -56,7 +56,7 @@ namespace OFEC {
 					}
 				}
 			}
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

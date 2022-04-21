@@ -1,6 +1,6 @@
 #include "dMOP1.h"
 
-namespace OFEC {
+namespace ofec {
 	dMOP1::dMOP1(param_map & v) : dMOP1(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -33,7 +33,7 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag dMOP1::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int dMOP1::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -55,7 +55,7 @@ namespace OFEC {
 			else
 				obj[m] = gt * (1 - std::pow(obj[0] / gt, Ht));
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 
 }

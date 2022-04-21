@@ -20,18 +20,12 @@
 #define OFEC_F3_SR_ACKLEY_H
 
 #include "../classical/ackley.h"
-namespace OFEC {
-	namespace CEC2015 {
-		class F3_SR_ackley final : public ackley
-		{
-		public:
-			F3_SR_ackley(const ParamMap &v);
-			F3_SR_ackley(const std::string &name, size_t size_var, size_t size_obj);
-			void initialize();
-		protected:
-			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
 
-		private:
+namespace ofec {
+	namespace CEC2015 {
+		class F3_SR_ackley final : public Ackley {
+		protected:
+			void initialize_() override;
 		};
 	}
 	using CEC2015_GOP_F03 = CEC2015::F3_SR_ackley;

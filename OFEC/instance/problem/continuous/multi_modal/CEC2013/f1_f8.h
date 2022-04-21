@@ -36,20 +36,20 @@
 #include "../classical/vincent.h"
 #include "f8_modified_rastrigin.h"
 
-namespace OFEC {
-	namespace CEC2013 {
+namespace ofec {
+	namespace cec2013 {
 		using F1_five_uneven_peak_trap = FiveUnevenPeakTrap;
 		using F2_equal_maxima = EqualMaxima;
 		using F3_uneven_de_maxima = UnevenDeMaxima;
 		using F7_vincent = Vincent;
 	}
-	using CEC2013_MMOP_F01 = CEC2013::F1_five_uneven_peak_trap;
-	using CEC2013_MMOP_F02 = CEC2013::F2_equal_maxima;
-	using CEC2013_MMOP_F03 = CEC2013::F3_uneven_de_maxima;
-	using CEC2013_MMOP_F04 = CEC2013::Himmenblau;
-	using CEC2013_MMOP_F05 = CEC2013::SixHumpCamelBack;
-	using CEC2013_MMOP_F06 = CEC2013::Shubert;
-	using CEC2013_MMOP_F07 = CEC2013::F7_vincent;
-	using CEC2013_MMOP_F08 = CEC2013::ModifiedRastrigin;
+	using CEC2013_MMOP_F01 = cec2013::F1_five_uneven_peak_trap;
+	using CEC2013_MMOP_F02 = cec2013::F2_equal_maxima;
+	using CEC2013_MMOP_F03 = cec2013::F3_uneven_de_maxima;
+	using CEC2013_MMOP_F04 = cec2013::Himmenblau;
+	using CEC2013_MMOP_F05 = cec2013::SixHumpCamelBack;
+	using CEC2013_MMOP_F06 = cec2013::Shubert;
+	using CEC2013_MMOP_F07 = cec2013::F7_vincent;
+	using CEC2013_MMOP_F08 = cec2013::ModifiedRastrigin;
 }
 #endif // !OFEC_F1_F8_H

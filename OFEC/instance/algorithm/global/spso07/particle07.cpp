@@ -2,7 +2,7 @@
 #include "../../../../core/problem/continuous/continuous.h"
 #include "../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
 	void Particle07::initVelocity(int id_pro, int id_rnd) {
 		for (size_t j = 0; j < m_var.size(); j++) {
 			auto &range = GET_CONOP(id_pro).range(j);

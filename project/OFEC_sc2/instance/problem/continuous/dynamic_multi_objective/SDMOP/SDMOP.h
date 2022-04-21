@@ -28,7 +28,7 @@
 #include "../DMOPs.h"
 //#include "../../dynamic/dynamic.h"
 
-namespace OFEC {
+namespace ofec {
 	class SDMOP :public DMOPs {
 	public:
 		using Obj_range = std::vector<std::vector<std::pair<Real, Real>>>;

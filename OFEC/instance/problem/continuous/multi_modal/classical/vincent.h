@@ -1,4 +1,4 @@
-//Register Vincent "Classic_vincent" MMOP,ConOP,SOP
+//Register Vincent "Classic_Vincent" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -19,11 +19,10 @@
 #ifndef OFEC_VINCENT_H
 #define OFEC_VINCENT_H
 
-#include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_mmop.h"
 
-namespace OFEC {
-	class Vincent : public Function, public MetricsMMOP {
+namespace ofec {
+	class Vincent : public MetricsMMOP {
 	protected:
 		void initialize_() override;
 		void evaluateObjective(Real *x, std::vector<Real>& obj) override;

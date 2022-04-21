@@ -12,52 +12,26 @@
 *************************************************************************/
 
 #include "schwefel.h"
+#include "../../../../../core/instance_manager.h"
 
-namespace OFEC {
-	
-	schwefel::schwefel(const ParamMap &v) :
-		schwefel((v.at("problem name")), (v.at("number of variables")), 1)
-	{
-
-	}
-	schwefel::schwefel(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-		function(name, size_var, size_obj) {
-
-		
-	}
-
-	void schwefel::initialize()
-	{
-		m_variable_monitor = true;
+namespace ofec {
+	void Schwefel::initialize_() {
+		Function::initialize_();
+		m_opt_mode[0] = OptMode::kMinimize;
+		auto &v = GET_PARAM(m_id_param);
+		resizeVariable(std::get<int>(v.at("number of variables")));
 		setDomain(-500, 500);
-		setInitialDomain(-500, 500);
-		std::vector<Real> v(m_num_vars, 420.9687);
-		setOriginalGlobalOpt(v.data());
-		
-		setGlobalOpt();
+		std::vector<Real> var(m_num_vars, 420.9687);
+		setOriginalGlobalOpt(var.data());
+		m_optima = m_original_optima;
 		m_variable_accuracy = 1.0e-2;
-		m_initialized = true;
 	}
 
-	EvalTag schwefel::evaluateObjective(Real *x, std::vector<Real> &obj)
-	{
-		if (m_translated)
-			translate(x);
-		if (m_scaled)
-			scale(x);
-		if (m_rotated)
-			rotate(x);
-		if (m_translated)
-			translateOrigin(x);
+	void Schwefel::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 		Real fitness = 0;
-
-		for (int i = 0; i < m_num_vars; i++)
-		{
+		for (int i = 0; i < m_num_vars; i++) {
 			fitness += -x[i] * sin(sqrt(fabs(x[i])));
 		}
-
 		obj[0] = fitness + m_bias;
-		return EvalTag::Normal;
-	}
-	
+	}	
 }

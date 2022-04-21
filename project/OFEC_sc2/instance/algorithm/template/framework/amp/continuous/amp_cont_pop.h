@@ -1,18 +1,18 @@
 #ifndef AMP_POP_CONTINUOUS_H
 #define AMP_POP_CONTINUOUS_H
 
-#include "../../../../core/problem/continuous/continuous.h"
-#include "../../../../core/algorithm/multi_population.h"
-#include "../../../../core/global.h"
+#include "../../../../../../core/problem/continuous/continuous.h"
+#include "../../../../../../core/algorithm/multi_population.h"
+#include "../../../../../../core/global.h"
 #include "hibernated_area.h"
 #include <vector>
 #include "../amp_pop.h"
 
-namespace OFEC {
-	template <typename PopType>
-	class PopContAMP : public PopAMP<PopType> {
+namespace ofec {
+	template <typename TPop>
+	class PopContAMP : public PopAMP<TPop> {
 	public:
-		using IndType = typename PopType::IndType;
+		using IndType = typename TPop::IndType;
 
 	protected:
 		Real m_converg_threshold = 0.0001;
@@ -21,15 +21,15 @@ namespace OFEC {
 
 	public:
 		PopContAMP(size_t pop_size, int id_pro) : 
-			PopAMP<PopType>(pop_size, id_pro), 
+			PopAMP<TPop>(pop_size, id_pro), 
 			m_center(GET_PRO(id_pro).numObjectives(), 
 				GET_PRO(id_pro).numConstraints(),
 				GET_CONOP(id_pro).numVariables()) {}
 
-		EvalTag evolve(int id_pro, int id_alg, int id_rnd) override {
-			EvalTag rf = PopAMP<PopType>::evolve(id_pro, id_alg, id_rnd);
+		int evolve(int id_pro, int id_alg, int id_rnd) override {
+			int rf = PopAMP<TPop>::evolve(id_pro, id_alg, id_rnd);
 			this->updateBest(id_pro);
-			if (rf != EvalTag::Normal)return rf;
+			if (rf)return rf;
 			std::vector<IndType> new_inds;
 			for (auto& best : this->m_best) {
 				new_inds.push_back(*best);
@@ -43,7 +43,7 @@ namespace OFEC {
 			for (auto& new_ind : new_inds) {
 				rf = new_ind.evaluate(id_pro, id_alg);
 				this->updateBest(new_ind, id_pro);
-				if (rf != EvalTag::Normal)return rf;
+				if (rf )return rf;
 			}
 			return rf;
 		}

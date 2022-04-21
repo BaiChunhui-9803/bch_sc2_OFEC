@@ -1,15 +1,13 @@
-#ifndef UF_H
-#define UF_H
+#ifndef OFEC_UF_H
+#define OFEC_UF_H
 
-#include "../../../../../core/problem/continuous/continuous.h"
+#include"../metrics_mop.h"
 
-namespace OFEC {
-	class UF :public continuous {
-	public:
-		virtual void initialize();
+namespace ofec {
+	class UF : public MetricsMOP {
 	protected:
-		UF(const std::string &name, size_t size_var, size_t size_obj);
-		void load_PF();
+		void initialize_() override;
+		void loadParetoFront();
 	};
 }
 

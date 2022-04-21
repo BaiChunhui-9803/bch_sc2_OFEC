@@ -1,6 +1,6 @@
 #include "CEC2015_function.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		CEC2015_function::CEC2015_function(const std::string &name, size_t size_var, size_t size_obj) : problem(name, size_var, size_obj), 
 			function(name, size_var, size_obj)

@@ -1,6 +1,6 @@
 #include "F5_SR_expanded_uneven_minima.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F5_SR_expanded_uneven_minima::F5_SR_expanded_uneven_minima(const ParamMap &v) :
 			F5_SR_expanded_uneven_minima((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -30,7 +30,7 @@ namespace OFEC {
 			evaluate_optima();
 			m_initialized = true;
 		}
-		EvalTag F5_SR_expanded_uneven_minima::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F5_SR_expanded_uneven_minima::evaluateObjective(Real *x, std::vector<Real> &obj) {
 
 			size_t i;
 
@@ -56,7 +56,7 @@ namespace OFEC {
 
 			obj[0] += 1.0*m_num_vars;
 			obj[0] += m_bias;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

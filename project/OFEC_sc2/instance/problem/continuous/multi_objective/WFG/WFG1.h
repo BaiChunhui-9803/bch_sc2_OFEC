@@ -1,22 +1,18 @@
-//Register WFG1 "WFG1" MOP,ConOP
+//Register WFG1 "MOP_WFG1" MOP,ConOP
 
 #ifndef WFG1_H
 #define WFG1_H
 
 #include "WFG.h"
 
-namespace OFEC {
+namespace ofec {
 	class WFG1 final : public WFG {
-	public:
-		WFG1(const ParamMap &v);
-		WFG1(const std::string &name, size_t size_var, size_t size_obj);
-		~WFG1() {}
-		void initialize();
-		std::vector<Real> t1(const std::vector<Real> &y);
-		std::vector<Real> t2(const std::vector<Real> &y);
-		std::vector<Real> t3(const std::vector<Real> &y);
-		std::vector<Real> t4(const std::vector<Real> &y);
-		std::vector<Real> shape(const std::vector<Real> &y);
+	protected:
+		void t1(std::vector<Real> &y) override;
+		void t2(std::vector<Real> &y) override;
+		void t3(std::vector<Real> &y) override;
+		void t4(std::vector<Real> &y) override;
+		void shape(std::vector<Real> &y) override;
 	};
 }
 

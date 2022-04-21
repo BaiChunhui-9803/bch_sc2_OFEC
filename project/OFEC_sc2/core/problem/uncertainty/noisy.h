@@ -16,37 +16,32 @@
 *
 *********************************************************************************/
 
-
-
 // Created: 9 June 2021
 // Last modified:
-#ifndef NOISY_H
-#define NOISY_H
+
+#ifndef OFEC_NOISY_H
+#define OFEC_NOISY_H
 #include "../problem.h"
 
-namespace OFEC {
-#define CAST_UNCERTAINTY_NOISY dynamic_cast<Noisy*>(global::ms_global->m_problem.get())
+namespace ofec {
+#define GET_NOISY dynamic_cast<Noisy&>(GET_PRO(id_pro))
 
-	class Noisy : virtual public Problem
-	{
-	public:
+	class Noisy : virtual public Problem {
 	protected:
-
 		// there are three sources of noisy
-
 		bool m_flag_noisy_from_objective = false;
 		Real m_obj_noisy_severity = 0.0;
 		bool m_flag_noisy_from_variable = false;
 		Real m_var_noisy_severity = 0.0;
 		bool m_flag_noisy_from_environment = false;
 		Real m_environment_noisy_severity = 0.0;
+
 	public:
-
-		template<typename ... Args>
-		Noisy(Args&& ... args) : Problem(std::forward<Args>(args)...) {};
-		virtual ~Noisy() = 0;
+		Noisy() = default;
+		//template<typename ... Args>
+		//Noisy(Args&& ... args) : Problem(std::forward<Args>(args)...) {};
+		virtual ~Noisy() = default;
 		Noisy& operator=(const Noisy& rhs) = default;
-
 
 		void setFlagNoisyFromObjective(bool flag_noisy_obj) {
 			m_flag_noisy_from_objective = flag_noisy_obj;
@@ -73,19 +68,11 @@ namespace OFEC {
 		bool getFlagNoisyFromEnvironment()const {
 			return m_flag_noisy_from_environment;
 		}
+		virtual void updateParameters() override {}
 
 	protected:
-
-		//void copy(const Problem& rP) {
-		//	auto& dcp = dynamic_cast<const Noisy&>(rP);
-		//	*this = dcp;
-
-		//}
-		void updateParameters() { 
-			//if (m_flag_noise)
-			//	m_params["Noise severity"] = m_noise_severity;
-		//	m_params["Flag of obj noise"] = m_flag_noisy_from_objective;
-		}
+		virtual void initialize_()override;
+		virtual void copy(const Problem& rP)override;
 
 	};
 }

@@ -17,13 +17,12 @@
 #ifndef F6_SHUBERT_H
 #define F6_SHUBERT_H
 
-#include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_mmop.h"
 
-namespace OFEC {
-	namespace CEC2013{
+namespace ofec {
+	namespace cec2013{
 		// An inverted version of Shubert function
-		class Shubert final : public Function, public MetricsMMOP {
+		class Shubert final : public MetricsMMOP {
 		protected:
 			void initialize_() override;
 			void evaluateObjective(Real *x, std::vector<Real>& obj) override;

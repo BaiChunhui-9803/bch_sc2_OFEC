@@ -1,4 +1,4 @@
-//Register center_peak "Classic_center_peak" MMOP,ConOP,SOP
+//Register CenterPeak "Classic_center_peak" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -14,26 +14,22 @@
 ******************************************************************************************
 *  Paper: Multimodal Optimization by Means of a Topological Species Conservation Algorithm
 *		  IEEE TRANSACTIONS ON EVOLUTIONARY COMPUTATION, VOL.14,NO.6,DECEMBER 2010
+* 
+//Ursem F4 in R. K. Ursem, ��Multinational evolutionary algorithms,�� in Proc. Congr.
+//Evol. Comput. (CEC), vol. 3. 1999, pp. 1633�C1640.
+//Ursem F4
 *******************************************************************************************/
 
 #ifndef OFEC_CENTER_PEAK_H
 #define OFEC_CENTER_PEAK_H
 
-#include "../../../../../core/problem/continuous/function.h"
-//Ursem F4 in R. K. Ursem, ��Multinational evolutionary algorithms,�� in Proc. Congr.
-//Evol. Comput. (CEC), vol. 3. 1999, pp. 1633�C1640.
-namespace OFEC {
-	
-	class center_peak : public function
-	{//Ursem F4
-	public:
-		center_peak(const ParamMap &v);
-		center_peak(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+#include "../metrics_mmop.h"
+
+namespace ofec {
+	class CenterPeak : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
-	
 }
 #endif // !OFEC_CENTER_PEAK_H

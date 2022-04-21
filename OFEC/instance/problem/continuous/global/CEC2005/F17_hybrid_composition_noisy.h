@@ -19,16 +19,15 @@
 #include "composition.h"
 #include "../metrics_gop.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class HybridCompositionNoisy final: public Composition, public MetricsGOP {
 		protected:
-			void initialize_() override;
 			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-			void setFunction();
+			void setFunction() override;
 			Real noise();
 		};
 	}
-	using CEC2005_GOP_F17 = CEC2005::HybridCompositionNoisy;
+	using CEC2005_GOP_F17 = cec2005::HybridCompositionNoisy;
 }
 #endif // !OFEC_F17_HYBRID_COMPOSITION_NOISY_H

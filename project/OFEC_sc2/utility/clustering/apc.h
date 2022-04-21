@@ -34,31 +34,31 @@
 
 #include<fstream>
 
-namespace OFEC {
-	template<typename Individual>
+namespace ofec {
+	template<typename TInd>
 	class APC {
-		const real m_lambda;
+		const Real m_lambda;
 		const size_t m_Mits, m_Cits;
 		size_t m_N; // Size of data
-		std::vector<std::vector<real>> m_responsibility;
-		std::vector<std::vector<real>> m_availability;
-		std::vector<std::vector<real>> m_similarity;
-		std::vector<const typename Individual::solution_type*> m_data;
+		std::vector<std::vector<Real>> m_responsibility;
+		std::vector<std::vector<Real>> m_availability;
+		std::vector<std::vector<Real>> m_similarity;
+		std::vector<const typename TInd::SolType*> m_data;
 		std::vector<std::vector<size_t>> m_clusters;
 	public:
-		APC(real lambda, size_t Mits, size_t Cits) : m_lambda(lambda), m_Mits(Mits), m_Cits(Cits) {}
-		void updateData(const population<Individual>& pop);
-		void updateData(const std::vector<Individual>& inds);
-		void clustering();
+		APC(Real lambda, size_t Mits, size_t Cits) : m_lambda(lambda), m_Mits(Mits), m_Cits(Cits) {}
+		void updateData(const Population<TInd>& pop);
+		void updateData(const std::vector<TInd>& inds);
+		void clustering(int id_pro);
 		const std::vector<std::vector<size_t>>& clusters() const { return m_clusters; }
 	protected:
-		void updateSimilarity();
+		void updateSimilarity(int id_pro);
 		void updateResponsibility();
 		void updateAvailability();
 		void updateClusters();
 	};
-	template<typename Individual>
-	void APC<Individual>::updateData(const population<Individual>& pop){
+	template<typename TInd>
+	void APC<TInd>::updateData(const Population<TInd>& pop){
 		m_N = pop.size();
 		if (m_responsibility.size() != m_N) {
 			m_responsibility.resize(m_N);
@@ -82,8 +82,8 @@ namespace OFEC {
 		m_clusters.clear();
 	}
 
-	template<typename Individual>
-	void APC<Individual>::updateData(const std::vector<Individual>& inds) {
+	template<typename TInd>
+	void APC<TInd>::updateData(const std::vector<TInd>& inds) {
 		m_N = inds.size();
 		if (m_responsibility.size() != m_N) {
 			m_responsibility.resize(m_N);
@@ -107,9 +107,9 @@ namespace OFEC {
 		m_clusters.clear();
 	}
 
-	template<typename Individual>
-	void APC<Individual>::clustering() {
-		updateSimilarity();
+	template<typename TInd>
+	void APC<TInd>::clustering(int id_pro) {
+		updateSimilarity(id_pro);
 		for (size_t iter = 0; iter < m_Mits; iter++) {
 			updateResponsibility();
 			updateAvailability();
@@ -117,17 +117,17 @@ namespace OFEC {
 		updateClusters();
 	}
 
-	template<typename Individual>
-	void APC<Individual>::updateSimilarity() {
-		std::vector<real> all_similarities;
+	template<typename TInd>
+	void APC<TInd>::updateSimilarity(int id_pro) {
+		std::vector<Real> all_similarities;
 		for (size_t i = 0; i < m_N; i++) {
 			for (size_t j = i + 1; j < m_N; j++) {
-				m_similarity[i][j] = m_similarity[j][i] = -pow(m_data[i]->variable_distance(*m_data[j]), 2);
+				m_similarity[i][j] = m_similarity[j][i] = -pow(m_data[i]->variableDistance(*m_data[j], id_pro), 2);
 				all_similarities.emplace_back(m_similarity[i][j]);
 			}
 		}
 		std::sort(all_similarities.begin(), all_similarities.end());
-		real median;
+		Real median;
 		size_t size = all_similarities.size();
 		if (size % 2 == 0)
 			median = (all_similarities[size / 2] + all_similarities[size / 2 - 1]) / 2;
@@ -138,14 +138,14 @@ namespace OFEC {
 		}
 	}
 
-	template<typename Individual>
-	void APC<Individual>::updateResponsibility() {
-		std::vector<real> max(m_N), sec(m_N);
+	template<typename TInd>
+	void APC<TInd>::updateResponsibility() {
+		std::vector<Real> max(m_N), sec(m_N);
 		for (size_t i = 0; i < m_N; i++) {
 			max[i] = std::max(m_availability[i][0] + m_similarity[i][0], m_availability[i][1] + m_similarity[i][1]);
 			sec[i] = std::min(m_availability[i][0] + m_similarity[i][0], m_availability[i][1] + m_similarity[i][1]);
 			for (size_t k = 3; k < m_N; k++) {
-				real val = m_availability[i][k] + m_similarity[i][k];
+				Real val = m_availability[i][k] + m_similarity[i][k];
 				if (val < sec[i]) 
 					continue;
 				else if (val < max[i]) 
@@ -165,26 +165,26 @@ namespace OFEC {
 		}
 	}
 
-	template<typename Individual>
-	void APC<Individual>::updateAvailability() {
-		std::vector<real> sum(m_N, 0);
+	template<typename TInd>
+	void APC<TInd>::updateAvailability() {
+		std::vector<Real> sum(m_N, 0);
 		for (size_t i = 0; i < m_N; i++) {
 			for (size_t k = 0; k < m_N; k++) {
-				sum[i] += std::max<real>(0, m_responsibility[i][k]);
+				sum[i] += std::max<Real>(0, m_responsibility[i][k]);
 			}
 		}
 		for (size_t i = 0; i < m_N; i++) {
 			for (size_t k = 0; k < m_N; k++) {
 				if (i == k)
-					m_availability[i][k] = m_lambda * m_availability[i][k] + (1 - m_lambda) * (sum[i] - std::max<real>(0, m_responsibility[i][k]));
+					m_availability[i][k] = m_lambda * m_availability[i][k] + (1 - m_lambda) * (sum[i] - std::max<Real>(0, m_responsibility[i][k]));
 				else
-					m_availability[i][k] = m_lambda * m_availability[i][k] + (1 - m_lambda) * (std::min<real>(0, m_responsibility[k][k] + (sum[i] - std::max<real>(0, m_responsibility[i][k]) - std::max<real>(0, m_responsibility[k][k]))));
+					m_availability[i][k] = m_lambda * m_availability[i][k] + (1 - m_lambda) * (std::min<Real>(0, m_responsibility[k][k] + (sum[i] - std::max<Real>(0, m_responsibility[i][k]) - std::max<Real>(0, m_responsibility[k][k]))));
 			}
 		}
 	}
 
-	template<typename Individual>
-	void APC<Individual>::updateClusters() {
+	template<typename TInd>
+	void APC<TInd>::updateClusters() {
 		std::set<size_t> set_exemplars;
 		std::vector<size_t> vec_exemplars;
 		for (size_t i = 0; i < m_N; i++) {
@@ -201,7 +201,7 @@ namespace OFEC {
 			return;
 //			std::ofstream out_file("C:/Users/WJC/Desktop/data.csv");
 //			for (size_t i = 0; i < m_N; i++) {
-//				for (real val : m_data[i]->variable().vect())
+//				for (Real val : m_data[i]->variable().vect())
 //					out_file << val << ",";
 //				out_file << std::endl;
 //			}

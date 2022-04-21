@@ -17,9 +17,9 @@
 #ifndef OFEC_F11_HYBRID2_H
 #define OFEC_F11_HYBRID2_H
 
-#include "hybrid.h"
+#include "../../global/cec2015/hybrid.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F11_hybrid2 final : public hybrid
 		{

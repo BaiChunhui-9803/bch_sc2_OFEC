@@ -19,10 +19,10 @@
 #ifndef OFEC_OPTIMA_H
 #define OFEC_OPTIMA_H
 
-#include "../algorithm/encoding.h"
+#include "encoding.h"
 #include "../../utility/functional.h"
 
-namespace OFEC {
+namespace ofec {
 
     template<typename T = VarVec<Real>>
     class Optima {
@@ -95,29 +95,13 @@ namespace OFEC {
             for (auto &i : m_obj) {
                 Real min_d = std::numeric_limits<Real>::max();
                 for (int j = 0; j < pop.size(); ++j) {
-                    Real d = euclidean_distance(pop[j].objective().begin(), pop[j].objective().end(), i.first.begin());
+                    Real d = euclideanDistance(pop[j].objective().begin(), pop[j].objective().end(), i.begin());
                     if (d<min_d)  min_d = d;
                 }
                 distance += min_d;
             }
             return distance / m_obj.size();
         }
-
-        //std::vector<Real>  disToOptVariables(const  SolBase&s, int id_pro) const{
-        //    std::vector<Real> min_dis(m_var.size());
-        //    for (int i = 0; i < m_var.size(); ++i) {
-        //        min_dis[i] = s.variableDistance(m_var[i], id_pro);
-        //    }
-        //    return std::move(min_dis);
-        //}
-
-        //std::vector<Real> disToOptObjectives(const SolBase&s) const {
-        //    std::vector<Real> cur_dis(m_obj.size());
-        //    for (int i = 0; i < m_obj.size(); ++i) {
-        //        cur_dis[i] = s.objectiveDistance(m_obj[i]);
-        //    }
-        //    return std::move(cur_dis);
-        //}
 
         void clear() {
             m_var.clear();
@@ -134,18 +118,9 @@ namespace OFEC {
             return m_obj.size();
         }
 
-        std::pair<Real, Real> objectiveRange(size_t oidx) {
-            std::pair<Real, Real> range(std::numeric_limits<Real>::max(),std::numeric_limits<Real>::min());
-            for (auto &i : m_obj) {
-                if (range.first > i.first[oidx]) range.first = i.first[oidx];
-                if (range.second < i.first[oidx])range.second = i.first[oidx];
-            }
-            return range;
-        }
-
         bool in_PF(const std::vector<Real> &obj,const std::vector<OptMode> &mode) {
             for (auto &i : m_obj) {
-                if (objectiveCompare(i.first, obj, mode) == Dominance::Dominant) return false;
+                if (objectiveCompare(i, obj, mode) == Dominance::kDominant) return false;
             }
             return true;
         }

@@ -1,4 +1,4 @@
-//Register Schwefel_1_2 "Classic_schwefel_1_2" GOP,ConOP,SOP
+//Register Schwefel_1_2 "Classic_Schwefel_1_2" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -18,15 +18,13 @@
 #define OFEC_SCHWEFEL_1_2_H
 
 #include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_gop.h"
 
-namespace OFEC {
-	class Schwefel_1_2 : public Function {
-	public:
-		Schwefel_1_2(const ParamMap &v);
-		Schwefel_1_2(const std::string &name, size_t num_vars);
-		void initialize();
+namespace ofec {
+	class Schwefel_1_2 : public Function, public MetricsGOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real>& obj) override;
 	};
 	
 }

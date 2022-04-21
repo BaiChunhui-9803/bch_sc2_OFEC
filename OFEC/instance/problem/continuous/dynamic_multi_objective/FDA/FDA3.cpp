@@ -1,6 +1,6 @@
 #include "FDA3.h"
 
-namespace OFEC {
+namespace ofec {
 	FDA3::FDA3(param_map & v) : FDA3(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -38,7 +38,7 @@ namespace OFEC {
 	}
 
 	//f1 =\sum(xi^Ft), f2 = g * h, f2 =(1+Gt)*(1 -sqrt(f1/(1+Gt))), f1 = [0, 5]
-	EvalTag FDA3::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int FDA3::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -65,6 +65,6 @@ namespace OFEC {
 			else
 				obj[m] = gt * (1 - std::pow(obj[0] / gt, 1./2));
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

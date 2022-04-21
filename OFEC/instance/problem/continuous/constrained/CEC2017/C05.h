@@ -17,24 +17,22 @@
 #ifndef OFEC_C05_H
 #define OFEC_C05_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "cop_base.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2017 {
-		class C05 final: public function
+		class C05 final: public CopBase
 		{
 		public:
-			C05(const ParamMap &v);
-			C05(const std::string &name, size_t size_var, size_t size_obj);
-			void initialize();
+			void initialize_();
 		protected:
-			void evaluate_obj_nd_con(Real *x, std::vector<Real>& obj, std::vector<Real> &con) override;
+			void evaluateObjAndCon(Real *x, std::vector<Real>& obj, std::vector<Real> &con) override;
 			bool load_rotation_C05(const std::string &path);
 			void load_rotation_C05_(const std::string &path);
 			void set_rotation_C05();
 			void rotate(Real *x, size_t num);
 		private:
-			matrix m_mat1, m_mat2;
+			Matrix m_mat1, m_mat2;
 		};
 	}
 	using CEC2017_COP_F05 = CEC2017::C05;

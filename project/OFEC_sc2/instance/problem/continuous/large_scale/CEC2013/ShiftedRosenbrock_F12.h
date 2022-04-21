@@ -17,7 +17,7 @@
 #define SHIFTEDROSENBROCK_F12_H
 
 #include "function_CEC2013.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		class ShiftedRosenbrock_F12 final:public function_CEC2013 {
 		public:

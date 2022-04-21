@@ -14,49 +14,38 @@
 *		  IEEE TRANSACTIONS ON EVOLUTIONARY COMPUTATION, VOL.14,NO.6,DECEMBER 2010
 *******************************************************************************************/
 
-
 #include "branin_rcos.h"
 
-namespace OFEC {
-
-	branin_rcos::branin_rcos(const ParamMap &v) :
-		branin_rcos((v.at("problem name")), 2, 1) {
-		
-	}
-	branin_rcos::branin_rcos(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-		function(name, size_var, size_obj) {
-		
-		
-	}
-
-	void branin_rcos::initialize() {
-		std::vector<std::pair<Real, Real>> range;
-		range.push_back(std::make_pair(-5., 10.));
-		range.push_back(std::make_pair(0., 15.));
-		setInitialDomain(range);
-		setDomain(std::move(range));
-		
+namespace ofec {
+	void BraninRCOS::initialize_() {
+		Continuous::initialize_();
+		resizeObjective(1);
+		m_opt_mode[0] = OptMode::kMinimize;
+		resizeVariable(2);
+		m_domain.setRange(-5, 10, 0);
+		m_domain.setRange(0, 15, 1);		
 		m_variable_accuracy = 0.1;
 		m_objective_accuracy = 1.e-5;
-
-	
-		m_variable_monitor = true;
-		std::vector<std::vector<Real>> var_data = { { -(Real)OFEC_PI, 12.275f },{ -(Real)OFEC_PI, 2.275f },{9.42478f, 2.475f} };
+		m_optima.clear();
+		VarVec<Real> var(2);
+		std::vector<Real> obj(1);
+		std::vector<std::vector<Real>> var_data = { { -(Real)OFEC_PI, 12.275f },{ (Real)OFEC_PI, 2.275f },{9.42478f, 2.475f} };
 		for (auto &i : var_data) {
-			setOriginalGlobalOpt(i.data());
+			var[0] = i[0];
+			var[1] = i[1];
+			evaluateObjective(var.data(), obj);
+			m_optima.appendVar(var);
+			m_optima.appendObj(obj);
 		}
-		m_optima = m_original_optima;
-		
-		//setObjSet();
-		m_initialized = true;
+		m_optima.setObjectiveGiven(true);
+		m_optima.setVariableGiven(true);
 	}
-	EvalTag branin_rcos::evaluateObjective(Real *x, std::vector<Real> &obj) {
 
+	void BraninRCOS::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real s, a;
 		a = x[1] - 5.1*x[0] * x[0] / (4 * OFEC_PI*OFEC_PI) + 5 * x[0] / OFEC_PI - 6;
 		s = a*a + 10 * (1 - 1 / (8 * OFEC_PI))*cos(x[0]) + 10;
-		obj[0] = s + m_bias;
-		return EvalTag::Normal;
+		obj[0] = s;
 	}
 	
 }

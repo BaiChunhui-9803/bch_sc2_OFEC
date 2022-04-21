@@ -3,7 +3,7 @@
 #include "../../../../core/global.h"
 #include <numeric>
 
-namespace OFEC {
+namespace ofec {
 	namespace DVRP {
 		//split string
 		std::vector<std::string> split(std::string str, std::string pattern)

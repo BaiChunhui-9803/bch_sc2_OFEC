@@ -16,23 +16,20 @@
 *  Methods for Multimodal Function Optimization.
 *******************************************************************************************/
 
-#ifndef OFEC_F9_COMPOSITION1_H
-#define OFEC_F9_COMPOSITION1_H
+#ifndef OFEC_CEC13_COMPOSITION1_H
+#define OFEC_CEC13_COMPOSITION1_H
 
-#include "../../global/CEC2005/composition.h"
-#include "../metrics_mmop.h"
+#include "composition.h"
 
-namespace OFEC {
-	namespace CEC2013 {
-		class Composition1 final : public CEC2005::Composition, public MetricsMMOP {
+namespace ofec {
+	namespace cec2013 {
+		class Composition1 final : public Composition {
 		protected:
-			void initialize_() override;
-			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
 			void setFunction() override;
 			void setRotation() override;
 		};
 	}
-	using CEC2013_MMOP_F09 = CEC2013::Composition1;
+	using CEC2013_MMOP_F09 = cec2013::Composition1;
 }
-#endif // !OFEC_F9_COMPOSITION1_H
+#endif // !OFEC_CEC13_COMPOSITION1_H
 

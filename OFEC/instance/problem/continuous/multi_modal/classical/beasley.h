@@ -1,4 +1,4 @@
-//Register beasley "Classic_beasley" MMOP,ConOP,SOP
+//Register Beasley "Classic_Beasley" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -14,25 +14,19 @@
 ******************************************************************************************
 *  Paper; A sequential niching memetic algorithm for continuous multimodal
 *		  Appled Mathematics and Computation 218(2012) 8242-8259
+*  //Beasley's F4 function
 *******************************************************************************************/
 
 #ifndef OFEC_BEASLEY_H
 #define OFEC_BEASLEY_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-
-	class beasley : public function
-	{ //Beasley's F4 function
-	public:
-		beasley(const ParamMap &v);
-		beasley(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class Beasley : public MetricsMMOP {
 	protected:
+		void initialize_() override;
 		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
-	};
-	
+	};	
 }
 #endif // OFEC_BEASLEY_H

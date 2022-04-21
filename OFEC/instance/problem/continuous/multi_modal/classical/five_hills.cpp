@@ -16,56 +16,44 @@
 
 #include "five_hills.h"
 
-namespace OFEC {
-	
-	five_hills::five_hills(const ParamMap &v) :
-		five_hills((v.at("problem name")), 2, 1) {
-		
-	}
-	five_hills::five_hills(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-		function(name, size_var, size_obj) {
-		
-	}
+namespace ofec {
+	void FiveHills::initialize_() {
+		Continuous::initialize_();
+		resizeObjective(1);
+		m_opt_mode[0] = OptMode::kMaximize;
 
-	void five_hills::initialize() {
-		std::vector<std::pair<Real, Real>> range;
-		range.push_back(std::make_pair(-2.5, 3.));
-		range.push_back(std::make_pair(-2, 2.));
-		setInitialDomain(range);
-		setDomain(std::move(range));
-		m_opt_mode[0] = optimization_mode::Maximization;
+		resizeVariable(2);
+		m_domain.setRange(-2.5, 3., 0);
+		m_domain.setRange(-2, 2., 1);
+
+		 //1 gopt + 4 lopt
+		m_optima.clear();
+		Real var_data[5][3] = {
+			-8.24371e-014,-1.53082e-013,2.5,
+			0.889286,-1.08335e-016,1.60084,
+			-0.889286,-8.32809e-017,1.60084,
+			-1.78391,1.09381e-016,0.699112,
+			1.78391,1.09381e-016,0.699112 };
+		VarVec<Real> var(2);
+		std::vector<Real> obj(1);
+		for (int i = 0; i < 5; ++i) {
+			var[0] = var_data[i][0];
+			var[1] = var_data[i][1];
+			evaluateObjective(var.data(), obj);
+			m_optima.appendVar(var);
+			m_optima.appendObj(obj);
+		}
+		m_optima.setObjectiveGiven(true);
+		m_optima.setVariableGiven(true);
 		m_objective_accuracy = 0.2;
 		m_variable_accuracy = 1.e-5;
-		m_variable_monitor = true;
-		 //1 gopt + 4 lopt
-
-		std::ifstream in;
-		std::stringstream ss;
-		std::vector<std::vector<Real>> var_data(5, std::vector<Real>(m_num_vars));
-		ss << g_working_dir << "/instance/problem/continuous/global/classical/data/" << m_name << "_Opt_" << m_num_vars << "Dim.txt";
-		in.open(ss.str().c_str());
-		if (in.fail()) {
-			throw myexcept("cannot open data file@five_hills::initialize()");
-		}
-		for (int i = 0; i < 5; ++i) {
-			Real x0, x1, obj;
-			in >> x0 >> x1 >> obj;
-			var_data[i][0] = x0;
-			var_data[i][1] = x1;
-		}
-		in.close();
-		for (auto &i : var_data) {
-			setOriginalGlobalOpt(i.data());
-		}
-		m_optima = m_original_optima;
-		m_initialized = true;
+		m_mb = MeasureBy::kVar;
 	}
-	EvalTag five_hills::evaluateObjective(Real *x, std::vector<Real> &obj) {
 
+	void FiveHills::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real s;
 		s = sin(2.2*OFEC_PI*x[0] + 0.5*OFEC_PI)*(2 - fabs(x[1])) / 2 * (3 - fabs(x[0])) / 2 + sin(0.5*OFEC_PI*x[1] + 0.5*OFEC_PI)*(2 - fabs(x[1])) / 2 * (2 - fabs(x[0])) / 2;
-		obj[0] = s + m_bias;
-		return EvalTag::Normal;
+		obj[0] = s;
 	}
 	
 }

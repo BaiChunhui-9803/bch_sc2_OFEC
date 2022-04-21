@@ -1,4 +1,4 @@
-//Register keane_bump "Classic_keane_bump" MMOP,ConOP,SOP
+//Register KeaneBump "Classic_Keane_Bump" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -21,20 +21,13 @@
 #ifndef OFEC_KEANE_BUMP_H
 #define OFEC_KEANE_BUMP_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-	
-	class keane_bump : public function
-	{
-	public:
-		keane_bump(const ParamMap &v);
-		keane_bump(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {	
+	class KeaneBump : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
-	
 }
 #endif // !OFEC_KEANE_BUMP_H

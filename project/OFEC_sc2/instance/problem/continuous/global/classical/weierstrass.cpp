@@ -14,32 +14,24 @@
 #include "weierstrass.h"
 #include "../../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
 	void Weierstrass::initialize_() {
 		Function::initialize_();
+		m_opt_mode[0] = OptMode::kMinimize;
 		auto &v = GET_PARAM(m_id_param);
 		resizeVariable(std::get<int>(v.at("number of variables")));
-		m_opt_mode[0] = OptMode::Minimize;
+		setDomain(-0.5, 0.5);
 		m_a = 0.5;
 		m_b = 3;
 		m_kmax = 20;
-		setDomain(-0.5, 0.5);
 		setOriginalGlobalOpt();
-		setGlobalOpt();
+		m_optima = m_original_optima;
+		m_variable_niche_radius = 1e-4 * 0.5 * m_num_vars;
+		m_objective_accuracy = 1e-8;
 	}
 
-	void Weierstrass::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		if (m_translated)
-			translate(x);
-		if (m_scaled)
-			scale(x);
-		if (m_rotated)
-			rotate(x);
-		if (m_translated)
-			translateOrigin(x);
-
+	void Weierstrass::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 		Real fit = 0, s = 0;
-
 		for (int i = 0; i < m_num_vars; i++)
 			for (int k = 0; k <= m_kmax; k++)
 				fit += pow(m_a, k) * cos(2 * OFEC_PI * pow(m_b, k) * (x[i] + 0.5));

@@ -17,19 +17,16 @@
 #ifndef OFEC_C01_H
 #define OFEC_C01_H
 
-#include "../../../../../core/problem/continuous/function.h"
-#include <functional>
+#include "cop_base.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2017 {
-		class C01 final: public function
+		class C01 final: public CopBase
 		{
 		public:
-			C01(const ParamMap &v);
-			C01(const std::string &name, size_t size_var, size_t size_obj);
-			void initialize() override;
+			void initialize_() override;
 		protected:
-			void evaluate_obj_nd_con(Real *x, std::vector<Real>& obj, std::vector<Real> &con) override;
+			void evaluateObjAndCon(Real *x, std::vector<Real>& obj, std::vector<Real> &con) override;
 		private:
 			
 		};

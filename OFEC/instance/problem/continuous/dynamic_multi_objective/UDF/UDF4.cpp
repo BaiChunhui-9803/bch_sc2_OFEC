@@ -1,6 +1,6 @@
 #include "UDF4.h"
 
-namespace OFEC {
+namespace ofec {
 	UDF4::UDF4(param_map & v) : UDF4(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -38,7 +38,7 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag UDF4::evaluateObjective(Real *x, std::vector<Real> &obj) {//recommend the number of variables is 20
+	int UDF4::evaluateObjective(Real *x, std::vector<Real> &obj) {//recommend the number of variables is 20
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -69,6 +69,6 @@ namespace OFEC {
 				obj[m] = 1 - Mt*std::pow(x[0],Ht) + 2. / (floor(m_num_vars / 2.))*obj[m];
 			}
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

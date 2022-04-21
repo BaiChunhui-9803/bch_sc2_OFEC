@@ -23,9 +23,9 @@
 
 #include "../../../../../core/algorithm/individual.h"
 
-namespace OFEC {
+namespace ofec {
 	enum class RecombineDE { Binomial, exponential };
-	class IndDE : public OFEC::Individual<> {
+	class IndDE : public ofec::Individual<> {
 	protected:
 		Solution<> m_pv;    // donor vector
 		Solution<> m_pu;    // trial vector
@@ -38,22 +38,39 @@ namespace OFEC {
 		IndDE& operator=(const IndDE& other) = default;
 		IndDE& operator=(IndDE&& other) noexcept = default;
 		IndDE& operator=(const Solution<>& other);
-		void mutate(Real F, const Solution<>* r1,
-			const Solution<>* r2,
-			const Solution<>* r3,
+		void mutate(Real F, 
+			const Solution<>* s1,
+			const Solution<>* s2,
+			const Solution<>* s3,
 			int id_pro,
-			const Solution<>* r4 = nullptr,
-			const Solution<>* r5 = nullptr);
-		virtual void recombine(Real CR, RecombineDE rs, int id_rnd);
-		virtual EvalTag select(int id_pro, int id_alg);
-		Solution<>& trial();
+			const Solution<>* s4 = nullptr,
+			const Solution<>* s5 = nullptr,
+			const Solution<>* s6 = nullptr,
+			const Solution<>* s7 = nullptr);
+		virtual void recombine(Real CR, RecombineDE rs, int id_rnd, int id_pro);
+		virtual int select(int id_pro, int id_alg);
+		Solution<> &trial() { return m_pu; }
+		const Solution& trial() const { return m_pu; }
+		Solution<>& donor() { return m_pv; }
+		const Solution &donor() const { return m_pv; }
 		void recombine(Real CR, const std::vector<int>& var, int I, int id_rnd);
-		void mutate(Real F, const std::vector<int>& var, Solution<>* r1,
-			Solution<>* r2,
-			Solution<>* r3,
+		void mutate(Real F, 
+			const std::vector<int>& var, 
+			const Solution<>* s1,
+			const Solution<>* s2,
+			const Solution<>* s3,
 			int id_pro,
-			Solution<>* r4 = nullptr,
-			Solution<>* r5 = nullptr);
+			const Solution<>* s4 = nullptr,
+			const Solution<>* s5 = nullptr,
+			const Solution<>* s6 = nullptr,
+			const Solution<>* s7 = nullptr);
+		void mutate(Real K, Real F,
+			const Solution<>* s1,
+			const Solution<>* s2,
+			const Solution<>* s3,
+			const Solution<>* s4,
+			const Solution<>* s5,
+			int id_pro);
 	};
 }
 #endif // !DE_INDIVIDUAL_H

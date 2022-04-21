@@ -17,13 +17,12 @@
 #ifndef F8_MODIFIED_RASTRIGIN_H
 #define F8_MODIFIED_RASTRIGIN_H
 
-#include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_mmop.h"
 
-namespace OFEC {
-	namespace CEC2013 {
+namespace ofec {
+	namespace cec2013 {
 		// An inverted version of Modified Rastrigin function
-		class ModifiedRastrigin final : public Function, public MetricsMMOP	{
+		class ModifiedRastrigin final : public MetricsMMOP	{
 		protected:		
 			void initialize_() override;
 			void evaluateObjective(Real *x, std::vector<Real>& obj) override;

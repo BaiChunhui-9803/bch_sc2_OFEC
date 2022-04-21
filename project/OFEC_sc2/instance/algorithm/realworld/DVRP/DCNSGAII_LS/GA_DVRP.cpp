@@ -1,6 +1,6 @@
 #include "GA_DVRP.h"
 
-namespace OFEC {
+namespace ofec {
 	GA_DVRP::GA_DVRP() :m_cr(0.8), m_mr(0.05) {}
 
 	void GA_DVRP::crossover(DCMOEA_ind<Individual<DVRP::routes>> & ind1, DCMOEA_ind<Individual<DVRP::routes>> & ind2, int id_rnd) {
@@ -70,5 +70,8 @@ namespace OFEC {
 		int customer = c1[car_1][pos1];
 		c1[car_1][pos1] = c1[car_2][pos2];
 		c1[car_2][pos2] = customer;
+		
 	}
+	
+
 }

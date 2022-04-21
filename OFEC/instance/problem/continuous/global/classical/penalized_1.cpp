@@ -12,37 +12,21 @@
 *************************************************************************/
 
 #include "penalized_1.h"
-namespace OFEC {
-	
-	penalized_1::penalized_1(const ParamMap &v) :
-		penalized_1((v.at("problem name")), (v.at("number of variables")), 1) {
+#include "../../../../../core/instance_manager.h"
 
-	}
-	penalized_1::penalized_1(const std::string &name, size_t size_var, size_t size_obj) : problem(name, size_var, size_obj), \
-		function(name, size_var, size_obj) {
-
-		
-	}
-
-	void penalized_1::initialize() {
-		m_variable_monitor = true;
+namespace ofec {
+	void Penalized_1::initialize_() {
+		Function::initialize_();
+		m_opt_mode[0] = OptMode::kMinimize;
+		auto &v = GET_PARAM(m_id_param);
+		resizeVariable(std::get<int>(v.at("number of variables")));
 		setDomain(-50, 50);
-		setInitialDomain(-50., 50.);
-		std::vector<Real> v(m_num_vars, -1);
-		setOriginalGlobalOpt(v.data());
+		std::vector<Real> var(m_num_vars, -1);
+		setOriginalGlobalOpt(var.data());
 		m_optima = m_original_optima;
-		m_initialized = true;
 	}
 
-	EvalTag penalized_1::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		if (m_translated)
-			translate(x);
-		if (m_scaled)
-			scale(x);
-		if (m_rotated)
-			rotate(x);
-		if (m_translated)
-			translateOrigin(x);
+	void Penalized_1::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 		std::vector<Real> y(m_num_vars);
 		for (int i = 0; i < m_num_vars; i++) y[i] = (x[i] + 1) / 4. + 1;
 		Real s = 0;
@@ -53,15 +37,12 @@ namespace OFEC {
 		for (int i = 0; i < m_num_vars; i++) {
 			s += u(x[i], 10, 100, 4);
 		}
-
 		obj[0] = s + m_bias;
-		return EvalTag::Normal;
-
 	}
-	Real penalized_1::u(Real x, Real a, Real k, Real m)const {
+
+	Real Penalized_1::u(Real x, Real a, Real k, Real m)const {
 		if (x > a) return k*pow(x - a, m);
 		else if (x < -a) return k*pow(-x - a, m);
 		else return 0;
 	}
-	
 }

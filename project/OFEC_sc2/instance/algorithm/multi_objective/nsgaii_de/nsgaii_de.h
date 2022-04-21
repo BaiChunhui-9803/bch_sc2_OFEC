@@ -19,32 +19,32 @@
 #ifndef OFEC_NSGAII_DE_H
 #define OFEC_NSGAII_DE_H
 
-#include "../NSGAII.h"
-#include "../../../DE/population.h"
-#include "../../../DE/MOEA_DE/MOEA_DE.h"
+#include "../../template/multi_objective/nsgaii/nsgaii.h"
+#include "../moea_de_pop.h"
 
-namespace OFEC {	
-	class NSGAII_DE_pop : public DE::MOEA_DE_pop<>, NSGAII<DE::individual> {
+namespace ofec {
+	class PopNSGAII_DE : public PopMODE<>, NSGAII {
 	public:
-		explicit NSGAII_DE_pop(size_t size_pop);
-		void initialize() override;
-		EvalTag evolve() override;
+		PopNSGAII_DE(size_t size_pop, int id_pro);
+		int evolve(int id_pro, int id_alg, int id_rnd) override;
 	protected:
-		std::vector<DE::individual> m_offspring;  // 2 size of population
+		Population<IndDE> m_pop_combined; // combination of parent and children
 	};
 
-	class NSGAII_DE : public algorithm {
+	class NSGAII_DE : public Algorithm {
 	public:
-		explicit NSGAII_DE(param_map& v);
-		void initialize() override;
+		void initialize_() override;
 		void record() override;
+		void initPop();
 #ifdef OFEC_DEMO
-		void updateBuffer() override {}
+		void updateBuffer();
 #endif
 	protected:
 		void run_() override;
 	protected:
-		NSGAII_DE_pop m_pop;
+		std::unique_ptr<PopNSGAII_DE> m_pop;
+		size_t m_pop_size;
+		Real m_mr, m_meta;
 	};
 }
 

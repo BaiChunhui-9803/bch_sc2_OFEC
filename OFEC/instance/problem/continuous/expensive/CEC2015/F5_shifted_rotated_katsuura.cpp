@@ -1,6 +1,6 @@
 #include "F5_shifted_rotated_katsuura.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F5_shifted_rotated_katsuura::F5_shifted_rotated_katsuura(const ParamMap &v) :
 			F5_shifted_rotated_katsuura((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -29,7 +29,7 @@ namespace OFEC {
 			setGlobalOpt(m_translation.data());
 			m_initialized = true;
 		}
-		EvalTag F5_shifted_rotated_katsuura::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F5_shifted_rotated_katsuura::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			return katsuura::evaluateObjective(x, obj);
 		}
 	}

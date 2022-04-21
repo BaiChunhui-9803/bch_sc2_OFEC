@@ -1,6 +1,6 @@
 #include "F9.h"
 
-namespace OFEC::DMOP {
+namespace ofec::DMOP {
 	F9::F9(param_map & v) : F9(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -35,7 +35,7 @@ namespace OFEC::DMOP {
 	}
 
 	//f1=x1, f2=g*h
-	EvalTag F9::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int F9::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//��ֹ�����������ظ�����������ظ�����PF
 			m_optima.clear();
@@ -62,6 +62,6 @@ namespace OFEC::DMOP {
 					obj[m] += std::pow(x[i] - b - 1 + std::pow(std::fabs(x[0] - a), Ht + (Real)(i + 1) / m_num_vars), 2);
 			}
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

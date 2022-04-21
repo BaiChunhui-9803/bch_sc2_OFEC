@@ -1,24 +1,7 @@
-#include "UF06.h"
+#include "uf06.h"
 
-namespace OFEC {
-	UF06::UF06(param_map & v) : UF06(v.at("problem name"), v.at("number of variables")) { //param_numDim = 30 is suggested
-
-	}
-	UF06::UF06(const std::string & name, size_t size_var) : problem(name, size_var, 2), UF(name, size_var, 2) {
-
-	}
-	void UF06::initialize() {
-		std::vector<std::pair<Real, Real>> r;
-		r.push_back(std::make_pair(0., 1.));
-		for (int i = 1; i < m_num_vars; ++i) {
-			r.push_back(std::make_pair(-1., 1.));
-		}
-		setInitialDomain(r);
-		setDomain(r);
-		load_PF();
-	}
-
-	EvalTag UF06::evaluateObjective(Real *x, std::vector<Real> &obj) {
+namespace ofec {
+	void UF06::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		int count1, count2;
 		Real sum1, sum2, prod1, prod2, yj, hj, pj, N, E;
 		N = 2.0; E = 0.1;
@@ -47,7 +30,5 @@ namespace OFEC {
 			obj[0] = x[0] + hj + 2.0*(4.0*sum1 - 2.0*prod1 + 2.0) / (Real)count1;
 
 		obj[1] = 1.0 - x[0] + hj + 2.0*(4.0*sum2 - 2.0*prod2 + 2.0) / (Real)count2;
-		return EvalTag::Normal;
 	}
-
 }

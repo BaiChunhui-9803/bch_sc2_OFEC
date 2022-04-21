@@ -1,20 +1,14 @@
 //Register UF01 "MOP_UF01" MOP,ConOP
 
-#ifndef UF1_H
-#define UF1_H
+#ifndef OFEC_UF1_H
+#define OFEC_UF1_H
 
+#include "uf.h"
 
-#include "UF.h"
-
-namespace OFEC {
-	class UF01 final : public UF {
-	public:
-		UF01(const ParamMap &v);
-		UF01(const std::string &name, size_t size_var);
-		~UF01() {}
-		void initialize();
-	private:
-		void evaluateObjective(Real *x, std::vector<Real> &obj);
+namespace ofec {
+	class UF01 : public UF {
+	protected:
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
 }
 

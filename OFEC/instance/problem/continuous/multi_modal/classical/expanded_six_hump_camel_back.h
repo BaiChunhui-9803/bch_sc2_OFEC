@@ -1,4 +1,4 @@
-//Register expanded_six_hump_camel_back "Classic_six_hump_camel_back_expanded" MMOP,ConOP,SOP
+//Register ExpandedSixHumpCamelBack "Classic_six_hump_camel_back_expanded" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -16,25 +16,17 @@
 *  Competition on Single Objective Multi-Niche Optimization.
 *******************************************************************************************/
 
-
 #ifndef OFEC_EXPANDED_SIX_HUMP_CAMEL_BACK_H
 #define OFEC_EXPANDED_SIX_HUMP_CAMEL_BACK_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-
-	class expanded_six_hump_camel_back : public function
-	{
-	public:
-		expanded_six_hump_camel_back(const ParamMap &v);
-		expanded_six_hump_camel_back(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class ExpandedSixHumpCamelBack : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
-
 }
 #endif // !OFEC_EXPANDED_SIX_HUMP_CAMEL_BACK_H
 

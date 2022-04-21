@@ -40,12 +40,12 @@
 #define OFEC_BBOB_H
 
 #include "../../../../../core/problem/continuous/continuous.h"
-#include "../../../../../utility/matrix.h"
+#include "../../../../../utility/linear_algebra/matrix.h"
 #include "../metrics_gop.h"
 #include <string>
 #include <algorithm>
 
-namespace OFEC {
+namespace ofec {
 	class BBOB final : public MetricsGOP {
 	protected:
 		void initialize_() override;

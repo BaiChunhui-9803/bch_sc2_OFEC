@@ -1,6 +1,6 @@
 
 #include "ConflictingOS_ShiftedSchwefel_F14.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		ConflictingOS_ShiftedSchwefel_F14::ConflictingOS_ShiftedSchwefel_F14(const ParamMap &v) : 
 			ConflictingOS_ShiftedSchwefel_F14((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -65,7 +65,7 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag ConflictingOS_ShiftedSchwefel_F14::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int ConflictingOS_ShiftedSchwefel_F14::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			size_t i;
 			Real result = 0.0;
 
@@ -80,7 +80,7 @@ namespace OFEC {
 			}
 
 			obj[0] = result;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

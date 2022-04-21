@@ -15,17 +15,17 @@
 *  Paper: Benchmark Functions for CEC��2013 Special Session and Competition on Niching
 *  Methods for Multimodal Function Optimization.
 *******************************************************************************************/
+
 #ifndef OFEC_EQUAL_MAXIMA_H
 #define OFEC_EQUAL_MAXIMA_H
-#include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
-	class EqualMaxima : public Function {
+
+#include "../metrics_mmop.h"
+
+namespace ofec {
+	class EqualMaxima : public MetricsMMOP {
 	protected:
 		void initialize_() override;
 		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	public:
-		void updateCandidates(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const override;
-		size_t numOptimaFound(const std::list<std::unique_ptr<SolBase>> &candidates) const override;
 	};	
 }
 

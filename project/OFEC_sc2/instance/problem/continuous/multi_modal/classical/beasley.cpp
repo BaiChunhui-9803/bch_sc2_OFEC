@@ -2,7 +2,7 @@
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
 *************************************************************************
 * Author: Changhe Li
-* Email: changhe.lw@gmail.com 
+* Email: changhe.lw@gmail.com
 * Language: C++
 *************************************************************************
 *  This file is part of OFEC. This library is free software;
@@ -22,41 +22,32 @@
 
 #include "beasley.h"
 
-namespace OFEC {
-	
-	beasley::beasley(const ParamMap &v) :
-		beasley((v.at("problem name")), 1, 1) {
-
-	}
-	beasley::beasley(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-		function(name, size_var, size_obj) {
-		
-	}
-
-	void beasley::initialize() { 
-		
-		setDomain(0, 1.); 
-		setInitialDomain(0, 1.);
-		m_opt_mode[0] = optimization_mode::Maximization;
-
-		 //1 gopt+ 4 lopt
-		m_variable_monitor = true;
+namespace ofec {
+	void Beasley::initialize_() {
+		Continuous::initialize_();
+		resizeObjective(1);
+		m_opt_mode[0] = OptMode::kMaximize;
+		resizeVariable(1);
+		setDomain(0, 1.);
 		m_variable_accuracy = 0.01;
 		m_objective_accuracy = 1.e-6;
-		std::vector<std::vector<Real>> var_data = { {0.08f}, {0.25f}, {0.45f}, {0.68f}, {0.93f} };
+		m_optima.clear();
+		VarVec<Real> var(1);
+		std::vector<Real> obj(1);
+		std::vector<Real> var_data = { 0.08f, 0.25f, 0.45f, 0.68f, 0.93f };
 		for (auto &i : var_data) {
-			setOriginalGlobalOpt(i.data());
+			var[0] = i;
+			evaluateObjective(var.data(), obj);
+			m_optima.appendVar(var);
+			m_optima.appendObj(obj);
 		}
-		m_optima = m_original_optima;
-		
-		m_initialized = true;
+		m_optima.setObjectiveGiven(true);
+		m_optima.setVariableGiven(true);
 	}
-	EvalTag beasley::evaluateObjective(Real *x, std::vector<Real> &obj) {
 
+	void Beasley::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real s;
-		s = exp(-2 * log(2.)*((x[0] - 0.08) / 0.854)*((x[0] - 0.08) / 0.854))*pow(sin(5 * OFEC_PI*(pow(x[0], 0.75) - 0.05)), 6);
-		obj[0] = s + m_bias;  // note
-		return EvalTag::Normal;
+		s = exp(-2 * log(2.) * ((x[0] - 0.08) / 0.854) * ((x[0] - 0.08) / 0.854)) * pow(sin(5 * OFEC_PI * (pow(x[0], 0.75) - 0.05)), 6);
+		obj[0] = s;
 	}
-	
 }

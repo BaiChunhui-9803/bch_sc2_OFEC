@@ -6,14 +6,13 @@
 #include "../../../../../utility/clustering/hslh.h"
 #include <vector>
 
-namespace OFEC {
-	template <typename T>
-	class AMP : public MultiPopulation<T> {
+namespace ofec {
+	template <typename TPop>
+	class AMP : public MultiPopulation<TPop> {
 	public:
-		using MultiPopulation<T>::m_pops;
-		using typename MultiPopulation<T>::PopType;
-		using typename MultiPopulation<T>::IterType;
-		using IndType = typename PopType::IndType;
+		using MultiPopulation<TPop>::m_pops;
+		using typename MultiPopulation<TPop>::IterType;
+		using IndType = typename TPop::IndType;
 	protected:
 		Real m_avgRadius = 0;
 		const int mc_init_indiSize;
@@ -67,10 +66,10 @@ namespace OFEC {
 			for (auto& it : (*iter1)->m_best) {
 				for (auto& it2 : (*iter2)->m_best) {
 					auto r = objectiveCompare(it->objective(), it2->objective(), GET_PRO(id_pro).optMode());
-					if (r == Dominance::Dominant) {
+					if (r == Dominance::kDominant) {
 						better++;
 					}
-					else if (r == Dominance::Dominated) {
+					else if (r == Dominance::kDominated) {
 						worse++;
 					}
 				}
@@ -114,11 +113,11 @@ namespace OFEC {
 			}
 		};
 		void initialize(int id_pro, int id_alg, int id_rnd);
-		EvalTag evolve(int id_pro, int id_alg, int id_rnd) override;
+		virtual int evolve(int id_pro, int id_alg, int id_rnd) override;
 	};
 
-	template<typename T>
-	void AMP<T>::updateMemory() {
+	template<typename TPop>
+	void AMP<TPop>::updateMemory() {
 		if (m_cur_subpopSize >= mv_indis.size()) {
 			unsigned size = mv_indis.size();
 			mv_indis.resize(m_cur_subpopSize + 1);
@@ -137,8 +136,8 @@ namespace OFEC {
 		mv_indis[m_cur_subpopSize][1] = sqrt(mv_indis[m_cur_subpopSize][1] / (mv_indis[m_cur_subpopSize].size() - 2));
 	}
 
-	template<typename T>
-	void AMP<T>::updateNumIdxs(int id_rnd) {
+	template<typename TPop>
+	void AMP<TPop>::updateNumIdxs(int id_rnd) {
 		m_cur_subpopSize = m_convergedPops + m_pops.size();
 		m_total_indiSize = totalNumInds();
 		if (m_first_update) {
@@ -170,15 +169,15 @@ namespace OFEC {
 	}
 
 
-	template<typename T>
-	int AMP<T>::createNewSwarms(int individual_num, int id_pro, int id_alg, int id_rnd){
+	template<typename TPop>
+	int AMP<TPop>::createNewSwarms(int individual_num, int id_pro, int id_alg, int id_rnd){
 		initIndividuals(individual_num, id_pro, id_alg, id_rnd);
 		HSLH<IndType> cluster(m_new_indis, id_pro);
 		std::vector<std::unique_ptr<IndType>> left_indis;
 		cluster.clustering(mc_init_subpopSize, id_pro);
 		for (int i(0); i < cluster.size(); ++i) {
 			if (cluster[i].size() > m_min_num_inds) {
-				T a(cluster[i].size(), id_pro);
+				TPop a(cluster[i].size(), id_pro);
 				this->append(std::move(a));
 				auto iter = cluster[i].begin();
 				for (int j(0); j < cluster[i].size(); ++j, ++iter) {
@@ -200,8 +199,8 @@ namespace OFEC {
 		return cluster.size();
 	}
 
-	template<typename T>
-	void AMP<T>::calAvgRadis() {
+	template<typename TPop>
+	void AMP<TPop>::calAvgRadis() {
 		m_avgRadius = 0;
 		int totalPop(0);
 		for (int i(0); i < m_pops.size(); ++i) {
@@ -214,8 +213,8 @@ namespace OFEC {
 		m_avgRadius /= static_cast<double>(totalPop);
 	}
 
-	template<typename T>
-	void AMP<T>::removeOverlapping(int id_pro) {
+	template<typename TPop>
+	void AMP<TPop>::removeOverlapping(int id_pro) {
 		for (auto iter1 = m_pops.begin(); iter1 != m_pops.end(); ++iter1) {
 			for (auto iter2 = iter1 + 1; iter2 != m_pops.end();) {
 				if (judgeOverlapping(**iter1, **iter2, id_pro))
@@ -226,10 +225,10 @@ namespace OFEC {
 		}
 	}
 
-	template<typename T>
-	EvalTag AMP<T>::evolve(int id_pro, int id_alg, int id_rnd) {
-		EvalTag rf = MultiPopulation<T>::evolve(id_pro, id_alg, id_rnd);
-		if (rf != EvalTag::Normal) {
+	template<typename TPop>
+	int AMP<TPop>::evolve(int id_pro, int id_alg, int id_rnd) {
+		int rf = MultiPopulation<TPop>::evolve(id_pro, id_alg, id_rnd);
+		if (rf) {
 			return rf;
 		}
 		calAvgRadis();
@@ -256,8 +255,8 @@ namespace OFEC {
 		return rf;
 	}
 
-	template<typename T>
-	void AMP<T>::initialize(int id_pro, int id_alg, int id_rnd) {
+	template<typename TPop>
+	void AMP<TPop>::initialize(int id_pro, int id_alg, int id_rnd) {
 		m_first_update = true;
 		m_total_indiSize = 0;
 		m_converged_indiSize = 0;

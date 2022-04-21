@@ -21,13 +21,14 @@
 #ifndef OFEC_INDIVIDUAL_H
 #define OFEC_INDIVIDUAL_H
 
-#include "solution.h"
+#include "../problem/solution.h"
 
-namespace OFEC {
-	template<typename T = VarVec<Real>>
-		class Individual : public Solution<T> {
+namespace ofec {
+	template<typename TVar = VarVec<Real>>
+		class Individual : public Solution<TVar> {
 		public:
-			using SolType = Solution<T>;
+			using SolType = Solution<TVar>;
+			Individual() = default;
 			virtual ~Individual() {}
 			template<typename ... Args>
 			Individual(size_t num_obj, size_t num_con, Args&& ... args) : 
@@ -82,9 +83,17 @@ namespace OFEC {
 			Individual& operator=(const Individual &rhs) = default;
 			Individual& operator=(Individual &&rhs) = default;
 			virtual const SolType& phenotype() const { return SolType::solut(); }
-
+			void reset() override {
+				SolBase::reset();
+				m_fitness = 0;
+				m_id = -1;
+				m_ranking = -1;
+				m_type = 0;
+				m_improved = false;
+				m_active = true;
+			}
 		protected:
-			Real m_fitness;
+			Real m_fitness = 0;
 			int m_id, m_ranking = -1, m_type;
 			bool m_improved = false, m_active = true;
 	};

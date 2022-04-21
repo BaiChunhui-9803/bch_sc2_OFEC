@@ -1,4 +1,4 @@
-//Register rotated_discus "Classic_discus_rotated" GOP,ConOP,SOP
+//Register RotatedDiscus "Classic_discus_rotated" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -16,20 +16,13 @@
 #ifndef OFEC_ROTATED_DISCUS_H
 #define OFEC_ROTATED_DISCUS_H
 
-#include "../../../../../instance/problem/continuous/global/classical/discus.h"
-namespace OFEC {
+#include "discus.h"
 
-	class rotated_discus : public discus
-	{
-	public:
-		rotated_discus(const ParamMap &v);
-		rotated_discus(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class RotatedDiscus : public Discus {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
 	};
-
 }
 #endif // !OFEC_ROTATED_DISCUS_H
 

@@ -3,7 +3,7 @@
 #include "../../global/classical/weierstrass.h"
 #include "../../global/classical/rosenbrock.h"
 #include "../../global/classical/scaffer_F6.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F11_hybrid2::F11_hybrid2(const ParamMap &v) :
 			F11_hybrid2((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -70,11 +70,11 @@ namespace OFEC {
 			// end set
 			m_initialized = true;
 		}
-		EvalTag F11_hybrid2::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F11_hybrid2::evaluateObjective(Real *x, std::vector<Real> &obj) {
 
 			hybrid::evaluateObjective(x, obj);
 			obj[0] += 1100;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

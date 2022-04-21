@@ -1,5 +1,5 @@
 #include "AHC.h"
-namespace OFEC {
+namespace ofec {
 	void AHC::clustering(Clustering_result &result)
 	{
 		auto dis_matrix = cacul_dis_matrix(m_data);

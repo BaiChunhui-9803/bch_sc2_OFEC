@@ -5,7 +5,7 @@
 extern unique_ptr<Demo::scene> Demo::msp_buffer;
 #endif
 
-namespace OFEC {
+namespace ofec {
 	FDA1::FDA1(param_map & v) : FDA1(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -41,7 +41,7 @@ namespace OFEC {
 	}
 
 	//f1=x1, f2=g*h, f2=1-sqrt(f1), f1=[0,1]
-	EvalTag FDA1::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int FDA1::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -68,6 +68,6 @@ namespace OFEC {
 				obj[j] = gt * (1 - std::sqrt(obj[0] / gt));
 		}
 		//std::cout << obj[0] << "  " << obj[1] << std::endl;
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

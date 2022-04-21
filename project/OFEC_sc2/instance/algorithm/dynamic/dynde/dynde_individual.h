@@ -19,23 +19,23 @@
 #ifndef OFEC_DynDE_individual_H
 #define OFEC_DynDE_individual_H
 
-#include "../individual.h"
+#include "../../template/classic/de/de_ind.h"
 
 
-namespace OFEC {
-	class DynDE_subpopulation;
+namespace ofec {
+	class SubPopDynDE;
 	//class DynPopDESubPop;
-	class DynDE_individual final : public DE::individual
+	class IndDynDE final : public IndDE
 	{
-		friend class DynDE_subpopulation;
+		friend class SubPopDynDE;
 		//friend class DynPopDESubPop;
 	public:
 		enum class individual_type { TYPE_DE, TYPE_ENTROPY_DE, TYPE_QUANTUM, TYPE_BROWNIAN };
-		DynDE_individual(size_t num_obj, size_t num_con, size_t size_var) : individual(num_obj, num_con, size_var) {}
+		IndDynDE(size_t num_obj, size_t num_con, size_t size_var) : IndDE(num_obj, num_con, size_var) {}
 
-		EvalTag brownian(const solution_type &best, Real sigma);
-		EvalTag quantum(const solution_type &best, Real r);
-		EvalTag entropy(Real sigma);
+		int brownian(const SolType &best, Real sigma, int id_pro, int id_alg, int id_rnd);
+		int quantum(const SolType &best, Real r, int id_pro, int id_alg, int id_rnd);
+		int entropy(Real sigma, int id_pro, int id_alg, int id_rnd);
 	private:
 		individual_type m_type = individual_type::TYPE_DE;
 	};

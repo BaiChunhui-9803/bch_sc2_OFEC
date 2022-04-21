@@ -1,5 +1,5 @@
 #include "fcm_twl.h"
-namespace OFEC {
+namespace ofec {
 
 	fcm_twl::fcm_twl(int num_cluster, const std::vector<size_t> & Data_points) :m_num_clusters(num_cluster) {
 		m_data_points = Data_points;

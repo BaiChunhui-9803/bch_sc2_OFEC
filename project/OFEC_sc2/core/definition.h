@@ -23,7 +23,7 @@
 
 #include <cmath>
 
-namespace OFEC {
+namespace ofec {
 #define OFEC_PI std::acos(-1.0)
 #define OFEC_E std::exp(1.0)
 
@@ -33,15 +33,25 @@ namespace OFEC {
 	using Real = double;				  // set precision type to double
 #endif
 
-	enum class Dominance { Equal, Dominant, Dominated, NonDominated, NonComparable };
-	enum class OptMode { Minimize, Maximize };
-	enum class Violation { Constraint, Boundary, None };
-	enum class Constraint{ Inequality, Equality };
-	enum class Validation { Ignore, Reinitialize, Remap, SetToBound };
-	enum class EvalTag {
-		Normal, Terminate, Infeasible, 
-		ChangeNextEval, ChangeNonMemory, ChangeObjectiveMemory, ChangeVariableMemory, ChangeObjAndVarMemory
+	enum class Dominance { kEqual, kDominant, kDominated, kNonDominated, kNonComparable };
+	enum class OptMode { kMinimize, kMaximize };
+	enum class Violation { kConstraint, kBoundary, kNone };
+	enum class Constraint{ kInequality, kEquality };
+	enum class Validation { kIgnore, kReinitialize, kRemap, kSetToBound };
+
+	/*using the binary coding to record the evaluation tag:
+	   cur_tag & kTerminate == true, means that cur_tag has kTerminate tag;
+	   cur_tag |= kTerminate, insert the kTerminate tag into cur_tag*/
+	enum EvalTag {
+		kNormalEval = 1 << 1,
+		kTerminate = 1 << 2,
+		kInfeasible = 1 << 3,
+		kChangeNextEval = 1 << 4,
+		kChangeCurEval = 1 << 5,
+		kChangeObjectiveMemory = 1 << 6,
+		kChangeVariableMemory = 1 << 7
 	};
+
 	//SOP: single objective problem
 	//MOP: multi-objective problem
 	//DOP: dynamic optimization problem
@@ -62,11 +72,13 @@ namespace OFEC {
 	//MKP: multi-dimensional knapsack problem
 	//EOP: expensive optimization problem
 	//LSOP: large scale optimization problem
+	//CSIWDN: contaminant source identification for water distribution network 
+	//SP: selection problem
+	//APP: airport planning problem
+	//NoisyOP: noisy optimization problem
 	enum class ProTag {NullTag,
-		SOP, MOP, DOP,DMOP, MMOP, GOP, ROOT, ConOP, ComOP, TSP, COP, VRP, TTP, JSP,
-		KOP, SAT, ONEMAX, QAP, MKP, EOP, LSOP, epanet, DVRP, SP
+		kSOP, kMOP, kDOP, kDMOP, kMMOP, kGOP, kROOT, kConOP, kComOP, kTSP, kCOP, kVRP, kTTP, kJSP,
+		kKOP, kSAT, kOneMax, kQAP, kMKP, kEOP, kLSOP, kCSIWDN, kDVRP, kSP, kAPP, kNoisyOP
 	};
-	//for epanet
-	enum class InitType { Random, Distance, KMeans, BeVisited };
 }
 #endif // !OFEC_DEFINITION_H

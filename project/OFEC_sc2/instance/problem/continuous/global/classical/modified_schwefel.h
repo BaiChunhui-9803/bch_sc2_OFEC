@@ -1,4 +1,4 @@
-//Register modified_schwefel "Classic_schwefel_modified" GOP,ConOP,SOP
+//Register ModifiedSchwefel "Classic_Schwefel_modified" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -17,17 +17,13 @@
 #define OFEC_MODIFIED_SCHWEFEL_H
 
 #include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
+#include "../metrics_gop.h"
 
-	class modified_schwefel : public function
-	{
-	public:
-		modified_schwefel(const ParamMap &v);
-		modified_schwefel(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class ModifiedSchwefel : public Function {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real>& obj) override;
 	};
 
 }

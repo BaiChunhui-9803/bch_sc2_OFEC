@@ -1,6 +1,6 @@
 
 #include "ConformingOS_ShiftedSchwefel_F13.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		ConformingOS_ShiftedSchwefel_F13::ConformingOS_ShiftedSchwefel_F13(const ParamMap &v) :
 			ConformingOS_ShiftedSchwefel_F13((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -57,7 +57,7 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag ConformingOS_ShiftedSchwefel_F13::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int ConformingOS_ShiftedSchwefel_F13::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			size_t i;
 			Real result = 0.0;
 
@@ -76,7 +76,7 @@ namespace OFEC {
 			}
 
 			obj[0] = result;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

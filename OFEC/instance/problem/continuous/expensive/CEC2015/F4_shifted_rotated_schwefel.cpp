@@ -1,6 +1,6 @@
 #include "F4_shifted_rotated_schwefel.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F4_shifted_rotated_schwefel::F4_shifted_rotated_schwefel(const ParamMap &v) :
 			F4_shifted_rotated_schwefel((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -30,7 +30,7 @@ namespace OFEC {
 			setGlobalOpt(m_translation.data());
 			m_initialized = true;
 		}
-		EvalTag F4_shifted_rotated_schwefel::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F4_shifted_rotated_schwefel::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			return schwefel::evaluateObjective(x, obj);
 		}
 	}

@@ -1,4 +1,4 @@
-//Register jDE "jDE" GOP,ConOP,SOP
+//Register jDE "jDE" GOP,ConOP,SOP,MMOP
 
 /******************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -27,34 +27,23 @@ Problems. IEEE Transactions on Evolutionary Computation, 2006, Vol. 10, Issue 6,
 #ifndef OFEC_JDE_H
 #define OFEC_JDE_H
 
-#include "../population.h"
+#include "jde_pop.h"
 #include "../../../../core/algorithm/algorithm.h"
 
-namespace OFEC {
-	class jDE_pop final : public DE::population<DE::individual>
-	{
-	public:
-		explicit jDE_pop(size_t size_pop);
-		EvalTag evolve() override;
+namespace ofec {
+	class jDE : public Algorithm {
 	protected:
-		void update_F_and_CR();
-	protected:
-		Real m_t1=0, m_t2=0, m_Fl=0, m_Fu=0;
-		std::vector<Real> mv_F, mv_CR;
-	};
+		std::unique_ptr<PopJDE> m_pop;
+		size_t m_pop_size;
 
-	class jDE : public algorithm {
-	public:
-		jDE(param_map& v);
-		void initialize() override;
-		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override {}
-#endif
-	protected:
+		void initialize_() override;
 		void run_() override;
-	protected:
-		jDE_pop m_pop;
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
+
+	public:
+		void record() override;
 	};
 }
 

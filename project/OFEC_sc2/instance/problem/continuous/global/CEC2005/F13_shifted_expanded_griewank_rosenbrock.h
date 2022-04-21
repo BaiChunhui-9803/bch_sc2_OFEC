@@ -18,18 +18,17 @@
 #define OFEC_F13_SHIFTED_EXPANDED_GRIEWANK_ROSENBROCK_H
 
 #include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
-	namespace CEC2005 {
-		class ShiftedExpandedGriewankRosenbrock final : public Function {
-		public:
-			ShiftedExpandedGriewankRosenbrock(const ParamMap &v);
-			ShiftedExpandedGriewankRosenbrock(const std::string &name, size_t num_vars);
-			void initialize();
+#include "../metrics_gop.h"
+
+namespace ofec {
+	namespace cec2005 {
+		class ShiftedExpandedGriewankRosenbrock final : public Function, public MetricsGOP {
 		protected:
-			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
+			void initialize_() override;
+			void evaluateOriginalObj(Real *x, std::vector<Real>& obj) override;
 		};
 	}
-	using CEC2005_GOP_F13 = CEC2005::ShiftedExpandedGriewankRosenbrock;
+	using CEC2005_GOP_F13 = cec2005::ShiftedExpandedGriewankRosenbrock;
 }
 #endif // ! OFEC_F13_SHIFTED_EXPANDED_GRIEWANK_ROSENBROCK_H
 

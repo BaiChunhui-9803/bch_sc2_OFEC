@@ -13,33 +13,10 @@
 *************************************************************************/
 
 #include "rotated_bent_cigar.h"
-namespace OFEC {
 
-	rotated_bent_cigar::rotated_bent_cigar(const ParamMap &v) :
-		rotated_bent_cigar((v.at("problem name")), (v.at("number of variables")), 1) {
-		
+namespace ofec {
+	void RotatedBentCigar::initialize_() {
+		BentCigar::initialize_();
+		loadRotation("/instance/problem/continuous/global/classical/data/");
 	}
-	rotated_bent_cigar::rotated_bent_cigar(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-		bent_cigar(name, size_var, 1) {
-		
-	}
-
-	void rotated_bent_cigar::initialize() {
-		m_variable_monitor = true;
-		setDomain(-100., 100.);
-		setInitialDomain(-100., 100.);
-
-		setOriginalGlobalOpt();
-
-		loadRotation("/instance/problem/continuous/global/CEC2005/data/");
-		
-		setGlobalOpt();
-		m_initialized = true;
-	}
-
-	EvalTag rotated_bent_cigar::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		return bent_cigar::evaluateObjective(x, obj);
-
-	}
-
 }

@@ -34,7 +34,7 @@
 #include "../../core/algorithm/individual.h"
 #include "../../core/problem/continuous/continuous.h"
 
-namespace OFEC {
+namespace ofec {
 	template<typename Individual>
 	class APD {
 	protected:

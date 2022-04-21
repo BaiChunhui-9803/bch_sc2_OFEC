@@ -2,12 +2,12 @@
 #define OFEC_MATH_AUX_H
 
 #include <vector>
-#include "../../../../core/definition.h"
+#include "../../../../../core/definition.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace math_aux {
 		// ASF(): achievement scalarization function
-		Real ASF(const std::vector<Real> &objs, const std::vector<Real> &weight);
+		Real ASF(const std::vector<Real>& objs, const std::vector<Real>& weight);
 
 		// guassian_elimination(): used to calculate the hyperplane
 		//
@@ -39,9 +39,9 @@ namespace OFEC {
 		//    GuassianElimination(x, A, b);
 		//    cout << x[0] << ' ' << x[1] << ' ' << x[2] << endl;
 		// ---------------------------------------------------------------------
-		void guassian_elimination(std::vector<Real> *px, std::vector< std::vector<Real> > A, const std::vector<Real> &b);
+		void guassianElimination(std::vector<Real>* px, std::vector< std::vector<Real> > A, const std::vector<Real>& b);
 
-		// perpendicular_distance(): calculate the perpendicular distance from a point to a line
+		// perpendicularDistance(): calculate the perpendicular distance from a point to a line
 		//
 		// Given a direction vector (w1, w2) and a point P(x1, y1),
 		// we want to find a point Q(x2, y2) on the line connecting (0, 0)-(w1, w2)
@@ -58,7 +58,7 @@ namespace OFEC {
 		//    vector<Real> dir{1, 3}, point{5.5, 1.5};
 		//    cout << PerpendicularDistance(dir, point) << endl;
 		// ---------------------------------------------------------------------
-		Real perpendicular_distance(const std::vector<Real> &direction, const std::vector<Real> &point);
+		Real perpendicularDistance(const std::vector<Real>& direction, const std::vector<Real>& point);
 	}
 }
 

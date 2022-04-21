@@ -1,7 +1,7 @@
 #include "int_dvrp_pop.h"
 #include <thread>
 
-namespace OFEC {
+namespace ofec {
 	void INIT_DVRP_POP::ahc_tsp_init_pop(std::vector<DVRP_ind> &pop, int id_pro, int id_rnd) {
 		//auto num_core = thread::hardware_concurrency() - 6;//获取cpu核心个数  
 		//

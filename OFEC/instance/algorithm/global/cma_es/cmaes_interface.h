@@ -24,26 +24,26 @@ extern "C" {
 #endif
 
 /* --- initialization, constructors, destructors --- */
-double * cmaes_init(cmaes_t *, int dimension , double *xstart, 
+double* cmaes_init(cmaes_t *, int dimension , double *xstart, 
 		double *stddev, long seed, int lambda, 
-		const char *input_parameter_filename);
+		const char *input_parameter_filename, int id_rnd);
 void cmaes_init_para(cmaes_t *, int dimension , double *xstart, 
 		double *stddev, long seed, int lambda, 
 		const char *input_parameter_filename);
-double * cmaes_init_final(cmaes_t *);
-void cmaes_resume_distribution(cmaes_t *evo_ptr, char *filename);
+double* cmaes_init_final(cmaes_t *, int id_rnd);
+void cmaes_resumeDistribution(cmaes_t *evo_ptr, char *filename);
 void cmaes_exit(cmaes_t *);
 
 /* --- core functions --- */
-double * const * cmaes_SamplePopulation(cmaes_t *);
+double * const * cmaes_SamplePopulation(cmaes_t *, int id_rnd);
 double *         cmaes_UpdateDistribution(cmaes_t *, 
 					  const double *rgFitnessValues);
 const char *     cmaes_TestForTermination(cmaes_t *);
 
 /* --- additional functions --- */
-double * const * cmaes_ReSampleSingle( cmaes_t *t, int index);
-double const *   cmaes_ReSampleSingle_old(cmaes_t *, double *rgx); 
-double *         cmaes_SampleSingleInto( cmaes_t *t, double *rgx);
+double * const * cmaes_ReSampleSingle( cmaes_t *t, int index, int id_rnd);
+double const *   cmaes_ReSampleSingle_old(cmaes_t *, double *rgx, int id_rnd);
+double *         cmaes_SampleSingleInto( cmaes_t *t, double *rgx, int id_rnd);
 void             cmaes_UpdateEigensystem(cmaes_t *, int flgforce);
 void             cmaes_ResizeLambda(cmaes_t* t, int lambda);
 void             cmaes_InitDistribution(cmaes_t* t, const double* rgFunVal);

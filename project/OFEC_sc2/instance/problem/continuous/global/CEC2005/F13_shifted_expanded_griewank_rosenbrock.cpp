@@ -1,34 +1,21 @@
 #include "F13_shifted_expanded_griewank_rosenbrock.h"
-#include <numeric>
+#include "../../../../../core/instance_manager.h"
 
-namespace OFEC {
-	namespace CEC2005 {
-		ShiftedExpandedGriewankRosenbrock::ShiftedExpandedGriewankRosenbrock(const ParamMap &v) :
-			ShiftedExpandedGriewankRosenbrock((v.at("problem name")), (v.at("number of variables"))) {}
-
-		ShiftedExpandedGriewankRosenbrock::ShiftedExpandedGriewankRosenbrock(const std::string &name, size_t num_vars) :
-			Problem(name), Function(name, num_vars) {}
-
-		void ShiftedExpandedGriewankRosenbrock::initialize() {
+namespace ofec {
+	namespace cec2005 {
+		void ShiftedExpandedGriewankRosenbrock::initialize_() {
+			Function::initialize_();
+			resizeVariable(std::get<int>(GET_PARAM(m_id_param).at("number of variables")));
 			setDomain(-3, 1);
 			setOriginalGlobalOpt();
 			setBias(-130);
-			
-			loadTranslation("/instance/problem/continuous/global/CEC2005/data/");  //data path
-
+			loadTranslation("/instance/problem/continuous/global/cec2005/data/");  //data path
 			setGlobalOpt(m_translation.data());
-			m_optima.setVariableGiven(true);
-			m_obj_minmax_monitored = true;
-			m_objective_accuracy = 1.0e-8;
-
-			m_initialized = true;
+			m_variable_niche_radius = 1e-4 * 2 * m_num_vars;
+			m_objective_accuracy = 1.0e-2;
 		}
 
-		EvalTag ShiftedExpandedGriewankRosenbrock::evaluateObjective(Real *x, std::vector<Real> &obj) {
-			if (m_translated) {
-				translate(x);
-				translateOrigin(x);
-			}
+		void ShiftedExpandedGriewankRosenbrock::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 			Real result = 0;
 			for (size_t i = 0; i < m_num_vars; ++i) {
 				Real result_f2 = 0;
@@ -41,7 +28,6 @@ namespace OFEC {
 			}
 			result += m_bias;
 			obj[0] = result;
-			return EvalTag::Normal;
 		}
 	}
 }

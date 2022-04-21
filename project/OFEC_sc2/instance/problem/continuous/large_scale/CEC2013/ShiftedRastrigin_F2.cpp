@@ -13,7 +13,7 @@
 *  Foundation; either version 2, or (at your option) any later version.
 *************************************************************************/
 #include "ShiftedRastrigin_F2.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		ShiftedRastrigin_F2::ShiftedRastrigin_F2(const ParamMap &v) :
 			ShiftedRastrigin_F2((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -47,13 +47,13 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag ShiftedRastrigin_F2::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int ShiftedRastrigin_F2::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			size_t i;
 			for (i = 0; i < m_num_vars; ++i) {
 				mp_anotherz[i] = x[i] - mp_Ovector[i];
 			}
 			obj[0] = rastrigin(mp_anotherz, m_num_vars);
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

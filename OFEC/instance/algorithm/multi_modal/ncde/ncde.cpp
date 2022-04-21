@@ -1,25 +1,28 @@
-#include "NCDE.h"
+#include "ncde.h"
+#include "../../../record/rcr_vec_real.h"
 
 #ifdef OFEC_DEMO
-#include <buffer/buffer_alg/buffer_alg_cont.h>
-extern std::unique_ptr<Demo::scene> Demo::g_buffer_alg;
+#include <core/global_ui.h>
 #endif
 
-namespace OFEC {
-	NCDE_pop::NCDE_pop(size_t size_pop) : DE::population<DE::individual>(size_pop), m_dis(size_pop) {
-		m_r = 0.1;
-		m_m = static_cast<size_t>(m_r * size());
+namespace ofec {
+	PopNCDE::PopNCDE(size_t size_pop, int id_pro) : 
+		PopDE<>(size_pop, id_pro), 
+		m_dis(size_pop),
+		m_r(0.1),
+		m_m(static_cast<size_t>(m_r * size()))
+	{
 		for (auto &i : m_inds) {
-			i->set_improved_flag(true);
+			i->setImproved(true);
 		}
 	}
 
-	void NCDE_pop::sort_distance(size_t a) {
-		if (!m_inds[a]->is_improved()) {
+	void PopNCDE::sortDistance(size_t a, int id_pro) {
+		if (!m_inds[a]->isImproved()) {
 			for (size_t j = 0; j < size(); ++j) {
 				if (a == j) continue;
-				if (m_inds[j]->is_improved()) {
-					std::pair<Real, int> dis = std::make_pair(m_inds[a]->variable_distance(*m_inds[j]), j);
+				if (m_inds[j]->isImproved()) {
+					std::pair<Real, int> dis = std::make_pair(m_inds[a]->variableDistance(*m_inds[j], id_pro), j);
 					auto it = m_dis[a].begin();
 					while (it != m_dis[a].end() && it->first < dis.first) {
 						++it;
@@ -34,7 +37,7 @@ namespace OFEC {
 		else {
 			for (size_t j = 0; j < size(); ++j) {
 				if (a == j) continue;
-				std::pair<Real, int> dis = std::make_pair(m_inds[a]->variable_distance(*m_inds[j]), j);
+				std::pair<Real, int> dis = std::make_pair(m_inds[a]->variableDistance(*m_inds[j], id_pro), j);
 				auto it = m_dis[a].begin();
 				while (it != m_dis[a].end() && it->first < dis.first) {
 					it++;
@@ -53,27 +56,26 @@ namespace OFEC {
 
 	}
 
-	EvalTag NCDE_pop::evolve() {
-		update_best();
-		EvalTag tag = EvalTag::Normal;
+	int PopNCDE::evolve(int id_pro, int id_alg, int id_rnd) {
+		int tag = kNormalEval;
 		size_t nearest_index = 0;
 		Real neardis;
 		for (size_t i = 0; i < size(); ++i) {
-			sort_distance(i);
+			sortDistance(i, id_pro);
 			std::vector<size_t> candidate;
 			for (auto it = m_dis[i].begin(); it != m_dis[i].end(); it++) {
 				candidate.push_back(it->second);
 			}
 			std::vector<size_t> result(3);
-			select_in_neighborhood(3, candidate, result);
-			m_inds[i]->mutate(m_F, m_inds[result[0]].get(), m_inds[result[1]].get(), m_inds[result[2]].get());
-			m_inds[i]->recombine(m_CR, m_recombine_strategy);
-			tag = m_inds[i]->select();
-			if (m_inds[i]->is_improved()) {
+			selectInNeighborhood(3, candidate, result, id_rnd);
+			m_inds[i]->mutate(m_F, m_inds[result[0]].get(), m_inds[result[1]].get(), m_inds[result[2]].get(), id_pro);
+			m_inds[i]->recombine(m_CR, m_recombine_strategy, id_rnd, id_pro);
+			tag = m_inds[i]->select(id_pro, id_alg);
+			if (m_inds[i]->isImproved()) {
 				neardis = std::numeric_limits<Real>::max();
 				for (size_t j = 0; j < size(); ++j) {
 					if (i == j) continue;
-					Real dis = m_inds[i]->variable_distance(*m_inds[j]);
+					Real dis = m_inds[i]->variableDistance(*m_inds[j], id_pro);
 					if (neardis > dis) {
 						neardis = dis;
 						nearest_index = j;
@@ -83,92 +85,78 @@ namespace OFEC {
 			else {
 				nearest_index = m_dis[i].begin()->second;
 			}
-			if (m_inds[i]->dominate(*m_inds[nearest_index])) {
+			if (m_inds[i]->dominate(*m_inds[nearest_index], id_pro)) {
 				*m_inds[nearest_index] = *m_inds[i];
-				m_inds[nearest_index]->set_improved_flag(true);
+				m_inds[nearest_index]->setImproved(true);
 			}
-			if (tag != EvalTag::Normal) break;
+			if (tag != kNormalEval) break;
 		}
-		if (tag == EvalTag::Normal) {
+		if (tag == kNormalEval) {
 			++m_iter;
 		}
 		return tag;
 	}
 
-	NCDE::NCDE(param_map& v) : algorithm(v.at("algorithm name")), m_pop(v.at("population size")) {
-		if (CONTINUOUS_CAST->has_tag(problem_tag::GOP))
-			CONTINUOUS_CAST->set_eval_monitor_flag(true);
-		CONTINUOUS_CAST->set_variable_track_flag(true);
+
+	void NCDE::initialize_() {
+		Algorithm::initialize_();
+		auto &v = GET_PARAM(m_id_param);
+		m_pop_size = std::get<int>(v.at("population size"));
+		m_f = v.count("scaling factor") > 0 ? std::get<Real>(v.at("scaling factor")) : 0.9;
+		m_cr = v.count("crossover rate") > 0 ? std::get<Real>(v.at("crossover rate")) : 0.1;
+		m_ms = v.count("mutation strategy") > 0 ?
+			static_cast<MutationDE>(std::get<int>(v.at("mutation strategy"))) : MutationDE::rand_1;
+		m_pop.reset();
+		if (ID_RCR_VALID(m_id_rcr))
+			m_keep_candidates_updated = true;
 	}
 
-	void NCDE::initialize() {
-		m_pop.initialize();
-		m_pop.evaluate();
-		m_pop.set_parameter(0.1, 0.9);
-		m_initialized = true;
+	void NCDE::initPop() {
+		m_pop.reset(new PopNCDE(m_pop_size, m_id_pro));
+		m_pop->initialize(m_id_pro, m_id_rnd);
+		m_pop->evaluate(m_id_pro, m_id_alg);
+		m_pop->CR() = m_cr;
+		m_pop->F() = m_f;
+		m_pop->mutationStrategy() = m_ms;
 	}
 
 	void NCDE::run_() {
+		initPop();
+#ifdef OFEC_DEMO
+		updateBuffer();
+#endif
 		while (!terminating()) {
-			m_pop.evolve();
+			m_pop->evolve(m_id_pro, m_id_alg, m_id_rnd);
+#ifdef OFEC_DEMO
+			updateBuffer();
+#endif
 		}
 	}
 
 #ifdef OFEC_DEMO
 	void NCDE::updateBuffer() {
-		if (!m_initialized) return;
-		std::vector<std::vector<Solution<>*>> pops(1);
-		for (size_t i = 0; i < m_pop.size(); ++i)
-			pops[0].emplace_back(&m_pop[i].solut());
-		dynamic_cast<Demo::buffer_alg_cont*>(Demo::g_buffer_alg.get())->updateBuffer(&pops);
-		Real num_improved = 0;
-		for (size_t i = 0; i < m_pop.size(); ++i)
-			if (m_pop[i].is_improved())
-				num_improved++;
-		if (CONTINUOUS_CAST->has_tag(problem_tag::GOP)) {
-			// ******* Global Optimization ************
-			size_t evals = CONTINUOUS_CAST->evaluations();
-			Real err = std::fabs(problem::get_sofar_best<Solution<>>(0)->objective(0) - CONTINUOUS_CAST->get_optima().objective(0).at(0));
-			std::cout << evals << "\t" << err << "\tImprove Ratio:" << num_improved / m_pop.size() * 100 << "\%" << std::endl;
-		}
-		else if (CONTINUOUS_CAST->has_tag(problem_tag::MMOP)) {
-			// ******* Multi-Modal Optimization *******
-			size_t evals = CONTINUOUS_CAST->evaluations();
-			size_t num_opt_found = CONTINUOUS_CAST->num_optima_found();
-			size_t num_opt_known = CONTINUOUS_CAST->get_optima().number_objective();
-			std::cout << evals << "\t" << num_opt_found << "/" << num_opt_known << "\tImprove Ratio:" << num_improved / m_pop.size() * 100 << "\%" << std::endl;
+		if (ofec_demo::g_buffer->idAlg() == m_id_alg) {
+			m_solution.clear();
+			m_solution.resize(1);
+			for (size_t i = 0; i < m_pop->size(); ++i)
+				m_solution[0].push_back(&m_pop->at(i).phenotype());
+			ofec_demo::g_buffer->appendAlgBuffer(m_id_alg);
 		}
 	}
 #endif
 
 	void NCDE::record() {
-		//if (CONTINUOUS_CAST->has_tag(problem_tag::MMOP)) {
-		//	// ******* Multi-Modal Optimization *******
-		//	size_t evals = CONTINUOUS_CAST->evaluations();
-		//	size_t num_opt_found = CONTINUOUS_CAST->num_optima_found();
-		//	size_t num_opt_known = CONTINUOUS_CAST->get_optima().number_objective();
-		//	Real peak_ratio = (Real)num_opt_found / (Real)num_opt_known;
-		//	Real success_rate = CONTINUOUS_CAST->solved() ? 1 : 0;
-		//	measure::get_measure()->record(global::ms_global.get(), evals, peak_ratio, success_rate);
-		//}
-		//else if (CONTINUOUS_CAST->has_tag(problem_tag::GOP)) {
-		//	// ******* Global Optimization ************
-		//	size_t evals = CONTINUOUS_CAST->evaluations();
-		//	Real err = std::fabs(problem::get_sofar_best<Solution<>>(0)->objective(0) - CONTINUOUS_CAST->get_optima().objective(0).at(0));
-		//	measure::get_measure()->record(global::ms_global.get(), evals, err);
-		//}
-		size_t num_opt = CONTINUOUS_CAST->get_optima().number_variable();
-		std::vector<Real> vals(num_opt + 1);
-		vals[0] = CONTINUOUS_CAST->evaluations();
-		Real dis;
-		for (size_t i = 0; i < num_opt; i++) {
-			dis = CONTINUOUS_CAST->get_optima().variable_min_dis(i);
-			if (dis == 0)
-				vals[i + 1] = -17;
-			else
-				vals[i + 1] = log10(dis);
+		std::vector<Real> entry;
+		entry.push_back(m_effective_eval);
+		if (GET_PRO(m_id_pro).hasTag(ProTag::kMMOP)) {
+			size_t num_optima_found = GET_PRO(m_id_pro).numOptimaFound(m_candidates);
+			size_t num_optima = GET_CONOP(m_id_pro).getOptima().numberObjectives();
+			entry.push_back(num_optima_found);
+			entry.push_back(num_optima_found == num_optima ? 1 : 0);
 		}
-		measure::get_measure()->record(global::ms_global.get(), vals);
+		else
+			entry.push_back(m_candidates.front()->objectiveDistance(GET_CONOP(m_id_pro).getOptima().objective(0)));
+		dynamic_cast<RecordVecReal &>(GET_RCR(m_id_rcr)).record(m_id_alg, entry);
 	}
 }
 

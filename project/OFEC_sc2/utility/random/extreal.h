@@ -23,7 +23,7 @@
 #include <iostream>
 #include "../../core/definition.h"
 
-namespace OFEC {
+namespace ofec {
 	/************************ extended real class ***************************/
 	enum class ExtRealCode
 	{

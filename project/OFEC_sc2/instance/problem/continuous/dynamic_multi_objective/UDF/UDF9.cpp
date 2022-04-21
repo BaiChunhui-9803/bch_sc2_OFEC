@@ -1,6 +1,6 @@
 #include "UDF9.h"
 
-namespace OFEC {
+namespace ofec {
 	UDF9::UDF9(param_map & v) : UDF9(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -38,7 +38,7 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag UDF9::evaluateObjective(Real *x, std::vector<Real> &obj) {//recommend the number of variables is 20
+	int UDF9::evaluateObjective(Real *x, std::vector<Real> &obj) {//recommend the number of variables is 20
 		Real t = get_time();
 		
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
@@ -81,6 +81,6 @@ namespace OFEC {
 					std::fabs(std::sin(0.5*OFEC_PI*m_count[4]))) + std::fabs(std::sin(0.5*OFEC_PI*m_count[2])) + 2. / (floor(m_num_vars / 2.))*obj[m];
 			}
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

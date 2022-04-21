@@ -3,22 +3,25 @@
 #ifndef OFEC_CEP_H
 #define OFEC_CEP_H
 
-#include "../population.h"
+#include "../../template/classic/ep/ep_pop.h"
 #include "../../../../core/algorithm/algorithm.h"
 
-namespace OFEC {
-	class CEP : public algorithm {   
+namespace ofec {
+	class CEP : public Algorithm {   
+	protected:
+		void initialize_() override;
+		void run_() override;
+
 	public:
-		CEP(param_map& v);
-		void initialize() override;
 		void record() override;
 #ifdef OFEC_DEMO
-		void updateBuffer() override {}
+		void updateBuffer();
 #endif
+
 	protected:
-		void run_() override;
-	protected:
-		EP::population<> m_pop;
+		Real m_tau, m_tau_prime;
+		size_t m_q, m_pop_size;
+		PopEP<> m_pop;
 	};
 }
 

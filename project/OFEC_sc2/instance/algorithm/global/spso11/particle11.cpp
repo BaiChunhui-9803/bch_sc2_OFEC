@@ -1,8 +1,8 @@
 #include "particle11.h"
 #include "../../../../core/problem/continuous/continuous.h"
-#include "../../../../utility/vector.h"
+#include "../../../../utility/linear_algebra/vector.h"
 
-namespace OFEC {
+namespace ofec {
 	void Particle11::initVelocity(int id_pro, int id_rnd) {
 		for (size_t j = 0; j < m_var.size(); j++) {
 			auto& range = GET_CONOP(id_pro).range(j);
@@ -10,7 +10,7 @@ namespace OFEC {
 		}
 	}
 
-	void Particle11::clampVelocity(int id_pro) {
+	void Particle11::clampVelocity(int id_pro, int id_rnd) {
 		for (size_t j = 0; j < m_var.size(); j++) {
 			auto& range = GET_CONOP(id_pro).range(j);
 			if (m_var[j] > range.second) {
@@ -42,7 +42,7 @@ namespace OFEC {
 		dis = sqrt(dis);
 
 		Vector v(m_var.size(), 0);
-		v.randomize_in_sphere(dis, &GET_RND(id_rnd).uniform);
+		v.randomizeInSphere(dis, &GET_RND(id_rnd).uniform);
 		v += G;
 
 		for (size_t j = 0; j < m_var.size(); j++)

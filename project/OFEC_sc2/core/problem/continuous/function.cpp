@@ -3,7 +3,7 @@
 #include "../../instance_manager.h"
 #include "../../global.h"
 
-namespace OFEC {
+namespace ofec {
 	void Function::initialize_() {
 		Continuous::initialize_();
 		m_scaled = false;
@@ -91,12 +91,12 @@ namespace OFEC {
 	void Function::setTranslation(const Real *opt_var) {
 		// Initial the location of shifted global optimum
 		m_translation.resize(m_num_vars);
-		for (size_t j = 0; j<m_num_vars; ++j) {
+		for (size_t j = 0; j < m_num_vars; ++j) {
 			Real x, rl, ru, range;
 			x = opt_var[j];
 			ru = m_domain[j].limit.second - x;
 			rl = x - m_domain[j].limit.first;
-			range = rl<ru ? rl : ru;
+			range = rl < ru ? rl : ru;
 			m_translation[j] = GET_RND(m_id_rnd).uniform.nextNonStd(-range, range);
 		}
 		m_translated = true;
@@ -135,47 +135,53 @@ namespace OFEC {
 	}
 
 	void Function::setRotation() {
-		m_rotation.generate_rotation_classical(&GET_RND(m_id_rnd).normal, m_condition_number);
+		m_rotation.generateRotationClassical(&GET_RND(m_id_rnd).normal, m_condition_number);
 	}
 
 	void Function::translate(Real *x) {
-		for (size_t i = 0; i<m_num_vars; ++i) {
-			x[i] -= m_optima.variable(0)[i];
+		for (size_t i = 0; i < m_num_vars; ++i) {
+			x[i] -= m_original_optima.variable(0)[i];
+		}
+		if (m_translated) {
+			for (size_t i = 0; i < m_num_vars; ++i) {
+				x[i] -= m_translation[i];
+			}
 		}
 	}
 
 	void Function::translateOrigin(Real *x) {
-		for (size_t i = 0; i<m_num_vars; ++i) {
+		for (size_t i = 0; i < m_num_vars; ++i) {
 			x[i] += m_original_optima.variable(0)[i];
 		}
 	}
 
 	void Function::rotate(Real *x) {
-		Real *x_ = new Real[m_num_vars];
-		std::copy(x, x + m_num_vars, x_);
-
-		for (size_t i = 0; i<m_num_vars; ++i) {
-			x[i] = 0;
-
-			for (size_t j = 0; j < m_num_vars; ++j) {
-				x[i] += m_rotation[j][i] * x_[j];
+		if (m_rotated) {
+			Real *x_ = new Real[m_num_vars];
+			std::copy(x, x + m_num_vars, x_);
+			for (size_t i = 0; i < m_num_vars; ++i) {
+				x[i] = 0;
+				for (size_t j = 0; j < m_num_vars; ++j) {
+					x[i] += m_rotation[j][i] * x_[j];
+				}
 			}
+			delete[] x_;
+			x_ = 0;
 		}
-
-		delete[] x_;
-		x_ = 0;
 	}
 
 	void Function::scale(Real *x) {
-		for (size_t i = 0; i<m_num_vars; ++i)
-			x[i] /= m_scale;
+		if (m_scaled) {
+			for (size_t i = 0; i < m_num_vars; ++i)
+				x[i] /= m_scale;
+		}
 	}
 
 	void Function::irregularize(Real *x) {
 		// this method from BBOB
 		Real c1, c2, x_;
 		for (size_t i = 0; i < m_num_vars; ++i) {
-			if (x[i]>0) {
+			if (x[i] > 0) {
 				c1 = 10;	c2 = 7.9;
 			}
 			else {
@@ -185,7 +191,7 @@ namespace OFEC {
 				x_ = log(fabs(x[i]));
 			}
 			else x_ = 0;
-			x[i] = sign(x[i])*exp(x_ + 0.049*(sin(c1*x_) + sin(c2*x_)));
+			x[i] = sign(x[i]) * exp(x_ + 0.049 * (sin(c1 * x_) + sin(c2 * x_)));
 		}
 	}
 
@@ -193,8 +199,8 @@ namespace OFEC {
 		// this method from BBOB
 		if (m_num_vars == 1) return;
 		for (size_t i = 0; i < m_num_vars; ++i) {
-			if (x[i]>0) {
-				x[i] = pow(x[i], 1 + belta*i*sqrt(x[i]) / (m_num_vars - 1));
+			if (x[i] > 0) {
+				x[i] = pow(x[i], 1 + belta * i * sqrt(x[i]) / (m_num_vars - 1));
 			}
 		}
 	}
@@ -208,28 +214,30 @@ namespace OFEC {
 	}
 
 	void Function::setOriginalGlobalOpt(Real *opt) {
-		if (m_num_objs > 1) 
+		if (m_num_objs > 1)
 			throw MyExcept("Function::setOriginalGlobalOpt only for problems with a single obj");
 		m_original_optima.clear();
 
 		VarVec<Real> temp_var(m_num_vars);
-		if (opt == 0)		for (auto&i : temp_var) i = 0.;
+		if (opt == 0)		for (auto &i : temp_var) i = 0.;
 		else	for (int i = 0; i < m_num_vars; i++)  temp_var[i] = opt[i];
 		m_original_optima.appendVar(std::move(temp_var));
+		m_original_optima.setVariableGiven(true);
 
 		std::vector<Real> temp_obj(m_num_objs);
-		evaluateObjective(temp_var.data(), temp_obj);
+		evaluateOriginalObj(temp_var.data(), temp_obj);
 		m_original_optima.appendObj(std::move(temp_obj));
+		m_original_optima.setObjectiveGiven(true);
 	}
 
 	void Function::setGlobalOpt(Real *tran) {
-		if (m_num_objs > 1) 
+		if (m_num_objs > 1)
 			throw MyExcept("Function::setGlobalOpt only for problems with a single obj");
 		m_optima.clear();
 
 		VarVec<Real> temp_var(m_num_vars);
 		for (int i = 0; i < m_num_vars; ++i) {
-			if( tran != 0 ) temp_var[i] = tran[i] + m_original_optima.variable(0)[i];
+			if (tran != 0) temp_var[i] = tran[i] + m_original_optima.variable(0)[i];
 			else temp_var[i] = m_original_optima.variable(0)[i];
 		}
 		m_optima.appendVar(std::move(temp_var));
@@ -249,4 +257,11 @@ namespace OFEC {
 		m_params["noise flag"] = m_noisy;
 	}
 
+	void Function::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		translate(x);
+		scale(x);
+		rotate(x);
+		translateOrigin(x);
+		evaluateOriginalObj(x, obj);
+	}
 }

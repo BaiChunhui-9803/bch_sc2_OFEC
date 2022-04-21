@@ -13,7 +13,7 @@
 
 #include "ShiftedElliptic_F1.h"
  
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		ShiftedElliptic_F1::ShiftedElliptic_F1(const ParamMap &v) :
 			ShiftedElliptic_F1((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -47,13 +47,13 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag ShiftedElliptic_F1::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int ShiftedElliptic_F1::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			size_t i;
 			for (i = 0; i < m_num_vars;++i) {
 				mp_anotherz[i] = x[i] - mp_Ovector[i];
 			}
 			obj[0] = elliptic(mp_anotherz, m_num_vars);
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

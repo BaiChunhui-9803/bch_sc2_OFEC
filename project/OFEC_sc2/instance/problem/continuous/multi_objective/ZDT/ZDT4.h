@@ -19,17 +19,12 @@
 #ifndef ZDT4_H
 #define ZDT4_H
 
-
 #include "ZDT.h"
 
-namespace OFEC {
-	class ZDT4 final : public ZDT {
-	public:
-		ZDT4(const ParamMap &v);
-		ZDT4(const std::string &name, size_t size_var);
-		~ZDT4() {}
-	private:
-		void evaluateObjective(Real *x, std::vector<Real> &obj);
+namespace ofec {
+	class ZDT4 : public ZDT {
+	protected:
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
 }
 

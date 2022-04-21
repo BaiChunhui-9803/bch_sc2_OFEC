@@ -19,26 +19,23 @@
 *
 *********************************************************************************/
 
-
-#ifndef NEWRAN_LIB_H
-#define NEWRAN_LIB_H 0
-
-
+#ifndef OFEC_NEWRAN_LIB_H
+#define OFEC_NEWRAN_LIB_H
 
 #include "../myexcept.h"
 #include "extreal.h"
 
 #include <utility>
+#include <functional>
+#include <vector>
 
-namespace OFEC {
-
+namespace ofec {
 	typedef double(*PDF)(double);                // probability density function
 	double ln_gamma(double);                      // log gamma function
 
 	//**************** uniform random number generator **********************
 
-	class RandBase                              // uniform random number generator
-	{
+	class RandBase {                             // uniform random number generator
 	protected:
 		double m_seed;                    // seed
 		double m_motherseed;            // must be (0,1)
@@ -46,7 +43,14 @@ namespace OFEC {
 		double raw();                     // unmixed random numbers
 		const char * m_name;
 	public:
+		double getSeed() {
+			return m_seed;
+		}
+		double getMotherSeed() {
+			return m_motherseed;
+		}
 		RandBase(double s);             // set seed (0 < seed < 1)
+		void initialize();
 		double get();                   // get seed
 		virtual double next();                   // get new value
 		const char* name() { return m_name; }                  // identification
@@ -97,43 +101,179 @@ namespace OFEC {
 			return iter;
 		}
 
-		//template<typename T>
-		//T spinWheel(std::vector<T>::iterator first, T last) {
-		//	Real sum = 0;
-		//	for (T iter = first; iter != last; ++iter) {
-		//		sum += *iter;
-		//	}
-		//	Real rand_pos = sum * next();
-		//	Real accum = 0;
-		//	T iter(first);
-		//	for (; iter != last; ++iter) {
-		//		accum += *iter;
-		//		if (rand_pos < accum)
-		//			break;
-		//	}
-		//	return iter;
-		//}
-
 		template<typename T>
 		T spinWheel(T first, T last) {
 			Real sum = 0;
 			for (T iter = first; iter != last; ++iter) {
 				sum += *iter;
 			}
-			Real rand_pos = sum * next();
-			Real accum = 0;
+			if (sum == 0)return last;
+			double rand_pos = sum * next();
+			double accum = 0;
 			T iter(first);
 			for (; iter != last; ++iter) {
 				accum += *iter;
+				if (rand_pos <= accum)
+					break;
+			}
+			return iter;
+		}
+
+		template<typename T, typename K>
+		T spinWheel(T first, T last, const std::function<K( const T& cur_iter)>& pro_fun) {
+			double sum = 0;
+			for (T iter = first; iter != last; ++iter) {
+				sum += pro_fun(iter);
+			}
+			if (sum == 0)return last;
+			double rand_pos = sum * next();
+			double accum = 0;
+			T iter(first);
+			for (; iter != last; ++iter) {
+				accum += pro_fun(iter);
 				if (rand_pos < accum)
 					break;
 			}
 			return iter;
 		}
 
+		template<typename T, typename K>
+		T greedyRandom(T first, T last, const std::function<K(int idx)>& pro_fun) {
+			double max_val =-std::numeric_limits<double>::max();
+			std::vector<int> idxs;
+			int cur_idx(0);
+			double cur_val(0);
+			for (T iter = first; iter != last; ++iter) {
+				cur_val = pro_fun(*iter);
+				if (cur_val > max_val) {
+					max_val = cur_val;
+					idxs.clear();
+					idxs.push_back(cur_idx);
+				}
+				else if (cur_val == max_val) {
+					idxs.push_back(cur_idx);
+				}
+				++cur_idx;
+			}
+			if (idxs.empty())return first;
+			else return idxs[nextNonStd<int>(0, idxs.size())] + first;
+		}
 
+		template<typename T,typename K>
+		T greedyRandom(T first, T last, const std::function<K(const T& iter)>& pro_fun) {
+			double max_val = -std::numeric_limits<double>::max();
+			std::vector<int> idxs;
+			int cur_idx(0);
+			double cur_val(0);
+			for (T iter = first; iter != last; ++iter) {
+				cur_val = pro_fun(iter);
+				if (cur_val > max_val) {
+					max_val = cur_val;
+					idxs.clear();
+					idxs.push_back(cur_idx);
+				}
+				else if (cur_val == max_val) {
+					idxs.push_back(cur_idx);
+				}
+				++cur_idx;
+			}
+			if (idxs.empty())return last;
+			else return idxs[nextNonStd<int>(0, idxs.size())] + first;
+		}
 
+		template<typename T, typename K>
+		T spinWheelIdx(T first, T last, const std::function<K(int idx)>& pro_fun) {
+			double sum = 0;
+			for (T iter = first; iter != last; ++iter) {
+				sum += pro_fun(*iter);
+			}
+			if (sum == 0)return last;
+			double rand_pos = sum * next();
+			double accum = 0;
+			T iter(first);
+			for (; iter != last; ++iter) {
+				accum += pro_fun(*iter);
+				if (rand_pos < accum)
+					break;
+			}
+			return iter;
+		}
 
+		template<typename T>
+		void sequencePro(T first, T last,std::vector<int> & seq) {
+			seq.clear();
+			std::vector<double> pro;
+			double sum(0);
+			T cur(first);
+			while (cur != last) {
+				pro += *cur;
+				sum += *cur;
+			}
+			while (sum > 0) {
+				double rand_num = sum * next();
+				for (int idx(0); idx < pro.size(); ++idx) {
+					rand_num -= pro[idx];
+					if (rand_num <= 0) {
+						seq.push_back(idx);
+						sum -= pro[idx];
+						pro[idx] = 0;
+						break;
+					}
+				}
+			}
+		}
+
+		template<typename T>
+		void sequencePro(T first, T last, const std::function<double(int idx)>& pro_fun, std::vector<int>& seq) {
+			seq.clear();
+			std::vector<double> pro;
+			double sum(0);
+			T cur(first);
+			double cur_val(0);
+			while (cur != last) {
+				cur_val = pro_fun(*cur);
+				pro.push_back(cur_val);
+				sum += cur_val;
+			}
+			while (sum > 0) {
+				double rand_num = sum * next();
+				for (int idx(0); idx < pro.size(); ++idx) {
+					rand_num -= pro[idx];
+					if (rand_num <= 0) {
+						seq.push_back(idx);
+						sum -= pro[idx];
+						pro[idx] = 0;
+						break;
+					}
+				}
+			}
+		}
+
+		template<typename T>
+		void sequenceProIdx(T first, T last, const std::function<double(T cur_iter)>& pro_fun, std::vector<int>& seq) {
+			seq.clear();
+			std::vector<double> pro;
+			double sum(0);
+			T cur(first);
+			double cur_val(0);
+			while (cur != last) {
+				cur_val = pro_fun(cur);
+				pro.push_back(cur_val);
+				sum += cur_val;
+			}
+			while (sum > 0) {
+				double rand_num = sum * next();
+				for (int idx(0); idx < pro.size(); ++idx) {
+					rand_num -= pro[idx];
+					if (rand_num <= 0) {
+						seq.push_back(idx);
+						sum -= pro[idx];
+						pro[idx] = 0;
+						break;
+					}
+				}
+			}
+		}
 
 	};
 
@@ -154,10 +294,8 @@ namespace OFEC {
 
 	//**************** positive random number generator **********************
 
-	class Positive : public RandBase              // generate positive rv
-	{
+	class Positive : public RandBase {            // generate positive r
 		void operator=(const Positive&) {}       // private so can't access
-
 	protected:
 		double m_xi, *m_sx, *m_sfx;
 		bool m_not_ready;
@@ -173,8 +311,7 @@ namespace OFEC {
 
 	//**************** symmetric random number generator **********************
 
-	class Symmetric : public Positive              // generate symmetric rv
-	{
+	class Symmetric : public Positive {             // generate symmetric rv
 	public:
 		Symmetric(double s) : Positive(s) { m_name = "symmetric"; };
 		double next();                           // to get a single new value
@@ -182,8 +319,7 @@ namespace OFEC {
 
 	//**************** normal random number generator **********************
 
-	class Normal : public Symmetric              // generate standard normal rv
-	{
+	class Normal : public Symmetric {           // generate standard normal rv
 		double Nxi, *Nsx, *Nsfx;          // so we need initialise only once
 		long count;                     // assume initialised to 0
 
@@ -198,8 +334,7 @@ namespace OFEC {
 
 	//**************** cauchy random number generator **********************
 
-	class Cauchy : public Symmetric              // generate standard cauchy rv
-	{
+	class Cauchy : public Symmetric {              // generate standard cauchy rv
 	public:
 		Cauchy(double s) : Symmetric(s) { m_name = "cauchy"; };
 		double density(double) const;              // cauchy density function
@@ -210,8 +345,7 @@ namespace OFEC {
 
 	//**************** exponential random number generator **********************
 
-	class Exponential : public Positive         // generate standard exponential rv
-	{
+	class Exponential : public Positive {        // generate standard exponential rv
 	public:
 		Exponential(double s) :Positive(s) { m_name = "exponential"; };
 		double density(double) const;              // exponential density function
@@ -221,8 +355,7 @@ namespace OFEC {
 
 	//**************** asymmetric random number generator **********************
 
-	class Asymmetric : public RandBase             // generate asymmetric rv
-	{
+	class Asymmetric : public RandBase {            // generate asymmetric rv
 		double m_xi, *m_sx, *m_sfx; int ic;
 		bool m_not_ready;
 		void build();                          // called on first call to next
@@ -249,16 +382,13 @@ namespace OFEC {
 
 	//**************** gamma random number generator **********************
 
-	class Gamma : public RandBase               // generate gamma rv
-	{
+	class Gamma : public RandBase {              // generate gamma rv
 		RandBase* m_method;
 
 		//********** gamma random number generator, alpha <= 1 *****************
 
-		class Gamma1 : public Positive              // generate gamma rv
-												  // shape parameter <= 1
-		{
-			double ln_gam, ralpha, alpha;
+		class Gamma1 : public Positive {          // generate gamma rv								  
+			double ln_gam, ralpha, alpha;		  // shape parameter <= 1
 		public:
 			Gamma1(double, double s);                          // constructor (double=shape)
 			double density(double) const;              // gamma density function
@@ -269,10 +399,8 @@ namespace OFEC {
 
 		//********** gamma random number generator, alpha > 1 ******************
 
-		class Gamma2 : public Asymmetric             // generate gamma rv
-												  // shape parameter > 1
-		{
-			double alpha, ln_gam;
+		class Gamma2 : public Asymmetric {          // generate gamma rv		 
+			double alpha, ln_gam;                      // shape parameter > 1
 		public:
 			Gamma2(double, double s);                          // constructor (double=shape)
 			double density(double) const;              // gamma density function
@@ -289,9 +417,18 @@ namespace OFEC {
 		void shape(double);
 	};
 
+	struct Random {
+		Random(Real seed);
+		void initialize();
+		Uniform uniform;
+		Normal normal;
+		Cauchy cauchy;
+		Levy levy;
+		Gamma gamma;
+	};
 }
 
-#endif
+#endif //!OFEC_NEWRAN_LIB_H
 
 // body file: newran.cpp
 

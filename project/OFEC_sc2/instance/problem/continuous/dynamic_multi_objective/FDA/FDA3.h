@@ -31,7 +31,7 @@ IEEE Transactions on evolutionary computation, 8(5), 425-442.
 
 #include "../DMOPs.h"
 
-namespace OFEC {
+namespace ofec {
 	class FDA3 final : public DMOPs {
 	public:
 		FDA3(const ParamMap &v);

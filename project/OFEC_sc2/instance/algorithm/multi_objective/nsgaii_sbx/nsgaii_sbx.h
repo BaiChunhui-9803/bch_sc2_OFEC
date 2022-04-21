@@ -16,37 +16,39 @@
 // Last modified: 15 Aug 2019 by Junchen Wang (email:wangjunchen.chris@gmail.com)
 // Last modified: 23 Aug 2019 by Xiaofang Wu (email:email:wuxiaofang@cug.edu.cn)
 
-#ifndef OFEC_NSGAII_SBXRM_H
-#define OFEC_NSGAII_SBXRM_H
+#ifndef OFEC_NSGAII_SBX_H
+#define OFEC_NSGAII_SBX_H
 
-#include "../NSGAII.h"
-#include "../../../GA/SBX/SBX.h"
-#include "../../../../../core/algorithm/algorithm.h"
+#include "../../template/classic/ga/sbx_pop.h"
+#include "../../template/multi_objective/nsgaii/nsgaii.h"
+#include "../../../../core/algorithm/algorithm.h"
 
-namespace OFEC {
-	class NSGAII_SBX_pop : public SBX_pop<>, NSGAII<individual<>> {
+namespace ofec {
+	class PopNSGAII_SBX : public PopSBX<>, public NSGAII {
 	public:
-		explicit NSGAII_SBX_pop(size_t size_pop);
-		void initialize() override;
-		EvalTag evolve() override;
+		PopNSGAII_SBX(size_t size_pop, int id_pro);
+		int evolve(int ind_pro, int id_alg, int id_rnd) override;
 	protected:
-		std::vector<individual<>> m_offspring;  // 2 size of population
+		Population<Individual<>> m_pop_combined;  // combination of parent and children
 	};
 
-	class NSGAII_SBX : public algorithm {
-	public:
-		explicit NSGAII_SBX(param_map& v);
-		void initialize() override;
-		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override {}
-#endif
+	class NSGAII_SBX : public Algorithm {
 	protected:
+		std::unique_ptr<PopNSGAII_SBX> m_pop;
+		size_t m_pop_size;
+		Real m_cr, m_mr, m_ceta, m_meta;
+		
+		void initialize_() override;
 		void run_() override;
-	protected:
-		NSGAII_SBX_pop m_pop;
+		void initPop();
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
+
+	public:
+		void record() override;
 	};
 }
 
-#endif // !OFEC_NSGAII_SBXRM_H
+#endif // !OFEC_NSGAII_SBX_H
 

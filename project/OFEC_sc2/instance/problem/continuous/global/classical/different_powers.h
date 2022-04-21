@@ -1,4 +1,4 @@
-//Register different_powers "Classic_different_powers" GOP,ConOP,SOP
+//Register DifferentPowers "Classic_different_powers" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -21,20 +21,14 @@
 #define OFEC_DIFFERENT_POWERS_H
 
 #include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_gop.h"
 
-namespace OFEC {
-
-	class different_powers : public function
-	{
-	public:
-		different_powers(const ParamMap &v);
-		different_powers(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class DifferentPowers : public Function, public MetricsGOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real> &obj) override;
 	};
-
 }
 #endif // !OFEC_DIFFERENT_POWERS_H
 

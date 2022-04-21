@@ -39,6 +39,7 @@ link_directories(D:/Boost/lib)
 link_directories(D:/Boost/include)
 
 # VC++目录 库目录
+link_libraries(D:/Boost/lib)
 
 # 链接器 输入 附加依赖项
 target_link_libraries(${PROJECT_NAME} 

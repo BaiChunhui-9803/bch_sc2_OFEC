@@ -1,4 +1,4 @@
-//Register modified_rastrigin "Classic_rastrigin_modified" MMOP,ConOP,SOP
+//Register ModifiedRastrigin "Classic_Rastrigin_modified" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -19,21 +19,15 @@
 #ifndef FMODIFIED_RASTRIGIN
 #define FMODIFIED_RASTRIGIN
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-	
-	class modified_rastrigin : public function
-	{
-	public:
-		modified_rastrigin(const ParamMap &v);
-		modified_rastrigin(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class ModifiedRastrigin : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
+		
 		std::vector<Real> m_k;
-	};
-	
+	};	
 }
 #endif 

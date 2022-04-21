@@ -1,5 +1,5 @@
-function number 5 6 8 23  # the first number is read by example2.c, see there.
-restarts 0                    # read by example2.c, remark that restarts 
+# function number 5 6 8 23  # the first number is read by example2.c, see there.
+# restarts 0                    # read by example2.c, remark that restarts 
                               # with the same initialX might be sub-optimal
 #
 # Input parameter file for cmaes_t.  

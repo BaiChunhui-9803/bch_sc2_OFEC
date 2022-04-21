@@ -1,18 +1,23 @@
 #include "F5_schwefel_2_6_bound.h"
-#include <numeric>
+#include "../../../../../core/instance_manager.h"
+#include "../../../../../core/global.h"
+#include <sstream>
 
-namespace OFEC {
-	namespace CEC2005 {
-		Schwefel_2_6_Bound::Schwefel_2_6_Bound(const ParamMap &v) :
-			Schwefel_2_6_Bound((v.at("problem name")), (v.at("number of variables"))) {}
+namespace ofec {
+	namespace cec2005 {
+		void Schwefel_2_6_Bound::initialize_() {
+			Function::initialize_();
+			resizeVariable(std::get<int>(GET_PARAM(m_id_param).at("number of variables")));
+			setDomain(-100, 100);
+			setOriginalGlobalOpt();
+			loadData("/instance/problem/continuous/global/cec2005/data/"); // load data into m_a and m_b
+			setBias(-310);
+			setGlobalOpt(m_translation.data());
+			m_variable_niche_radius = 1e-4 * 100 * m_num_vars;
+			m_objective_accuracy = 1.0e-6;
+		}
 
-		Schwefel_2_6_Bound::Schwefel_2_6_Bound(const std::string &name, size_t num_vars) :
-			Problem(name), 
-			Function(name, num_vars),
-			m_a(num_vars, std::vector<Real>(num_vars)),
-			m_b(num_vars) {}
-
-		void Schwefel_2_6_Bound::load_data(const std::string &path) {
+		void Schwefel_2_6_Bound::loadData(const std::string &path) {
 			std::string sa;
 			std::stringstream ss;
 			ss << m_num_vars << "Dim.txt";
@@ -20,6 +25,9 @@ namespace OFEC {
 			sa.insert(0, m_name + "_a_");
 			sa.insert(0, path);
 			sa.insert(0, g_working_dir);// data path
+
+			m_a.assign(m_num_vars, std::vector<Real>(m_num_vars));
+			m_b.resize(m_num_vars);
 
 			std::ifstream in_a(sa);
 			if (in_a.fail()) {
@@ -89,20 +97,7 @@ namespace OFEC {
 			}
 		}
 
-		void Schwefel_2_6_Bound::initialize() {
-			setDomain(-100, 100);
-			load_data("/instance/problem/continuous/global/CEC2005/data/"); // load data into m_a and m_b
-			setBias(-310);
-			setOriginalGlobalOpt(m_translation.data());
-			setGlobalOpt();
-			m_optima.setVariableGiven(true);
-			m_obj_minmax_monitored = true;
-			m_objective_accuracy = 1.0e-8;
-
-			m_initialized = true;
-		}
-
-		EvalTag Schwefel_2_6_Bound::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		void Schwefel_2_6_Bound::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 			std::vector<Real> temp_vector(m_num_vars);
 			for (int i = 0; i < m_num_vars; ++i) {
 				for (int j = 0; j < m_num_vars; ++j) {
@@ -121,7 +116,6 @@ namespace OFEC {
 					temp_max = abs(temp_vector[j]);
 			}
 			obj[0] = temp_max + m_bias;
-			return EvalTag::Normal;
 		}
 	}
 }

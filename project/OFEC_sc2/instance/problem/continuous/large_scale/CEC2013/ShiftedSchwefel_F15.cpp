@@ -1,6 +1,6 @@
 
 #include "ShiftedSchwefel_F15.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		ShiftedSchwefel_F15::ShiftedSchwefel_F15(const ParamMap &v) : 
 			ShiftedSchwefel_F15((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -36,7 +36,7 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag ShiftedSchwefel_F15::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int ShiftedSchwefel_F15::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			int i;
 			Real result = 0.0;
 
@@ -50,7 +50,7 @@ namespace OFEC {
 			result = schwefel(mp_anotherz, m_num_vars);
 
 			obj[0] = result;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

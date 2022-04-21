@@ -20,28 +20,28 @@
 #include<algorithm>
 #include<iomanip>
 #include<fstream>
-#include "../../DE/MOEA_DE/MOEA_DE.h"
-#include "../../../../utility/matrix.h"
-#include "../../../../utility/random/newran.h"
+#include "../../../multi_objective/moea_de_pop.h"
+#include "../../../../../utility/linear_algebra/matrix.h"
+#include "../../../../../utility/random/newran.h"
 
-namespace OFEC {
-	template<typename Individual>
-	class MOEAD{
-		enum DecomFun { _TCHE1, _TCHE2, _NBI1, _NBI2, _NBI3 };
+namespace ofec {
+	template<typename TInd>
+	class MOEAD {
+		enum class DecomFun { _TCHE1, _TCHE2, _NBI1, _NBI2, _NBI3 };
 	public:
-		MOEAD();
-		EvalTag evolve();
-		virtual EvalTag evolve_mo() = 0;
+		MOEAD(int id_pro);
+		MOEAD(size_t num_objs);
+
 	protected:
-		void initialize(std::vector<std::unique_ptr<Individual>> &parent);
-		void init_uniformweight(int parent_size);
-		void init_neighbourhood();
-		void update_reference(Individual &sol);
-		void update_problem(std::vector<std::unique_ptr<Individual>> &parent, Individual &sol, int id, int type);
-		Real fitnessfunction(std::vector<Real> &obj, int k);
-		void matingselection(std::vector<int> &list, int cid, int size, int type, int parent_size);
+		void initialize(std::vector<std::unique_ptr<TInd>>& parent, int id_pro);
+		void initUniformWeight(int parent_size, int id_pro);
+		void initNeighbourhood();
+		void updateReference(TInd& sol, int id_pro);
+		void updateProblem(std::vector<std::unique_ptr<TInd>>& parent, TInd& sol, int id, int type, int id_pro, int id_rnd);
+		Real fitnessFunction(std::vector<Real>& obj, int k, int id_pro);
+		void matingSelection(std::vector<int>& list, int cid, int size, int type, int parent_size, int id_rnd);
 		std::vector<Real> mv_ideal_point;	//the best value in every dimension
-		std::vector<Individual> mv_sol_arr;	//corresponding Individual of the best value in every dimension
+		std::vector<TInd> mv_sol_arr;	//corresponding TInd of the best value in every dimension
 		std::vector<Vector> mv_namda;
 		std::vector<std::vector<int> > mvv_neigh;
 		int m_unit;
@@ -50,54 +50,57 @@ namespace OFEC {
 		Real m_realb;     // probability of selecting mating parents from neighborhood
 		DecomFun m_decom_function;
 	private:
-		void min_max_sort(std::vector<Real> &v, std::vector<int> &idx);
+		void minMaxSort(std::vector<Real>& v, std::vector<int>& idx);
 	};
 
-	template<typename Individual>
-	MOEAD<Individual>::MOEAD():m_unit(13), m_niche(20), m_realb(0.9), m_limit(2), m_decom_function(_TCHE1) {
-		int numObj = global::ms_global->m_problem->objective_size();
-		mv_sol_arr.resize(numObj);
-		mv_ideal_point.resize(numObj, 1.0e+30);	
-	}
+	template<typename TInd>
+	MOEAD<TInd>::MOEAD(int id_pro) :
+		m_unit(13),
+		m_niche(20),
+		m_realb(0.9),
+		m_limit(2),
+		m_decom_function(DecomFun::_TCHE1),
+		mv_ideal_point(GET_PRO(id_pro).numObjectives(), 1.0e+30) {}
 
-	template<typename Individual>
-	EvalTag MOEAD<Individual>::evolve() {
-		//std::cout << "the " << this->m_iter << " generation" << std::endl;
-		EvalTag tag = EvalTag::Normal;
-		tag = evolve_mo();		
-		return tag;
-	}
+	template<typename TInd>
+	MOEAD<TInd>::MOEAD(size_t num_objs) :
+		m_unit(13),
+		m_niche(20),
+		m_realb(0.9),
+		m_limit(2),
+		m_decom_function(DecomFun::_TCHE1),
+		mv_ideal_point(num_objs, 1.0e+30) {}
 
-	template<typename Individual>
-	void MOEAD<Individual>::initialize(std::vector<std::unique_ptr<Individual>> &parent) {
-		init_uniformweight(parent.size());
-		init_neighbourhood();
+	template<typename TInd>
+	void MOEAD<TInd>::initialize(std::vector<std::unique_ptr<TInd>>& parent, int id_pro) {
+		initUniformWeight(parent.size(), id_pro);
+		initNeighbourhood();
 		for (int i = 0; i < parent.size(); i++)
-			update_reference(*(parent[i]));
+			updateReference(*(parent[i]), id_pro);
 	}
 
-	template<typename Individual>
-	void MOEAD<Individual>::init_uniformweight(int parent_size) {		
-		if (global::ms_global->m_problem->objective_size() == 2){
+	template<typename TInd>
+	void MOEAD<TInd>::initUniformWeight(int parent_size, int id_pro) {
+		if (GET_PRO(id_pro).numObjectives() == 2) {
 			mv_namda.resize(parent_size);
-			for (int n = 0; n < parent_size; n++){
-				Real a = 1.0*n / (parent_size - 1);
-				mv_namda[n].push_back(a);
-				mv_namda[n].push_back(1 - a);
+			for (int n = 0; n < parent_size; n++) {
+				Real a = 1.0 * n / (parent_size - 1.);
+				mv_namda[n].pushBack(a);
+				mv_namda[n].pushBack(1 - a);
 			}
 		}
-		else{
+		else {
 			int n = 0;
-			for (int i = 0; i <= m_unit; i++){
-				for (int j = 0; j <= m_unit; j++){
-					if (i + j <= m_unit){
+			for (int i = 0; i <= m_unit; i++) {
+				for (int j = 0; j <= m_unit; j++) {
+					if (i + j <= m_unit) {
 						std::vector<int> arr;
 						arr.push_back(i);
 						arr.push_back(j);
 						arr.push_back(m_unit - i - j);
 						mv_namda.push_back(std::vector<Real>(0));
 						for (int k = 0; k < arr.size(); k++)
-							mv_namda[n].push_back(1.0*arr[k] / m_unit);
+							mv_namda[n].pushBack(1.0 * arr[k] / m_unit);
 						n++;
 						arr.clear();
 					}
@@ -105,21 +108,21 @@ namespace OFEC {
 			}
 		}
 	}
-	
-	template<typename Individual>
-	void MOEAD<Individual>::init_neighbourhood() {
+
+	template<typename TInd>
+	void MOEAD<TInd>::initNeighbourhood() {
 		int pops = mv_namda.size();
 		mvv_neigh.resize(pops);
 		std::vector<Real> dis(pops);
 		std::vector<int> index(pops);
-		for (int i = 0; i < pops; i++){
+		for (int i = 0; i < pops; i++) {
 			// calculate the distances based on weight vectors
-			for (int j = 0; j < pops; j++){
+			for (int j = 0; j < pops; j++) {
 				dis[j] = mv_namda[i].distance(mv_namda[j]);
 				index[j] = j;
 			}
 			//find 'niche' nearest neighboring subproblems			
-			min_max_sort(dis, index);
+			minMaxSort(dis, index);
 			for (int k = 0; k < m_niche; k++)
 				mvv_neigh[i].push_back(index[k]);
 		}
@@ -127,71 +130,71 @@ namespace OFEC {
 		index.clear();
 	}
 
-	template<typename Individual>
-	void MOEAD<Individual>::update_reference(Individual &sol) {
-		//sol: child Individual
-		int numObj = global::ms_global->m_problem->objective_size();		
-		for (int n = 0; n < numObj; n++){
-			if (sol.objective()[n] < mv_ideal_point[n]){
+	template<typename TInd>
+	void MOEAD<TInd>::updateReference(TInd& sol, int id_pro) {
+		//sol: child TInd
+		int numObj = GET_PRO(id_pro).numObjectives();
+		for (int n = 0; n < numObj; n++) {
+			if (sol.objective()[n] < mv_ideal_point[n]) {
 				mv_ideal_point[n] = sol.objective()[n];
-				mv_sol_arr[n] = sol;
+				mv_sol_arr.emplace_back(sol);
 			}
-		}		
+		}
 	}
 
-	template<typename Individual>
-	void MOEAD<Individual>::update_problem(std::vector<std::unique_ptr<Individual>> &parent, Individual &sol, int id, int type) {
-		// sol: child Individual
+	template<typename TInd>
+	void MOEAD<TInd>::updateProblem(std::vector<std::unique_ptr<TInd>>& parent, TInd& sol, int id, int type, int id_pro, int id_rnd) {
+		// sol: child TInd
 		// id:  the id of current subproblem
 		// type:update Individuals in - neighborhood (1) or whole population (otherwise)
 		int size, time = 0;
-		if (type == 1)	
+		if (type == 1)
 			size = m_niche;
-		else        
+		else
 			size = parent.size();
 		std::vector<int> perm(size);
 		for (int i(0); i < perm.size(); ++i) {
 			perm[i] = i;
 		}
-		global::ms_global->m_uniform[caller::Algorithm]->shuffle(perm.begin(), perm.end());
+		GET_RND(id_rnd).uniform.shuffle(perm.begin(), perm.end());
 
-		for (int i = 0; i < size; i++){
+		for (int i = 0; i < size; i++) {
 			int k;
-			if (type == 1) 
+			if (type == 1)
 				k = mvv_neigh[id][perm[i]];
-			else        
+			else
 				k = perm[i];
 			// calculate the values of objective function regarding the current subproblem
 			Real f1, f2;
-			f1 = fitnessfunction(parent[k]->objective(), k);
-			f2 = fitnessfunction(sol.objective(), k);
-			if (f2 < f1){
+			f1 = fitnessFunction(parent[k]->objective(), k, id_pro);
+			f2 = fitnessFunction(sol.objective(), k, id_pro);
+			if (f2 < f1) {
 				*parent[k] = sol;
 				time++;
 			}
-			// the maximal number of Individual updated is not allowed to exceed 'limit'
+			// the maximal number of TInd updated is not allowed to exceed 'limit'
 			if (time >= m_limit)
 				return;
 		}
 		perm.clear();
 	}
 
-	template<typename Individual>
-	Real MOEAD<Individual>::fitnessfunction(std::vector<Real> &obj, int k) {
+	template<typename TInd>
+	Real MOEAD<TInd>::fitnessFunction(std::vector<Real>& obj, int k, int id_pro) {
 		// Chebycheff Scalarizing Function
 		Real fitness = 0;
-		int numObj = global::ms_global->m_problem->objective_size();
+		int numObj = GET_PRO(id_pro).numObjectives();
 		//int numObj = obj.size();
-		if (m_decom_function == _TCHE1){
+		if (m_decom_function == DecomFun::_TCHE1) {
 			Real max_fun = -1.0e+30;
-			for (int n = 0; n < numObj; n++){
+			for (int n = 0; n < numObj; n++) {
 				//Real diff = fabs(y_obj[n] - idealpoint[n] + scale[n]);
 				//Real diff = fabs(y_obj[n] - idealpoint[n] + 0.05);
 				Real diff = fabs(obj[n] - mv_ideal_point[n]);
 				//Real diff = fabs(y_obj[n] - 0);
 				Real feval;
 				if (mv_namda[k][n] == 0)
-					feval = 0.0001*diff;
+					feval = 0.0001 * diff;
 				else
 					feval = diff * mv_namda[k][n];
 				if (feval > max_fun) max_fun = feval;
@@ -200,16 +203,16 @@ namespace OFEC {
 			fitness = max_fun;
 		}
 
-		if (m_decom_function == _TCHE2)	{
+		if (m_decom_function == DecomFun::_TCHE2) {
 			// reference point in the CHIM
 			std::vector<int> scale(numObj);
-			//throw myException("Please initialize the scale @MOEAD<Poppulation,Individual>::fitnessfuction");
+			//throw myException("Please initialize the scale @MOEAD<Poppulation,TInd>::fitnessfuction");
 			Real max_fun = -1.0e+30;
-			for (int n = 0; n < numObj; n++){
+			for (int n = 0; n < numObj; n++) {
 				Real diff = (obj[n] - mv_ideal_point[n]) / scale[n];  //note: the scale is not initialized, there has no knowledge
 				Real feval;
 				if (mv_namda[k][n] == 0)
-					feval = 0.0001*diff;
+					feval = 0.0001 * diff;
 				else
 					feval = diff * mv_namda[k][n];
 				if (feval > max_fun) max_fun = feval;
@@ -220,11 +223,11 @@ namespace OFEC {
 
 		// CHIM + Tchebycheff
 		// CHIM is not available in 3 objectives
-		if (m_decom_function == _NBI1) {
+		if (m_decom_function == DecomFun::_NBI1) {
 			// quasi normal direction
 			Vector norm;
-			for (int i = 0; i < numObj; i++){
-				norm.push_back(0.0);
+			for (int i = 0; i < numObj; i++) {
+				norm.pushBack(0.0);
 				for (int j = 0; j < numObj; j++) {
 					norm[i] += -mv_sol_arr[j].objective()[i];
 				}
@@ -235,7 +238,7 @@ namespace OFEC {
 
 			// reference point in the CHIM
 			std::vector <Real> base;
-			for (int i = 0; i < numObj; i++){
+			for (int i = 0; i < numObj; i++) {
 				Real tp2 = 0;
 				for (int j = 0; j < numObj; j++)
 					tp2 += mv_sol_arr[j].objective()[i] * mv_namda[k][j];
@@ -244,7 +247,7 @@ namespace OFEC {
 
 			// Tchebycheff function
 			Real max_fun = -1.0e+30;
-			for (int n = 0; n < numObj; n++){
+			for (int n = 0; n < numObj; n++) {
 				Real diff = obj[n] - base[n];
 				Real feval = -diff * norm[n];
 				if (feval > max_fun) max_fun = feval;
@@ -256,7 +259,7 @@ namespace OFEC {
 		//* Boundary intersection approach
 		//* reference point is chosen as the ideal point
 		//* the direction is independent of CHIM
-		if (m_decom_function == _NBI2){
+		if (m_decom_function == DecomFun::_NBI2) {
 
 			mv_namda[k].normalize();
 
@@ -270,7 +273,7 @@ namespace OFEC {
 				realA[n] = (obj[n] - mv_ideal_point[n]);
 
 			// distance along the search direction norm
-			Real d1 = fabs(realA*mv_namda[k]);
+			Real d1 = fabs(realA * mv_namda[k]);
 
 			// distance to the search direction norm
 			for (int n = 0; n < numObj; n++)
@@ -284,12 +287,12 @@ namespace OFEC {
 		}
 
 		// NBI method
-		if (m_decom_function == _NBI3) {
+		if (m_decom_function == DecomFun::_NBI3) {
 
 			// quasi normal direction
 			Vector norm;
-			for (int i = 0; i < numObj; i++){
-				norm.push_back(0.0);
+			for (int i = 0; i < numObj; i++) {
+				norm.pushBack(0.0);
 				for (int j = 0; j < numObj; j++) {
 					norm[i] += -mv_sol_arr[j].objective()[i];
 				}
@@ -300,7 +303,7 @@ namespace OFEC {
 
 			// reference point in the CHIM
 			std::vector<Real> base;
-			for (int i = 0; i < numObj; i++){
+			for (int i = 0; i < numObj; i++) {
 				Real tp2 = 0;
 				for (int j = 0; j < numObj; j++)
 					tp2 += mv_sol_arr[j].objective()[i] * mv_namda[k][j];
@@ -314,14 +317,14 @@ namespace OFEC {
 
 			// difference beween current point and reference point
 			for (int n = 0; n < numObj; n++)
-				realA.push_back(obj[n] - base[n]);
+				realA.pushBack(obj[n] - base[n]);
 
 			// distance along the search direction norm
 			Real d1 = realA * norm;
 
 			// distance to the search direction norm
 			for (int n = 0; n < numObj; n++)
-				realB.push_back(obj[n] - (base[n] + d1 * norm[n]));
+				realB.pushBack(obj[n] - (base[n] + d1 * norm[n]));
 			Real d2 = realB.length();
 
 			fitness = -d1 + 2 * d2;
@@ -329,24 +332,25 @@ namespace OFEC {
 		return fitness;
 	}
 
-	template<typename Individual>
-	void MOEAD<Individual>::matingselection(std::vector<int> &list, int cid, int size, int type, int parent_size) {
+	template<typename TInd>
+	void MOEAD<TInd>::matingSelection(std::vector<int>& list, int cid, int size, int type, int parent_size, int id_rnd) {
 		// list : the set of the indexes of selected mating parents
 		// cid  : the id of current subproblem
 		// size : the number of selected mating parents
 		// type : 1 - neighborhood; otherwise - whole population
 		int r, p;
-		while (list.size() < size){
+		while (list.size() < size) {
 			if (type == 1) {
-				r = global::ms_global->m_uniform[caller::Algorithm]->next_non_standard(0, m_niche);				
+				r = GET_RND(id_rnd).uniform.nextNonStd(0, m_niche);
 				p = mvv_neigh[cid][r];
 			}
-			else
-				p = global::ms_global->m_uniform[caller::Algorithm]->next_non_standard(0, parent_size);
-				
+			else {
+				p = GET_RND(id_rnd).uniform.nextNonStd(0, parent_size);
+			}
+
 			bool flag = true;
-			for (int i = 0; i < list.size(); i++){
-				if (list[i] == p){ // p is in the list				
+			for (int i = 0; i < list.size(); i++) {
+				if (list[i] == p) { // p is in the list				
 					flag = false;
 					break;
 				}
@@ -356,9 +360,8 @@ namespace OFEC {
 		}
 	}
 
-
-	template<typename Individual>
-	void MOEAD<Individual>::min_max_sort(std::vector<Real> &v, std::vector<int> &idx) {
+	template<typename TInd>
+	void MOEAD<TInd>::minMaxSort(std::vector<Real>& v, std::vector<int>& idx) {
 		for (int i = 0; i < v.size(); ++i) {
 			int min = i;
 			for (int j = i + 1; j < v.size(); ++j) {

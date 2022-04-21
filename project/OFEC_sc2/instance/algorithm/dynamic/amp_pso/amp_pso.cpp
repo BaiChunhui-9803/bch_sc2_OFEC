@@ -4,7 +4,7 @@
 #include <core/global_ui.h>
 #endif
 
-namespace OFEC {
+namespace ofec {
 	void AMP_PSO::initialize_() {
 		Algorithm::initialize_();
 		auto &v = GET_PARAM(m_id_param);

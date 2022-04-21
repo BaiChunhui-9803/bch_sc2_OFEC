@@ -1,4 +1,4 @@
-//Register NonContinuousScafferF6 "Classic_scaffer_F6_non_continuous" GOP,ConOP,SOP
+//Register NonContinuousScafferF6 "Classic_Scaffer_F6_non_continuous" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -19,11 +19,11 @@
 #include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_gop.h"
 
-namespace OFEC {
+namespace ofec {
 	class NonContinuousScafferF6 : public Function, public MetricsGOP {
 	protected:
 		void initialize_() override;
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
+		void evaluateOriginalObj(Real *x, std::vector<Real>& obj) override;
 	};	
 }
 #endif // ! OFEC_NON_CONTINUOUS_SCAFFER_F6_H

@@ -32,7 +32,7 @@
 #include <windows.h>
 #endif
 
-namespace OFEC {
+namespace ofec {
 	class INIT_DVRP_POP {
 	public:
 		using DVRP_ind = std::unique_ptr<DCMOEA_ind<Individual<DVRP::routes>>>;

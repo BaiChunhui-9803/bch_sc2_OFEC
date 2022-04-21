@@ -1,4 +1,4 @@
-//Register ScafferF6 "Classic_scaffer_F6" GOP,ConOP,SOP
+//Register ScafferF6 "Classic_Scaffer_F6" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -20,11 +20,11 @@
 #include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_gop.h"
 
-namespace OFEC {
+namespace ofec {
 	class ScafferF6 : public Function, public MetricsGOP {
 	protected:
 		void initialize_() override;
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
+		void evaluateOriginalObj(Real *x, std::vector<Real>& obj) override;
 	};	
 }
 #endif // OFEC_SCAFFER_F6_H

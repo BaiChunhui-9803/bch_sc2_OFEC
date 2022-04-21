@@ -1,6 +1,6 @@
 #include "F10.h"
 
-namespace OFEC::DMOP {
+namespace ofec::DMOP {
 	F10::F10(param_map & v) : F10(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -35,7 +35,7 @@ namespace OFEC::DMOP {
 	}
 
 	//f1=x1; f2=g*h. recommend the number of variables is 20
-	EvalTag F10::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int F10::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//��ֹ�����������ظ�����������ظ�����PF
 			m_optima.clear();
@@ -71,6 +71,6 @@ namespace OFEC::DMOP {
 				}
 			}
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

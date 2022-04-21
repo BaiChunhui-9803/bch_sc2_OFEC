@@ -9,7 +9,7 @@
 extern unique_ptr<Demo::scene> Demo::msp_buffer;
 #endif
 
-namespace OFEC {
+namespace ofec {
 	SDMOP::SDMOP(const ParamMap &v) :SDMOP(v.at("problem name"), v.at("number of variables"), v.at("numObj"), v.at("testItems"), v.at("numPeak")) {
 
 	}
@@ -555,7 +555,7 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag SDMOP::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int SDMOP::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
@@ -725,6 +725,6 @@ namespace OFEC {
 			//obj[m_num_objs - 1]=g*temp_obj;
 		}
 		
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

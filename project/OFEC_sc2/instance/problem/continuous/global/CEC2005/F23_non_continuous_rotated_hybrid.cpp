@@ -20,39 +20,9 @@
 #include "../classical/weierstrass.h"
 #include "../classical/rotated_scaffer_F6.h"
 #include "../../../../../core/instance_manager.h"
-#include <numeric>
 
-namespace OFEC {
-	namespace CEC2005 {
-		void F23_non_continuous_rotated_hybrid::initialize_() {
-			Composition::initialize_();
-			auto &v = GET_PARAM(m_id_param);
-			resizeVariable(std::get<int>(v.at("number of variables")));
-			setDomain(-5., 5.);
-			resizeObjective(1);
-			m_opt_mode[0] = OptMode::Minimize;
-			m_objective_accuracy = 1.0e-8;
-			m_variable_niche_radius = 1. * m_num_vars;
-			m_height_normalize_severity = 2000.;
-
-			setFunction();
-			for (auto &i : m_function)
-				i->setOriginalGlobalOpt();
-			loadRotation("/instance/problem/continuous/global/CEC2005/data/");
-			computeFmax();
-			loadTranslation("/instance/problem/continuous/global/CEC2005/data/");  //data path
-
-			for (auto &i : m_function)
-				i->setGlobalOpt(i->translation().data());
-			m_optima.appendVar(VarVec<Real>(m_function[0]->translation()));
-			m_optima.setVariableGiven(true);
-
-			std::vector<Real> objs(1);
-			evaluateObjective(m_function[0]->translation().data(), objs);
-			m_optima.appendObj(objs);
-			m_optima.setObjectiveGiven(true);
-		}
-
+namespace ofec {
+	namespace cec2005 {
 		void F23_non_continuous_rotated_hybrid::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			std::vector<Real> x_(m_num_vars);
 			for (size_t j = 0; j < m_num_vars; ++j) {
@@ -73,6 +43,14 @@ namespace OFEC {
 		}
 
 		void F23_non_continuous_rotated_hybrid::setFunction() {
+			m_num_function = 10;
+			m_function.resize(m_num_function);
+			m_param_ids.resize(m_num_function);
+			m_height.resize(m_num_function);
+			m_fmax.resize(m_num_function);
+			m_converge_severity.resize(m_num_function);
+			m_stretch_severity.resize(m_num_function);
+
 			basic_func f(5);
 			f[0] = &create_function<RotatedScafferF6>;
 			f[1] = &create_function<Rastrigin>;
@@ -81,9 +59,12 @@ namespace OFEC {
 			f[4] = &create_function<Griewank>;
 
 			for (size_t i = 0; i < m_num_function; ++i) {
+				auto param = GET_PARAM(m_id_param);
+				param["problem name"] = m_name + "_part" + std::to_string(i + 1);
+				m_param_ids[i] = ADD_PARAM(param);
 				m_function[i] = dynamic_cast<Function*>(f[i / 2]());
 				m_function[i]->setIdRnd(m_id_rnd);
-				m_function[i]->setIdParam(m_id_param);
+				m_function[i]->setIdParam(m_param_ids[i]);
 				m_function[i]->initialize();
 				m_function[i]->setBias(0);
 			}

@@ -17,18 +17,16 @@
 #ifndef OFEC_C22_H
 #define OFEC_C22_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "cop_base.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2017 {
-		class C22 final: public function
+		class C22 final: public CopBase
 		{
 		public:
-			C22(const ParamMap &v);
-			C22(const std::string &name, size_t size_var, size_t size_obj);
-			void initialize();
+			void initialize_();
 		protected:
-			void evaluate_obj_nd_con(Real *x, std::vector<Real>& obj, std::vector<Real> &con) override;
+			void evaluateObjAndCon(Real *x, std::vector<Real>& obj, std::vector<Real> &con) override;
 		private:
 
 		};

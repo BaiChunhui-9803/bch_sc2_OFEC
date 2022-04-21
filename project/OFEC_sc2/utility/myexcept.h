@@ -18,13 +18,13 @@
 *
 *********************************************************************************/
 
-#ifndef USING_myexcept_H
-#define USING_myexcept_H
+#ifndef OFEC_MYEXCEPT_H
+#define OFEC_MYEXCEPT_H
 
 ///
 /// MyExcept class thrown by OFEC
 ///
-namespace OFEC {
+namespace ofec {
 	class MyExcept {
 	public :
 		MyExcept(const char* message)  { 
@@ -39,5 +39,5 @@ namespace OFEC {
 #define THROW(mess) throw MyExcept(mess);
 }
 
-#endif                            // end of USING_myexcept_H
+#endif                            // end of OFEC_MYEXCEPT_H
 

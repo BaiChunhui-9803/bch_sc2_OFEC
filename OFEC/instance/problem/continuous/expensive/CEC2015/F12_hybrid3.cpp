@@ -4,7 +4,7 @@
 #include "../../global/classical/griewank_rosenbrock.h"
 #include "../../global/classical/modified_schwefel.h"
 #include "../../global/classical/ackley.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F12_hybrid3::F12_hybrid3(const ParamMap &v) :
 			F12_hybrid3((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -69,11 +69,11 @@ namespace OFEC {
 			// end set
 			m_initialized = true;
 		}
-		EvalTag F12_hybrid3::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F12_hybrid3::evaluateObjective(Real *x, std::vector<Real> &obj) {
 
 			hybrid::evaluateObjective(x, obj);
 			obj[0] += 1200;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

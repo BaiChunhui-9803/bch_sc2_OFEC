@@ -1,25 +1,7 @@
-#include "UF09.h"
+#include "uf09.h"
 
-namespace OFEC {
-	UF09::UF09(param_map & v) : UF09(v.at("problem name"), v.at("number of variables")) { //param_numDim = 30 is suggested
-
-	}
-	UF09::UF09(const std::string & name, size_t size_var) : problem(name, size_var, 3), UF(name, size_var, 3) {
-
-	}
-	void UF09::initialize() {
-		std::vector<std::pair<Real, Real>> r;
-		r.push_back(std::make_pair(0., 1.));
-		r.push_back(std::make_pair(0., 1.));
-		for (int i = 2; i < m_num_vars; ++i) {
-			r.push_back(std::make_pair(-2., 2.));
-		}
-		setInitialDomain(r);
-		setDomain(r);
-		load_PF();
-	}
-
-	EvalTag UF09::evaluateObjective(Real *x, std::vector<Real> &obj) {
+namespace ofec {
+	void UF09::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		int count1, count2, count3;
 		Real sum1, sum2, sum3, yj, E;
 		E = 0.1;
@@ -56,8 +38,5 @@ namespace OFEC {
 			obj[2] = 1.0 - x[1];
 		else
 			obj[2] = 1.0 - x[1] + 2.0*sum3 / (Real)count3;
-		return EvalTag::Normal;
-
 	}
-
 }

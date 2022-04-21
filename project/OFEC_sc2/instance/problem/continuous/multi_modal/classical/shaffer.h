@@ -1,4 +1,4 @@
-//Register shaffer "Classic_shaffer" MMOP,ConOP,SOP
+//Register Shaffer "Classic_Shaffer" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -20,18 +20,13 @@
 #define OFEC_SHAFFER_H
 
 #include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
+#include "../metrics_mmop.h"
 
-	class shaffer : public function
-	{
-	public:
-		shaffer(const ParamMap &v);
-		shaffer(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class Shaffer : public Function, public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateOriginalObj(Real *x, std::vector<Real> &obj) override;
 	};
-	
 }
 #endif // !OFEC_SHAFFER_H

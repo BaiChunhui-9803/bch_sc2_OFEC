@@ -27,7 +27,7 @@
 
 #include "../real_DBG.h"
 
-namespace OFEC {
+namespace ofec {
 	class rotation_DBG final : public real_DBG
 	{
 	public:

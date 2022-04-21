@@ -22,44 +22,45 @@
 #ifndef OFEC_NCDE_H
 #define OFEC_NCDE_H
 
-
 /*
-Paper:B. Y. Qu, P. N. Suganthan, and J. J. Liang, ��Differential evolution
-with neighborhood mutation for multimodal optimization,�� IEEE Trans.
+Paper:B. Y. Qu, P. N. Suganthan, and J. J. Liang, "Differential evolution
+with neighborhood mutation for multimodal optimization", IEEE Trans.
 Evol. Comput., vol. 16, no. 5, pp. 601�C614, Oct. 2012.
 */
 
-#include "../population.h"
+#include "../../template/classic/de/de_pop.h"
 #include "../../../../core/algorithm/algorithm.h"
 #include <list>
 
-namespace OFEC {
-	class NCDE_pop final : public DE::population<DE::individual>
-	{
+namespace ofec {
+	class PopNCDE final : public PopDE<> {
 	public:
-		NCDE_pop(size_t size_pop);
-		EvalTag evolve() override;
+		PopNCDE(size_t size_pop, int id_pro);
+		int evolve(int id_pro, int id_alg, int id_rnd) override;
 	protected:
-		void sort_distance(size_t a);
+		void sortDistance(size_t a, int id_pro);
 	protected:
 		std::vector<std::list<std::pair<Real, int>>> m_dis;  //save individuals' distance
 		Real m_r;                             //size of neighborhood
 		size_t m_m;                                //size of neighborhood
 	};
 
-	class NCDE final : public algorithm
-	{
-	public:
-		NCDE(const ParamMap &v);
-		void initialize() override;
-		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override;
-#endif
+	class NCDE final : public Algorithm {
 	protected:
+		std::unique_ptr<PopNCDE> m_pop;
+		size_t m_pop_size;
+		Real m_f, m_cr;
+		MutationDE m_ms;
+
+		void initialize_() override;
 		void run_() override;
-	protected:
-		NCDE_pop m_pop;
+		void initPop();
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
+
+	public:
+		void record() override;
 	};
 }
 

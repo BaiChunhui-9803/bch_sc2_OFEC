@@ -22,7 +22,7 @@
 
 #include "../definition.h"
 
-namespace OFEC {
+namespace ofec {
 
 	template<typename ValueType = Real>
 	class Domain {

@@ -17,7 +17,7 @@
 #define N20_SHIFTEDSCHWEFEL_F11_H
 
 #include "function_CEC2013.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		class N20_ShiftedSchwefel_F11 final:public function_CEC2013 {
 		public:

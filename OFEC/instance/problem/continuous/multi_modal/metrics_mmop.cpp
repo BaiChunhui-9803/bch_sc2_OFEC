@@ -1,18 +1,36 @@
-#include "../../../../core/algorithm/solution.h"
+#include "../../../../core/problem/solution.h"
 #include "../../../../core/problem/continuous/continuous.h"
 #include "metrics_mmop.h"
 #include <algorithm>
 
-namespace OFEC {
+namespace ofec {
 	void MetricsMMOP::updateCandidates(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const {
-		updateOnlyByObj(sol, candidates);
+		switch (m_mb) {
+		case ofec::MetricsMMOP::MeasureBy::kObj:
+			updateByObj(sol, candidates); break;
+		case ofec::MetricsMMOP::MeasureBy::kVar:
+			updateByVar(sol, candidates); break;
+		case ofec::MetricsMMOP::MeasureBy::kObjAndVar:
+			updateByObjAndVar(sol, candidates); break;
+		}	
 	}
 
 	size_t MetricsMMOP::numOptimaFound(const std::list<std::unique_ptr<SolBase>> &candidates) const {
-		return numOptimaOnlyByObj(candidates);
+		switch (m_mb) {
+		case ofec::MetricsMMOP::MeasureBy::kObj:
+			return numOptimaByObj(candidates);
+		case ofec::MetricsMMOP::MeasureBy::kVar:
+			return numOptimaByVar(candidates);
+		case ofec::MetricsMMOP::MeasureBy::kObjAndVar:
+			return numOptimaByObjAndVar(candidates);
+		}		
 	}
 
-	void MetricsMMOP::updateOnlyByObj(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const {
+	bool MetricsMMOP::isSolved(const std::list<std::unique_ptr<SolBase>> &candidates) const {
+		return numOptimaFound(candidates) == m_optima.numberObjectives();
+	}
+
+	void MetricsMMOP::updateByObj(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const {
 		if (sol.objectiveDistance(m_optima.objective(0)) < m_objective_accuracy) {
 			for (auto &c : candidates) {
 				if (c->variableDistance(sol, m_id_pro) < m_variable_niche_radius)
@@ -20,6 +38,24 @@ namespace OFEC {
 			}
 			candidates.emplace_back(new Solution<>(dynamic_cast<const Solution<>&>(sol)));
 		}
+	}
+
+	size_t MetricsMMOP::numOptimaByObj(const std::list<std::unique_ptr<SolBase>> &candidates) const {
+		std::list<SolBase *> opts_fnd;
+		for (auto &c : candidates) {
+			if (c->objectiveDistance(m_optima.objective(0)) < m_objective_accuracy) {
+				bool is_new_opt = true;
+				for (auto of : opts_fnd) {
+					if (of->variableDistance(*c, m_id_pro) < m_variable_niche_radius) {
+						is_new_opt = false;
+						break;
+					}
+				}
+				if (is_new_opt)
+					opts_fnd.push_back(c.get());
+			}
+		}
+		return opts_fnd.size();
 	}
 
 	void MetricsMMOP::updateByObjAndVar(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const {
@@ -47,6 +83,48 @@ namespace OFEC {
 		}
 	}
 
+	size_t MetricsMMOP::numOptimaByObjAndVar(const std::list<std::unique_ptr<SolBase>> &candidates) const {
+		size_t count = 0;
+		Real dis_obj, dis_var;
+		for (size_t i = 0; i < m_optima.numberObjectives(); i++) {
+			for (auto &c : candidates) {
+				dis_obj = c->objectiveDistance(m_optima.objective(i));
+				dis_var = c->variableDistance(m_optima.variable(i), m_id_pro);
+				if (dis_obj < m_objective_accuracy && dis_var < m_variable_niche_radius) {
+					count++;
+					break;
+				}
+			}
+		}
+		return count;
+	}
+
+	void MetricsMMOP::updateByVar(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const {
+		auto &s = dynamic_cast<const Solution<>&>(sol);
+		if (candidates.empty()) {
+			for (size_t i = 0; i < m_optima.numberVariables(); i++)
+				candidates.emplace_back(new Solution<>(s));
+			return;
+		}
+		auto it = candidates.begin();
+		for (size_t i = 0; i < m_optima.numberVariables(); ++i, ++it) {
+			if (variableDistance(s.variable(), m_optima.variable(i)) < (*it)->variableDistance(m_optima.variable(i), m_id_pro))
+				(*it).reset(new Solution<>(s));
+		}
+	}
+
+	size_t MetricsMMOP::numOptimaByVar(const std::list<std::unique_ptr<SolBase>> &candidates) const {
+		size_t num = 0;
+		if (!candidates.empty()) {
+			auto it = candidates.begin();
+			for (size_t i = 0; i < m_optima.numberVariables(); ++i, ++it) {
+				if ((*it)->objectiveDistance(m_optima.objective(i)) < m_objective_accuracy)
+					num++;
+			}
+		}
+		return num;
+	}
+
 	void MetricsMMOP::updateBestFixedNumSols(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates, size_t num_sols) const {
 		bool flag_add = true;
 		for (auto iter = candidates.begin(); iter != candidates.end();) {
@@ -71,39 +149,5 @@ namespace OFEC {
 				(*iter_worst).reset(new Solution<>(dynamic_cast<const Solution<>&>(sol)));
 			}
 		}
-	}
-
-	size_t MetricsMMOP::numOptimaOnlyByObj(const std::list<std::unique_ptr<SolBase>> &candidates) const {
-		std::list<SolBase*> opts_fnd;
-		for (auto &c : candidates) {
-			if (c->objectiveDistance(m_optima.objective(0)) < m_objective_accuracy) {
-				bool is_new_opt = true;
-				for (auto of : opts_fnd) {
-					if (of->variableDistance(*c, m_id_pro) < m_variable_niche_radius) {
-						is_new_opt = false;
-						break;
-					}
-				}
-				if (is_new_opt)
-					opts_fnd.push_back(c.get());
-			}
-		}
-		return opts_fnd.size();
-	}
-
-	size_t MetricsMMOP::numOptimaByObjAndVar(const std::list<std::unique_ptr<SolBase>> &candidates) const {
-		size_t count = 0;
-		Real dis_obj, dis_var;
-		for (size_t i = 0; i < m_optima.numberObjectives(); i++) {
-			for (auto &c : candidates) {
-				dis_obj = c->objectiveDistance(m_optima.objective(i));
-				dis_var = c->variableDistance(m_optima.variable(i), m_id_pro);
-				if (dis_obj < m_objective_accuracy && dis_var < m_variable_niche_radius) {
-					count++;
-					break;
-				}
-			}
-		}
-		return count;
 	}
 }

@@ -17,7 +17,7 @@
 #define N20_SR_ACKLEY_F10_H
 
 #include "function_CEC2013.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		class N20_SR_Ackley_F10 final:public function_CEC2013 {
 		public:

@@ -1,107 +1,46 @@
 #include "uncertianty_continuous.h"
 #include "../../../../core/global.h"
-#include "../../../../utility/vector.h"
+#include "../../../../core/instance_manager.h"
+#include "../../../../utility/linear_algebra/vector.h"
+#include "../../../../core/problem/solution.h"
 #include <algorithm>
 
-namespace OFEC {
+#ifdef OFEC_DEMO
+#include <core/global_ui.h>
+#endif // OFEC_DEMO
 
-
-
+namespace ofec {
 	const std::vector<std::string> UncertaintyContinuous::ms_type = { "SmallStep", "LargeStep", "Random", "Recurrent", "Chaotic", "RecurrentNoisy" };
 
-
-	UncertaintyContinuous::UncertaintyContinuous(const std::string& name, size_t num_peak, size_t num_vars, size_t num_objs , size_t num_cons) :
-		Problem(name, num_objs, num_cons), Dynamic(name, num_objs, num_cons), Noisy(name, num_objs, num_cons),Continuous(name, num_vars, num_objs, num_cons) {
-	
-
-		m_max_dimension = 15;
-		m_min_dimension = 2;     //should be greater than 1
-		m_max_peaks = 100;
-		m_min_peaks = 10;
-
-
-		m_frequency = 5000;
-		m_change.type = CT_Random;
-		m_change.counter = 0;
-		m_period = 0;
-		m_flag_variable_memory_change = false;
-		m_flag_variable_memory_dir = 1;
-		m_synchronize = true;
-		m_recurrent_noisy_severity = 0.8;
-
-		m_alpha = 0.04;
-		m_max_alpha = 0.1;
-		m_chaotic_constant = 3.67; //in [3.57,4]
-
-		m_flag_num_peak_change = false;
-		m_dir_num_peak_change = true;
-		m_mode = 1;
-		m_var_noisy_severity = 0.01;
-		m_time_linkage_severity = 0.1;
-
-
-		m_init_peaks = m_num_peaks;
-		m_init_dimensions = m_num_vars;
-
-		addTag(ProTag::DOP);
-		updateParameters();
-		
-		
-
-		m_objective_accuracy = 0.01;
-		m_peak.resize(num_peak);
-		m_pre_peak.resize(num_peak);
-		m_ini_peak.resize(num_peak);
-		for (int i = 0; i < num_peak; i++) {
-			m_peak[i].resize(num_vars);
-			m_pre_peak[i].resize(num_vars);
-			m_ini_peak[i].resize(num_vars);
+	void UncertaintyContinuous::resizeVariable(size_t num_vars)	{
+		Continuous::resizeVariable(num_vars);
+		for (int i(0); i < m_peak.size();++i) {
+			m_peak[i].resize(m_num_vars);
+			m_pre_peak[i].resize(m_num_vars);
+			m_ini_peak[i].resize(m_num_vars);
 		}
-
-		m_width.resize(num_peak);
-		m_height.resize(num_peak);
-		m_pre_height.resize(num_peak);
-		m_pre_width.resize(num_peak);
-		m_fitness.resize(num_peak);
-		m_width_severity.resize(num_peak);
-		m_height_severity.resize(num_peak);
-
-		m_flag_change.resize(num_peak);
-		m_flag_global_optima.resize(num_peak);
-		m_num_tracking.resize(num_peak);
-		m_height_order.resize(num_peak);
-		m_tracked.resize(num_peak);
-
-		m_time_linkage.resize(num_peak);
-		for (int i = 0; i < num_peak; ++i) {
-			m_tracked[i] = false;
-			m_flag_global_optima[i] = false;
-			m_flag_change[i] = true;
-			m_height_order[i] = -1;
-		}
-		m_num_changing_peak = num_peak;
 	}
 
-	void UncertaintyContinuous::set_num_change(Real rRatio) {
+	void UncertaintyContinuous::setNumChange(Real rRatio) {
 		if (rRatio < 0 || rRatio>1) {
 			throw MyExcept("the ratio of changing peaks is invalid@UncertaintyContinuous::set_num_change");
 		}
 
 		m_ratio_changing_peak = rRatio;
 		m_num_changing_peak = (int)(m_peak.size()*m_ratio_changing_peak) > 1 ? (int)(m_peak.size()*m_ratio_changing_peak) : 1;
-		update_num_change();
+		updateNumChange();
 
-		m_params["Changing peaks ratio"] = m_ratio_changing_peak;
+		m_params["changePeakRatio"] = m_ratio_changing_peak;
 	}
 
-	void UncertaintyContinuous::update_num_change() {
+	void UncertaintyContinuous::updateNumChange() {
 		if (m_num_changing_peak == m_peak.size()) {
 			for (int i = 0; i < m_peak.size(); i++) m_flag_change[i] = true;
 			return;
 		}
 		std::vector<int> a(m_peak.size());
 		for (int i = 0; i < m_peak.size(); ++i) a[i] = i;
-		GET_RND(m_id_pro).uniform.shuffle(a.begin(), a.end());
+		GET_RND(m_id_rnd).uniform.shuffle(a.begin(), a.end());
 //		global::ms_global->m_uniform[caller::Problem]->shuffle(a.begin(), a.end());
 		// make sure the global optimum changes always
 		int gopt = 0;
@@ -126,44 +65,54 @@ namespace OFEC {
 		for (int i = 0; i < m_num_changing_peak; i++) m_flag_change[a[i]] = true;
 		
 	}
-	void UncertaintyContinuous::set_height_severity(const Real rS) {
+
+	void UncertaintyContinuous::setHeightSeverity(const Real rS) {
 		for (int i = 0; i < m_peak.size(); i++) 	m_height_severity[i] = rS;
 	}
-	void UncertaintyContinuous::set_width_severity(const Real rS) {
+
+	void UncertaintyContinuous::setWidthSeverity(const Real rS) {
 		for (int i = 0; i < m_peak.size(); i++) 	m_width_severity[i] = rS;
 	}
-
-
 
 	void UncertaintyContinuous::setType(ChangeType rT) {
 		m_change.type = rT;
 		m_params["Change type"] = ms_type[static_cast<int>(m_change.type)];
 	}
 
-
 	//int UncertaintyContinuous::get_num_peak()const {
 	//	return m_num_peaks;
 	//}
 
-	void UncertaintyContinuous::updateParameters()
-	{
+	void UncertaintyContinuous::updateParameters() {
 		Dynamic::updateParameters();
 		Noisy::updateParameters();
 		Continuous::updateParameters();
 
-		m_params["Changing peaks ratio"] = m_ratio_changing_peak;
+		m_params["changePeakRatio"] = m_ratio_changing_peak;
 		if (m_flag_num_peak_change)
 			m_params["change mode"] = m_mode;
-		m_params["Initial peaks"] = m_num_peaks;
+		m_params["initial number of peaks"] = m_num_peaks;
 
 		//if (m_flag_time_linkage)
 		//	m_params["Time-linkage severity"] = m_time_linkage_severity;
 		//m_params["Flag dimensional change"] = m_flag_dimension_change;
 
-		m_params["Flag number of peaks change"] = m_flag_num_peak_change;
+		m_params["flag number of peaks change"] = m_flag_num_peak_change;
 
 		if (m_change.type == CT_RecurrentNoisy)
-			m_params["Recurrent noisy severity"] = m_recurrent_noisy_severity;
+			m_params["recurrent noisy severity"] = m_recurrent_noisy_severity;
+	}
+
+	int UncertaintyContinuous::updateEvalTag(SolBase& s, int id_alg, bool effective_eval) {
+		return Continuous::updateEvalTag(s, id_alg, effective_eval) | Dynamic::updateEvalTag(s, id_alg, effective_eval);
+	}
+
+	void UncertaintyContinuous::updateCandidates(const SolBase& sol, std::list<std::unique_ptr<SolBase>>& candidates) const {
+		if (candidates.empty()) {
+			candidates.emplace_back(new Solution<>(sol));
+		}
+		if (!candidates.front() || sol.dominate(*candidates.front(), m_opt_mode))
+			candidates.front().reset(new Solution<>(sol));
 	}
 
 
@@ -194,13 +143,12 @@ namespace OFEC {
 
 	//void UncertaintyContinuous::set_recurrent_noisy_severity(Real rSeverity) {
 	//	m_recurrent_noisy_severity = rSeverity;
-	//	m_params["Recurrent noisy severity"] = m_recurrent_noisy_severity;
+	//	m_params["recurrent noisy severity"] = m_recurrent_noisy_severity;
 	//}
 
 
 
 	void UncertaintyContinuous::change() {
-
 		Dynamic::change();
 		switch (m_change.type) {
 		case CT_Random:
@@ -259,89 +207,73 @@ namespace OFEC {
 			}
 			changeNumPeak();
 		}
-
-#ifdef OFEC_DEMO
-		//		msp_buffer->updateFitnessLandsacpe_();
-#endif
 	}
 
 
-	//void UncertaintyContinuous::copy(const Problem& rP) {
-	//	Dynamic::copy(rP);
-	//	Noisy::copy(rP);
-	//	Continuous::copy(rP);
+	void UncertaintyContinuous::copy(const Problem& rP) {
+		Problem::copy(rP);
+		Dynamic::copy(rP);
+		Noisy::copy(rP);
+		Continuous::copy(rP);
 
-	//	auto& dcp = dynamic_cast<const UncertaintyContinuous &>(rP);
-
-
-
-	//	m_change = dcp.m_change;
-	//	m_frequency = dcp.m_frequency;
-	//	m_period = dcp.m_period;
-
-	//	m_flag_time_linkage = dcp.m_flag_time_linkage;
-	//	m_flag_trigger_time_linkage = dcp.m_flag_trigger_time_linkage;
-
-	//	m_recurrent_noisy_severity = dcp.m_recurrent_noisy_severity;
-	//	m_alpha = dcp.m_alpha;
-	//	m_max_alpha = dcp.m_max_alpha;
-	//	m_chaotic_constant = dcp.m_chaotic_constant;
-
-
-	////	m_noise_severity = dcp.m_noise_severity;
+		auto& dcp = dynamic_cast<const UncertaintyContinuous &>(rP);
+		m_change = dcp.m_change;
+		m_recurrent_noisy_severity = dcp.m_recurrent_noisy_severity;
+		m_alpha = dcp.m_alpha;
+		m_max_alpha = dcp.m_max_alpha;
+		m_chaotic_constant = dcp.m_chaotic_constant;
+	//	m_noise_severity = dcp.m_noise_severity;
 	//	m_time_linkage_severity = dcp.m_time_linkage_severity;
 
 
-	//	//m_flag_dimension_change = dcp.m_flag_dimension_change;
-	//	//m_direction_dimension_change = dcp.m_direction_dimension_change;
-	//	m_synchronize = dcp.m_synchronize;
+		//m_flag_dimension_change = dcp.m_flag_dimension_change;
+		//m_direction_dimension_change = dcp.m_direction_dimension_change;
+		m_synchronize = dcp.m_synchronize;
 
 
-	//	m_flag_num_peak_change = dcp.m_flag_num_peak_change;
-	//	m_dir_num_peak_change = dcp.m_dir_num_peak_change;
-	//	m_mode = dcp.m_mode;
+		m_flag_num_peak_change = dcp.m_flag_num_peak_change;
+		m_dir_num_peak_change = dcp.m_dir_num_peak_change;
+		m_mode = dcp.m_mode;
 
 
 
-	//	int dim = m_temp_dimension < dcp.numVariables() ? m_temp_dimension : dcp.numVariables();
-	//	int peaks = m_peak.size() < dcp.m_peak.size() ? m_peak.size() : dcp.m_peak.size();
+		int dim = m_temp_dimension < dcp.numVariables() ? m_temp_dimension : dcp.numVariables();
+		int peaks = m_peak.size() < dcp.m_peak.size() ? m_peak.size() : dcp.m_peak.size();
 
-	//	for (int i = 0; i < peaks; i++) {
-	//		std::copy(dcp.m_peak[i].begin(), dcp.m_peak[i].begin()+ dim, m_peak[i].begin());
-	//		std::copy(dcp.m_pre_peak[i].begin(), dcp.m_pre_peak[i].begin() + dim, m_pre_peak[i].begin());
-	//		std::copy(dcp.m_ini_peak[i].begin(), dcp.m_ini_peak[i].begin() + dim, m_ini_peak[i].begin());
-	//	}
-	//	std::copy(dcp.m_height.begin(), dcp.m_height.begin()+ peaks, m_height.begin());
-	//	std::copy(dcp.m_width.begin(), dcp.m_width.begin() + peaks, m_width.begin());
-	//	std::copy(dcp.m_pre_height.begin(), dcp.m_pre_height.begin() + peaks, m_pre_height.begin());
-	//	std::copy(dcp.m_pre_width.begin(), dcp.m_pre_width.begin() + peaks, m_pre_width.begin());
-	//	std::copy(dcp.m_fitness.begin(), dcp.m_fitness.begin() + peaks, m_fitness.begin());
-	//	std::copy(dcp.m_flag_change.begin(), dcp.m_flag_change.begin() + peaks, m_flag_change.begin());
+		for (int i = 0; i < peaks; i++) {
+			std::copy(dcp.m_peak[i].begin(), dcp.m_peak[i].begin()+ dim, m_peak[i].begin());
+			std::copy(dcp.m_pre_peak[i].begin(), dcp.m_pre_peak[i].begin() + dim, m_pre_peak[i].begin());
+			std::copy(dcp.m_ini_peak[i].begin(), dcp.m_ini_peak[i].begin() + dim, m_ini_peak[i].begin());
+		}
+		std::copy(dcp.m_height.begin(), dcp.m_height.begin()+ peaks, m_height.begin());
+		std::copy(dcp.m_width.begin(), dcp.m_width.begin() + peaks, m_width.begin());
+		std::copy(dcp.m_pre_height.begin(), dcp.m_pre_height.begin() + peaks, m_pre_height.begin());
+		std::copy(dcp.m_pre_width.begin(), dcp.m_pre_width.begin() + peaks, m_pre_width.begin());
+		std::copy(dcp.m_fitness.begin(), dcp.m_fitness.begin() + peaks, m_fitness.begin());
+		std::copy(dcp.m_flag_change.begin(), dcp.m_flag_change.begin() + peaks, m_flag_change.begin());
 
-	//	m_min_height = dcp.m_min_height;
-	//	m_max_height = dcp.m_max_height;
+		m_min_height = dcp.m_min_height;
+		m_max_height = dcp.m_max_height;
 
-	//	m_min_width = dcp.m_min_width;
-	//	m_max_width = dcp.m_max_width;
+		m_min_width = dcp.m_min_width;
+		m_max_width = dcp.m_max_width;
 
-	//	std::copy(dcp.m_height_severity.begin(), dcp.m_height_severity.begin() + peaks, m_height_severity.begin());
-	//	std::copy(dcp.m_width_severity.begin(), dcp.m_width_severity.begin() + peaks, m_width_severity.begin());
-	//	std::copy(dcp.m_flag_global_optima.begin(), dcp.m_flag_global_optima.begin() + peaks, m_flag_global_optima.begin());
+		std::copy(dcp.m_height_severity.begin(), dcp.m_height_severity.begin() + peaks, m_height_severity.begin());
+		std::copy(dcp.m_width_severity.begin(), dcp.m_width_severity.begin() + peaks, m_width_severity.begin());
+		std::copy(dcp.m_flag_global_optima.begin(), dcp.m_flag_global_optima.begin() + peaks, m_flag_global_optima.begin());
 
-	//	m_current_peak = dcp.m_current_peak;
+		m_current_peak = dcp.m_current_peak;
 
-	//	m_ratio_changing_peak = dcp.m_ratio_changing_peak;
-	//	m_num_changing_peak = (int)(m_ratio_changing_peak*peaks) > 1 ? (int)(m_ratio_changing_peak*peaks) : 1;//dcp.m_num_changing_peak;
+		m_ratio_changing_peak = dcp.m_ratio_changing_peak;
+		m_num_changing_peak = (int)(m_ratio_changing_peak*peaks) > 1 ? (int)(m_ratio_changing_peak*peaks) : 1;//dcp.m_num_changing_peak;
 
-	//	std::copy(dcp.m_num_tracking.begin(), dcp.m_num_tracking.begin() + peaks, m_num_tracking.begin());
-	//	std::copy(dcp.m_height_order.begin(), dcp.m_height_order.begin() + peaks, m_height_order.begin());
-	//	std::copy(dcp.m_tracked.begin(), dcp.m_tracked.begin() + peaks, m_tracked.begin());
-	//	m_num_peak_tracked = dcp.m_num_peak_tracked;
-	//	std::copy(dcp.m_time_linkage.begin(), dcp.m_time_linkage.begin() + peaks, m_time_linkage.begin());
+		std::copy(dcp.m_num_tracking.begin(), dcp.m_num_tracking.begin() + peaks, m_num_tracking.begin());
+		std::copy(dcp.m_height_order.begin(), dcp.m_height_order.begin() + peaks, m_height_order.begin());
+		std::copy(dcp.m_tracked.begin(), dcp.m_tracked.begin() + peaks, m_tracked.begin());
+		m_num_peak_tracked = dcp.m_num_peak_tracked;
+		std::copy(dcp.m_time_linkage.begin(), dcp.m_time_linkage.begin() + peaks, m_time_linkage.begin());
 
-	//}
-
-
+	}
 
 	Real UncertaintyContinuous::getRecurrentNoise(int x, Real min, Real max, Real amplitude, Real angle, Real noisy_severity) {
 		// return a value in recurrent with noisy dynamism environment
@@ -363,76 +295,138 @@ namespace OFEC {
 		return chaotic_value * scale;
 	}
 
-	bool UncertaintyContinuous::predictChange(const int evalsMore) {
+	bool UncertaintyContinuous::predictChange(int eff_evals, int evalsMore) {
 		int fre = getFrequency();
-		int evals = numEvals() % fre;
+		int evals = eff_evals % fre;
 		if (evals + evalsMore >= fre) return true;
 		else return false;
 	}
+
 	void UncertaintyContinuous::setNumPeakChangeMode(const int mode) {
 		m_mode = mode;
 	}
+
 	int UncertaintyContinuous::getNumPeakChangeMode() {
 		return m_mode;
 	}
+
 	//void UncertaintyContinuous::setFlagNoise(const bool flag) {
 	//	m_flag_noise = flag;
 	//	m_params["Flag of noise"] = flag;
 	//}
+
 	//void UncertaintyContinuous::setFlagTimeLinkage(const bool flag) {
 	//	m_flag_time_linkage = flag;
 	//	m_params["Flag time-linkage"] = m_flag_time_linkage;
 	//}
 
+	void UncertaintyContinuous::initialize_() {
+		//Problem::initialize_();
+		Dynamic::initialize_();
+		Noisy::initialize_();
+		Continuous::initialize_();
 
-	EvalTag UncertaintyContinuous::evaluate_(SolBase& s, bool effective)
-	{
-		auto tag = EvalTag::Normal;
+		auto& v = GET_PARAM(m_id_param);
 
-		VarVec<Real>& x = dynamic_cast<Solution<>&>(s).variable();
-		auto& obj = dynamic_cast<Solution<> &>(s).objective();
-		auto& con = dynamic_cast<Solution<> &>(s).constraint();
+		if (v.find("numPeak") != v.end()) 
+			m_num_peaks = std::get<int>(v.at("numPeak"));
+		else 
+			throw MyExcept("initial number of peaks is not given@UncertaintyContinuous::initialize_()");
 
-		std::vector<Real> x_(x.begin(), x.end()); //for parallel running
-		if (con.empty())
-			tag = evaluateObjective(x_.data(), obj);
+		if (v.find("number of variables") != v.end())
+			m_num_vars = std::get<int>(v.at("number of variables"));
+		else 
+			throw MyExcept("numPeak is not given@UncertaintyContinuous::initialize_()");
+		
+		if (v.count("changeFre"))
+			m_frequency = std::get<int>(v.at("changeFre"));
+		else 
+			throw MyExcept("changeFre is not given@UncertaintyContinuous::initialize_()");
+
+		if (v.count("changePeakRatio"))
+			m_ratio_changing_peak = std::get<Real>(v.at("changePeakRatio"));
 		else
-			tag = evaluateObjAndCon(x_.data(), obj, con);
+			throw MyExcept("changePeakRatio is not given@UncertaintyContinuous::initialize_()");
 
-		if (m_initialized && effective) {
-			m_effective_eval++;
-		//	bool flag_stop;
-//#ifndef OFEC_DEMO
-//			if (global::ms_global->m_algorithm != nullptr)	flag_stop = global::ms_global->m_algorithm->terminating();
-//			else flag_stop = false;
-//#else
-//			flag_stop = false;
-//#endif
-			if (m_effective_eval % m_frequency == 0 ) {
-				change();
-			}
-			if (m_num_vars_found_monitored) {
-				m_optima.isOptimalVariable(dynamic_cast<Solution<>&>(s), m_optima_found, m_variable_accuracy, m_id_pro);
-				if (m_optima.isVariableAllFound())
-					m_solved = true;
-			}
-			if (m_num_objs_found_monitored) {
-				m_optima.isOptimalObjective(dynamic_cast<Solution<>&>(s), m_optima_found, m_objective_accuracy, m_variable_accuracy, m_id_pro);
-				if (m_optima.isObjectiveAllFound())
-					m_solved = true;
-			}
-			if (m_min_dist_to_vars_tracked) {
-				m_optima.trackVarMinDis(dynamic_cast<Solution<>&>(s), m_id_pro);
-			}
-			updateBestSoFar(dynamic_cast<const Solution<>&>(s));
+		m_flag_variable_memory_change = v.count("flagNumDimChange") ? std::get<bool>(v.at("flagNumDimChange")) : false;
+		
+		m_mode = v.count("change mode") ? std::get<int>(v.at("change mode")) : 1;
+		
+		m_flag_noisy_from_variable = v.count("flagNoise") ? std::get<bool>(v.at("flagNoise")) : false;
+		if (m_flag_noisy_from_variable)
+			m_var_noisy_severity = v.count("noiseSeverity") ? std::get<Real>(v.at("noiseSeverity")) : 0.01;
+		
+		m_flag_time_linkage = v.count("flagTimeLinkage") ? std::get<bool>(v.at("flagTimeLinkage")) : false;
+		if (m_flag_time_linkage)
+			m_time_linkage_severity = v.count("timelinkageSeverity") ? std::get<Real>(v.at("timelinkageSeverity")) : 0.1;
+
+		resizeVariable(m_num_vars);
+		resizeObjective(1);
+
+		m_max_dimension = 15;
+		m_min_dimension = 2;     //should be greater than 1
+		m_max_peaks = 100;
+		m_min_peaks = 10;
+
+
+		m_change.type = CT_Random;
+		m_change.counter = 0;
+		m_period = 0;
+		m_flag_variable_memory_dir = 1;
+		m_synchronize = true;
+		m_recurrent_noisy_severity = 0.8;
+
+		m_alpha = 0.04;
+		m_max_alpha = 0.1;
+		m_chaotic_constant = 3.67; //in [3.57,4]
+
+		m_flag_num_peak_change = false;
+		m_dir_num_peak_change = true;
+
+		m_init_peaks = m_num_peaks;
+		m_init_dimensions = m_num_vars;
+
+		addTag(ProTag::kDOP);
+		updateParameters();
+
+		m_objective_accuracy = 0.01;
+		m_peak.resize(m_num_peaks);
+		m_pre_peak.resize(m_num_peaks);
+		m_ini_peak.resize(m_num_peaks);
+		for (int i = 0; i < m_num_peaks; i++) {
+			m_peak[i].resize(m_num_vars);
+			m_pre_peak[i].resize(m_num_vars);
+			m_ini_peak[i].resize(m_num_vars);
 		}
-		return tag;
+
+		m_width.resize(m_num_peaks);
+		m_height.resize(m_num_peaks);
+		m_pre_height.resize(m_num_peaks);
+		m_pre_width.resize(m_num_peaks);
+		m_fitness.resize(m_num_peaks);
+		m_width_severity.resize(m_num_peaks);
+		m_height_severity.resize(m_num_peaks);
+
+		m_flag_change.resize(m_num_peaks);
+		m_flag_global_optima.resize(m_num_peaks);
+		m_num_tracking.resize(m_num_peaks);
+		m_height_order.resize(m_num_peaks);
+		m_tracked.resize(m_num_peaks);
+
+		m_time_linkage.resize(m_num_peaks);
+		for (int i = 0; i < m_num_peaks; ++i) {
+			m_tracked[i] = false;
+			m_flag_global_optima[i] = false;
+			m_flag_change[i] = true;
+			m_height_order[i] = -1;
+		}
+
+		setNumChange(m_ratio_changing_peak);
 	}
 
-	void UncertaintyContinuous::calculate_global_optima() {
-
+	void UncertaintyContinuous::calculateGlobalOptima() {
 		Real gobj;
-		if (m_opt_mode[0] == OptMode::Maximize) gobj = *std::max_element(m_height.begin(), m_height.end());
+		if (m_opt_mode[0] == OptMode::kMaximize) gobj = *std::max_element(m_height.begin(), m_height.end());
 		else gobj = *min_element(m_height.begin(), m_height.end());
 
 		m_optima.clear();
@@ -449,88 +443,94 @@ namespace OFEC {
 					}
 				}
 				m_flag_global_optima[i] = true;
-				m_optima.append(VarVec<Real>(m_peak[i]));
-				m_optima.append(m_height[i]);
+				m_optima.appendVar(VarVec<Real>(m_peak[i]));
+				m_optima.appendObj(m_height[i]);
 			}
 		}
+		m_optima.setObjectiveGiven(true);
+		m_optima.setVariableGiven(true);
 
-		if (m_name=="DYN_CONT_RotationDBG" || m_name == "moving_peak") {
-			if (mindis / 2 < m_variable_accuracy)		m_variable_accuracy=(mindis / 2);
+		if (m_name=="DYN_CONT_RotationDBG" || m_name == "Moving-Peaks") {
+			if (mindis / 2 < m_variable_accuracy)		
+				m_variable_accuracy=(mindis / 2);
 		}
-		update_num_visable_peak();
+		updateNumVisablePeak();
 		m_num_peak_tracked = 0;
-		if (m_flag_time_linkage) update_time_linkage();
+		if (m_flag_time_linkage) updateTimeLinkage();
 		for (int i = 0; i < m_peak.size(); i++) {
 			m_height_order[i] = i;
 			m_tracked[i] = false;
 		}
-		merge_sort(m_height, m_peak.size(), m_height_order);		
+		mergeSort(m_height, m_peak.size(), m_height_order);		
 		m_height_order=amend_order(m_height, m_height_order);
 	}
 
-	void UncertaintyContinuous::set_height(const Real *h) {
+	void UncertaintyContinuous::setHeight(const Real *h) {
 		std::copy(h, h + m_peak.size(), m_height.begin());
 	}
 
 
 	//const Real **p
 
-	void UncertaintyContinuous::set_location(const std::vector<std::vector<Real>> &p) {
+	void UncertaintyContinuous::setLocation(const std::vector<std::vector<Real>> &p) {
 		for (int i = 0; i < m_peak.size(); i++) {
 			m_peak[i].vect() = p[i];
 		}
 	}
 
-	void UncertaintyContinuous::set_initial_location(const std::vector<std::vector<Real>> &p) {
+	void UncertaintyContinuous::setInitialLocation(const std::vector<std::vector<Real>> &p) {
 		for (int i = 0; i < m_peak.size(); i++) {
 			m_ini_peak[i].vect() = m_peak[i].vect() = p[i];
 		}
 	}
 
-	void UncertaintyContinuous::set_width(const Real w) {
+	void UncertaintyContinuous::setWidth(const Real w) {
 		for (int i = 0; i < m_peak.size(); i++)
 			m_width[i] = w;
 	}
 
-	int UncertaintyContinuous::get_num_visible_peak() {
+	int UncertaintyContinuous::getNumVisiblePeak() {
 		return m_num_visable_peak;
 
 	}
-	void UncertaintyContinuous::update_num_visable_peak() {
+
+	void UncertaintyContinuous::updateNumVisablePeak() {
 		m_num_visable_peak = m_peak.size();
 		for (int i = 0; i < m_peak.size(); i++) {
-			if (!is_visible(i)) --m_num_visable_peak;
+			if (!isVisible(i)) --m_num_visable_peak;
 		}
 
 	}
-	bool UncertaintyContinuous::is_visible(const int rIdx) {
+
+	bool UncertaintyContinuous::isVisible(const int rIdx) {
         Solution<VarVec<Real>> s(m_num_objs, m_num_cons, m_num_vars);
         s.variable() = m_peak[rIdx];
-		evaluate(s, false);
+		evaluate_(s, false);
   //      s.evaluate(false,caller::Problem);
 		Real height = s.objective(0);
 		switch (m_opt_mode[0]) {
-		case OptMode::Minimize:
+		case OptMode::kMinimize:
 			if (height < m_height[rIdx]) return false;
 			break;
-		case OptMode::Maximize:
+		case OptMode::kMaximize:
 			if (height > m_height[rIdx]) return false;
 			break;
 		}
 		return true;
 
 	}
-	void UncertaintyContinuous::add_noise(Real *x_) {
+
+	void UncertaintyContinuous::addNoise(Real *x_) {
 		for (int d = 0; d < m_num_vars; d++) {
 			Real x = x_[d];
-			x += m_var_noisy_severity * GET_RND(m_id_pro).normal.next();
+			x += m_var_noisy_severity * GET_RND(m_id_rnd).normal.next();
 			if (m_domain[d].limit.second < x) x = m_domain[d].limit.second;
 			if (m_domain[d].limit.first > x)  x = m_domain[d].limit.first;
 			x_[d] = x;
 		}
 	}
 
-	bool UncertaintyContinuous::is_tracked(Real *gen, Real obj) {
+	bool UncertaintyContinuous::isTracked(Real *gen, Real obj) {
 		bool flag = false, movepeaks = false;
 		for (int i = 0; i < m_peak.size(); i++) {
 			Real dis = 0, dis1 = fabs(obj - m_height[i]);
@@ -550,8 +550,8 @@ namespace OFEC {
 			if (dis < m_time_linkage_severity) {
 				// move peak[i] to a near random position when it was tracked
 				if (m_flag_time_linkage) {
-					move_peak(i);
-					update_time_linkage();
+					movePeak(i);
+					updateTimeLinkage();
 					movepeaks = true;
 					m_flag_trigger_time_linkage = true;
 				}
@@ -564,19 +564,22 @@ namespace OFEC {
 		}
 		return flag;
 	}
-	int UncertaintyContinuous::get_num_peak_found() {
+
+	int UncertaintyContinuous::getNumPeakFound() {
 		return m_num_peak_tracked;
 	}
-	void UncertaintyContinuous::update_time_linkage() {
+
+	void UncertaintyContinuous::updateTimeLinkage() {
 		if (!m_flag_time_linkage) return;
 		Real range;
 		for (int j = 0; j < m_num_vars; j++) {
 			range = fabs(Real(m_domain[j].limit.second - m_domain[j].limit.first));
-			m_time_linkage[j] = 0.2 * range * (GET_RND(m_id_pro).uniform.next() - 0.5);
+			m_time_linkage[j] = 0.2 * range * (GET_RND(m_id_rnd).uniform.next() - 0.5);
 
 		}
 	}
-	void UncertaintyContinuous::move_peak( int idx) {
+
+	void UncertaintyContinuous::movePeak( int idx) {
 		if (idx < 0 || idx >= m_peak.size()) throw MyExcept("index out of boundary @ UncertaintyContinuous::move_peak(const int idx)");
 		for (int d = 0; d < m_num_vars; d++) {
 			Real x = m_peak[idx][d];
@@ -610,7 +613,7 @@ namespace OFEC {
 		return m_peak[nearest].vect();
 	}
 
-	void UncertaintyContinuous::update_pre_peak() {
+	void UncertaintyContinuous::updatePrePeak() {
 		m_pre_peak = m_peak;
 		m_pre_height = m_height;
 		m_pre_width = m_width;

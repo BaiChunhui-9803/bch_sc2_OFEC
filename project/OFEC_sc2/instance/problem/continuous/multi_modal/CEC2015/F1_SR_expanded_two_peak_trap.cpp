@@ -1,6 +1,6 @@
 #include "F1_SR_expanded_two_peak_trap.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F1_SR_expanded_two_peak_trap::F1_SR_expanded_two_peak_trap(const ParamMap &v) :
 			F1_SR_expanded_two_peak_trap((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -32,7 +32,7 @@ namespace OFEC {
 			m_initialized = true;
 			
 		}
-		EvalTag F1_SR_expanded_two_peak_trap::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F1_SR_expanded_two_peak_trap::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			
 			size_t i;
 
@@ -64,7 +64,7 @@ namespace OFEC {
 			}
 			obj[0] += 200.0*m_num_vars;
 			obj[0] += m_bias;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

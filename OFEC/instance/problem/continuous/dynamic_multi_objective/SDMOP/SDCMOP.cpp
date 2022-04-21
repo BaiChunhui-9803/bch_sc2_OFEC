@@ -4,7 +4,7 @@
 #include "../../../../../utility/functional.h"
 //#include<utility>
 
-namespace OFEC {
+namespace ofec {
 	SDCMOP::SDCMOP(const ParamMap &v) :SDCMOP(v.at("problem name"), v.at("number of variables"), v.at("numObj"), v.at("testItems"), v.at("numPeak")) {
 
 	}
@@ -678,6 +678,6 @@ namespace OFEC {
 		//由得到的M-1个子目标的取值范围设计约束值，由解到理想解的距离来设计违约值
 
 
-		//return EvalTag::Normal;
+		//return kNormalEval;
 	}
 }

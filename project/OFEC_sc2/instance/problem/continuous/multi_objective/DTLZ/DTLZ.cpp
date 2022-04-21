@@ -1,32 +1,36 @@
-#include "DTLZ.h"
+#include "dtlz.h"
 #include <fstream>
+#include "../../../../../core/instance_manager.h"
+#include "../../../../../core/global.h"
 
-namespace OFEC {
-	DTLZ::DTLZ(const std::string & name, size_t size_var, size_t size_obj) : problem(name, size_var, size_obj), continuous(name, size_var, size_obj){
-		if (m_num_objs > m_num_vars) throw myexcept("the number of dim must be greater or eaqual to the number of obj for DTLZ pros");
-	
-	}
-	void DTLZ::initialize() {
-		setInitialDomain(0., 1.);
+namespace ofec {
+	void DTLZ::initialize_() {
+		Continuous::initialize_();
+		auto &v = GET_PARAM(m_id_param);
+		resizeVariable(std::get<int>(v.at("number of variables")));//recommend Xm=5,n=M+Xm-1
 		setDomain(0., 1.);
 
-		load_PF();
-		m_initialized = true;
+		resizeObjective(std::get<int>(v.at("number of objectives")));
+		if (m_num_vars < m_num_objs)
+			throw MyExcept("The number of variables should be no less than the number of objectives.");
+		for (size_t i = 0; i < m_num_objs; ++i)
+			m_opt_mode[i] = OptMode::kMinimize;
+
+		loadParetoFront();
 	}
 
-	void DTLZ::generate_PF()
-	{
-		const std::string problem_name[] = { "MOP_DTLZ1", "MOP_DTLZ2", "MOP_DTLZ3", "MOP_DTLZ4" };
+	void DTLZ::generateParetoFront() {
+		const std::string problem_name[] = { "MOP_DTLZ1", "MOP_DTLZ2", "MOP_DTLZ3", "MOP_DTLZ4", "MOP_DTLZ7" };
 		const int M[5] = { 3, 5, 8, 10, 15 };
 		bool flag1(false);
-		for (int i = 0; i < 4; ++i) {
+		for (int i = 0; i < 5; ++i) {
 			if (m_name == problem_name[i]) {
 				flag1 = true;
 				break;
 			}
 		}
 		if (!flag1)
-			throw myexcept("The problem name should be included in DTLZ1-DTLZ4");
+			throw MyExcept("The problem name should be included in MOP_DTLZ1-MOP_DTLZ4, MOP_DTLZ7");
 		else {
 			bool flag2(false);
 			for (int i = 0; i < 5; ++i) {
@@ -36,37 +40,41 @@ namespace OFEC {
 				}
 			}
 			if (!flag2)
-				throw myexcept("The number of objectives should be included in 3,5,8,10,15");
+				throw MyExcept("The number of objectives should be included in 3,5,8,10,15");
 			else { // generate PF
 				std::stringstream os;
-				os << "./instance/problem/continuous/objective/DTLZ/data/PF_" << m_name << "_" << m_num_objs << "objs.dtlz";
+				os <<g_working_dir<< "/instance/problem/continuous/multi_objective/dtlz/data/PF_" << m_name << "_" << m_num_objs << "objs.dtlz";
 				std::ofstream ofile(os.str());
 
 				if (m_num_objs == 3)
-					generate_PF_onelayer(ofile, m_name, m_num_objs, 12);
+					generateOnelayerPF(ofile, m_name, m_num_objs, 12);
 				else if (m_num_objs == 5)
-					generate_PF_onelayer(ofile, m_name, m_num_objs, 6);
+					generateOnelayerPF(ofile, m_name, m_num_objs, 6);
 				else if(m_num_objs == 8 || m_num_objs == 10)
-					generate_PF_twolayers(ofile, m_name, m_num_objs, 3, 2);
+					generateTwolayersPF(ofile, m_name, m_num_objs, 3, 2);
 				else
-					generate_PF_twolayers(ofile, m_name, m_num_objs, 2, 1);
+					generateTwolayersPF(ofile, m_name, m_num_objs, 2, 1);
 				ofile.close();
 			}
 		}
 
 	}
-	void DTLZ::load_PF()
-	{
+
+	void DTLZ::loadParetoFront() {
 		std::stringstream os;
-		os << "./instance/problem/continuous/multi_objective/DTLZ/data/PF_" << m_name << "_" << m_num_objs << "objs.dtlz";
+		os << g_working_dir<<"/instance/problem/continuous/multi_objective/dtlz/data/PF_" << m_name << "_" << m_num_objs << "objs.dtlz";
 		std::ifstream infile(os.str());
-		if (!infile)
-			generate_PF();
+		if (!infile) {
+			generateParetoFront();
+			infile.close();
+			infile.clear();
+			infile.open(os.str());
+		}
 		std::string str;
 		size_t line = 0;
 		while (getline(infile, str))
 			++line;
-		m_optima.resize_objective_set(line);
+		m_optima.resizeObjectiveSet(line);
 		infile.close();
 		infile.clear();
 		infile.open(os.str());
@@ -74,114 +82,78 @@ namespace OFEC {
 			std::vector<Real> temp_obj(m_num_objs);
 			for (size_t j = 0; j < m_num_objs; j++)
 				infile >> temp_obj[j];
-			m_optima.set_objective(temp_obj, i);
+			m_optima.setObjective(temp_obj, i);
 		}
+		m_optima.setObjectiveGiven(true);
 		infile.close();
 	}
-	void generate_recursive(TFront * pf, TObjVec * pt, size_t num_objs, size_t left, size_t total, size_t element) {
-		if (element == num_objs - 1)
-		{
+
+	void DTLZ::generateRecursive(TFront * pf, TObjVec * pt, size_t num_objs, size_t left, size_t total, size_t element) {
+		if (element == num_objs - 1) {
 			(*pt)[element] = (Real)left;
 			pf->push_back(*pt);
 		}
-		else
-		{
-			for (size_t i = 0; i <= left; i += 1)
-			{
+		else {
+			for (size_t i = 0; i <= left; i += 1) {
 				(*pt)[element] = (Real)i;
-				generate_recursive(pf, pt, num_objs, left - i, total, element + 1);
+				generateRecursive(pf, pt, num_objs, left - i, total, element + 1);
 			}
 		}
 	}
-	void generate_weight(TFront * pf, size_t M, size_t p)
-	{
+
+	void DTLZ::generateWeight(TFront * pf, size_t M, size_t p) {
 		TObjVec pt(M);
-
-		generate_recursive(pf, &pt, M, p, p, 0);
+		generateRecursive(pf, &pt, M, p, p, 0);
 	}
-	void generate_PF_onelayer(std::ostream & os, const std::string & problem_name, int M, int p) {
-		TFront PF;
 
+	void DTLZ::generateOnelayerPF(std::ostream & os, const std::string & problem_name, int M, int p) {
+		TFront PF;
 		int num_objectives = M, num_divisions = p;
-		generate_weight(&PF, num_objectives, num_divisions);
-
-		if (problem_name == "MOP_DTLZ1")
-		{
-			for (size_t i = 0; i<PF.size(); i += 1)
-			{
+		generateWeight(&PF, num_objectives, num_divisions);
+		if (problem_name == "MOP_DTLZ1") {
+			for (size_t i = 0; i<PF.size(); i += 1) {
 				for (size_t j = 0; j<PF[i].size(); j += 1)
-				{
 					os << (0.5*PF[i][j]) / num_divisions << ' ';
-				}
 				os << std::endl;
 			}
 		}
-		else // DTLZ2-4
-		{
-			for (size_t i = 0; i<PF.size(); i += 1)
-			{
+		else { // DTLZ2-4 
+			for (size_t i = 0; i<PF.size(); i += 1) {
 				Real sum = 0;
-
 				for (size_t j = 0; j<PF[i].size(); j += 1)
-				{
 					sum += PF[i][j] * PF[i][j];
-				}
-
 				Real k = sqrt(1.0 / sum);
-
 				for (size_t j = 0; j<PF[i].size(); j += 1)
-				{
 					os << k*PF[i][j] << ' ';
-				}
 				os << std::endl;
 			}
 		}
 	}
-	void generate_PF_twolayers(std::ostream & os, const std::string & problem_name, int M, int outside_p, int inside_p) {
 
-		generate_PF_onelayer(os, problem_name, M, outside_p);
-
+	void DTLZ::generateTwolayersPF(std::ostream & os, const std::string & problem_name, int M, int outside_p, int inside_p) {
+		generateOnelayerPF(os, problem_name, M, outside_p);
 		TFront PF;
-
 		int num_objectives = M, num_divisions = inside_p;
-		generate_weight(&PF, num_objectives, num_divisions);
-
-		for (size_t i = 0; i<PF.size(); i += 1)
-		{
+		generateWeight(&PF, num_objectives, num_divisions);
+		for (size_t i = 0; i<PF.size(); i += 1) {
 			for (size_t j = 0; j<PF[i].size(); j += 1)
-			{
 				PF[i][j] = (static_cast<Real>(num_divisions) / M + PF[i][j]) / 2; // (k=num_divisions/M, k, k, ..., k) is the center point
-			}
 		}
-
-		if (problem_name == "MOP_DTLZ1")
-		{
-			for (size_t i = 0; i<PF.size(); i += 1)
-			{
+		if (problem_name == "DTLZ1") {
+			for (size_t i = 0; i<PF.size(); i += 1) {
 				for (size_t j = 0; j<PF[i].size(); j += 1)
-				{
 					os << (0.5*PF[i][j]) / num_divisions << ' ';
-				}
 				os << std::endl;
 			}
 		}
-		else // DTLZ2-4
-		{
-			for (size_t i = 0; i < PF.size(); i += 1)
-			{
+		else {// DTLZ2-4
+			for (size_t i = 0; i < PF.size(); i += 1) {
 				Real sum = 0;
-
 				for (size_t j = 0; j < PF[i].size(); j += 1)
-				{
 					sum += PF[i][j] * PF[i][j];
-				}
-
 				Real k = sqrt(1.0 / sum);
-
 				for (size_t j = 0; j < PF[i].size(); j += 1)
-				{
 					os << k*PF[i][j] << ' ';
-				}
 				os << std::endl;
 			}
 		}

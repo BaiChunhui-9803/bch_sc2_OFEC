@@ -20,11 +20,10 @@
 #ifndef OFEC_FIVE_UNEVEN_PEAK_TRAP_H
 #define OFEC_FIVE_UNEVEN_PEAK_TRAP_H
 
-#include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_mmop.h"
 
-namespace OFEC {	
-	class FiveUnevenPeakTrap : public Function, public MetricsMMOP {
+namespace ofec {	
+	class FiveUnevenPeakTrap : public MetricsMMOP {
 	protected:
 		void initialize_() override;
 		void evaluateObjective(Real *x, std::vector<Real>& obj) override;

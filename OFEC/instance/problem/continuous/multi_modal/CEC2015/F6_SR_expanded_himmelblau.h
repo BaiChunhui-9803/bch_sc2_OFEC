@@ -22,7 +22,7 @@
 
 #include "CEC2015_function.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F6_SR_expanded_himmelblau final : public CEC2015_function
 		{

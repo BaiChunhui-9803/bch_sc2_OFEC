@@ -1,6 +1,6 @@
 #include "F7_shifted_rotated_HGBat.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F7_shifted_rotated_HGBat::F7_shifted_rotated_HGBat(const ParamMap &v) :
 			F7_shifted_rotated_HGBat((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -28,7 +28,7 @@ namespace OFEC {
 			setGlobalOpt(m_translation.data());
 			m_initialized = true;
 		}
-		EvalTag F7_shifted_rotated_HGBat::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F7_shifted_rotated_HGBat::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			return HGBat::evaluateObjective(x, obj);
 		}
 	}

@@ -1,4 +1,4 @@
-//Register quartic_noisy "Classic_quartic_noisy" GOP,ConOP,SOP
+//Register QuarticNoisy "Classic_quartic_noisy" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -15,20 +15,15 @@
 
 #ifndef OFEC_QUARTIC_NOISY_H
 #define OFEC_QUARTIC_NOISY_H
+
 #include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_gop.h"
 
-namespace OFEC {
-
-	class quartic_noisy : public function
-	{
-	public:
-		quartic_noisy(const ParamMap &v);
-		quartic_noisy(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class QuarticNoisy : public Function, public MetricsGOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real> &obj) override;
 	};
-	
 }
 #endif // !OFEC_QUARTIC_NOISY_H

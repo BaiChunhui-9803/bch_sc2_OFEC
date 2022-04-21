@@ -10,7 +10,7 @@ using namespace std::placeholders;
 extern unique_ptr<Demo::scene> Demo::msp_buffer;
 #endif
 
-namespace OFEC {
+namespace ofec {
 	void MOLS_pop::initialize() {
 		//test_lkh();
 		//m_ahc_tsp.ahc_tsp_init_pop(m_inds);
@@ -663,8 +663,8 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag MOLS_pop::evolve() {
-		EvalTag tag = EvalTag::Normal;
+	int MOLS_pop::evolve() {
+		int tag = kNormalEval;
 
 		//MOLS
 		int max_eva = 1000;
@@ -686,7 +686,7 @@ namespace OFEC {
 		}
 		/*	eva++;
 		}*/
-		if (tag == EvalTag::Normal)
+		if (tag == kNormalEval)
 			m_iter++;
 		return tag;
 	}

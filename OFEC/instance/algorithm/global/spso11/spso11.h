@@ -26,21 +26,22 @@ SPSO11: C. Maurice, "Standard PSO 2011 (SPSO-2011)" http://www.particleswarm.inf
 #include "particle11.h"
 #include "../../template/classic/pso/swarm.h"
 
-namespace OFEC {
+namespace ofec {
 	class SPSO11 final : public Algorithm {
 	protected:
 		std::unique_ptr<Swarm<Particle11>> m_pop;
 		Real m_w, m_c1, m_c2;
 		size_t m_pop_size;
-	public:
-		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override;
-#endif
-	protected:
+
 		void initialize_() override;
 		void run_() override;
 		void initPop();
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
+
+	public:
+		void record() override;
 	};
 }
 #endif // SPSO11_H

@@ -1,4 +1,4 @@
-//Register step "Classic_step" GOP,ConOP,SOP
+//Register Step "Classic_step" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -17,18 +17,13 @@
 #define OFEC_STEP_H
 
 #include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
-	
-	class step : public function
-	{
-	public:
-		step(const ParamMap &v);
-		step(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+#include "../metrics_gop.h"
+
+namespace ofec {	
+	class Step : public Function, public MetricsGOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real> &obj) override;
 	};
-	
 }
 #endif // !OFEC_STEP_H

@@ -1,4 +1,4 @@
-//Register bent_cigar "Classic_bent_cigar" GOP,ConOP,SOP
+//Register BentCigar "Classic_bent_cigar" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -17,17 +17,13 @@
 #define OFEC_BENT_CIGAR_H
 
 #include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
+#include "../metrics_gop.h"
 
-	class bent_cigar : public function
-	{
-	public:
-		bent_cigar(const ParamMap &v);
-		bent_cigar(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class BentCigar : public Function, public MetricsGOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real> &obj) override;
 	};
 
 }

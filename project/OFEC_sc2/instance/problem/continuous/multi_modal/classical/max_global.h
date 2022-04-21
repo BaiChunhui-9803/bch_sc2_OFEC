@@ -1,4 +1,4 @@
-//Register max_global "Classic_max_global" MMOP,ConOP,SOP
+//Register MaxGlobal "Classic_max_global" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -17,20 +17,14 @@
 #ifndef OFEC_MAX_GLOBAL_H
 #define OFEC_MAX_GLOBAL_H
 
-#include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
-	
-	class max_global : public function
-	{
-	public:
-		max_global(const ParamMap &v);
-		max_global(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+#include "../metrics_mmop.h"
+
+namespace ofec {	
+	class MaxGlobal : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
-	
 }
 
 #endif // FMAX_GLOBAL1_H

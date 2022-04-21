@@ -19,7 +19,7 @@
 
 #include "../../global/classical/happy_cat.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F6_shifted_rotated_happy_cat final : public happy_cat
 		{

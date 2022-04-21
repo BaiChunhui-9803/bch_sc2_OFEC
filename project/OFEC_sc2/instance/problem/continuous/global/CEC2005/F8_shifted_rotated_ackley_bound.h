@@ -19,16 +19,14 @@
 
 #include "../classical/ackley.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class ShiftedRotatedAckleyBound final: public Ackley {
-		public:
-			ShiftedRotatedAckleyBound(const ParamMap &v);
-			ShiftedRotatedAckleyBound(const std::string &name, size_t num_vars);
-			void initialize();
+		protected:
+			void initialize_() override;
 		};
 	}
-	using CEC2005_GOP_F08 = CEC2005::ShiftedRotatedAckleyBound;
+	using CEC2005_GOP_F08 = cec2005::ShiftedRotatedAckleyBound;
 }
 #endif // ! OFEC_F8_SHIFTED_ROTATED_ACKLEY_BOUND_H
 

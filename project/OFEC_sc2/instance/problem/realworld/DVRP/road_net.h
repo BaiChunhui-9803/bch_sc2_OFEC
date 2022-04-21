@@ -11,7 +11,7 @@
 #include <deque>
 #include <cstdlib>
 
-namespace OFEC {
+namespace ofec {
 	namespace DVRP {
 		struct datum {
 			size_t road_num = 0;

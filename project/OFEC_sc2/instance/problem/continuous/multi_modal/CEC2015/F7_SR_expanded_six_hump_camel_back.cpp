@@ -1,6 +1,6 @@
 #include "F7_SR_expanded_six_hump_camel_back.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F7_SR_expanded_six_hump_camel_back::F7_SR_expanded_six_hump_camel_back(const ParamMap &v) :
 			F7_SR_expanded_six_hump_camel_back((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -30,7 +30,7 @@ namespace OFEC {
 			evaluate_optima();
 			m_initialized = true;
 		}
-		EvalTag F7_SR_expanded_six_hump_camel_back::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F7_SR_expanded_six_hump_camel_back::evaluateObjective(Real *x, std::vector<Real> &obj) {
 
 			size_t i;
 
@@ -49,7 +49,7 @@ namespace OFEC {
 			}
 			obj[0] += 4.126514*m_num_vars / 2.0;
 			obj[0] += m_bias;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

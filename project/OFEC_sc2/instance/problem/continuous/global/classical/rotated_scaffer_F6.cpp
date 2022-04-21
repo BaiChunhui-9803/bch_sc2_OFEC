@@ -13,9 +13,9 @@
 
 #include "rotated_scaffer_F6.h"
 
-namespace OFEC {
+namespace ofec {
 	void RotatedScafferF6::initialize_() {
 		ScafferF6::initialize_();
-		loadRotation("/instance/problem/continuous/global/CEC2005/data/");
+		loadRotation("/instance/problem/continuous/global/classical/data/");
 	}	
 }

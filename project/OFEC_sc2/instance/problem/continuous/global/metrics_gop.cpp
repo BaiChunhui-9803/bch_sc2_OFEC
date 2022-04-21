@@ -1,8 +1,8 @@
 #include "metrics_gop.h"
-#include "../../../../core/algorithm/solution.h"
+#include "../../../../core/problem/solution.h"
 #include "../../../../core/problem/continuous/continuous.h"
 
-namespace OFEC {
+namespace ofec {
 	void MetricsGOP::updateCandidates(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const {
 		if (candidates.empty())
 			candidates.emplace_back(new Solution<>(dynamic_cast<const Solution<>&>(sol)));

@@ -6,14 +6,14 @@
 #include <algorithm> 
 #include <vector>
 
-namespace OFEC {
+namespace ofec {
 	template<typename>  class AMP;
 
-	template <typename PopType>
-	class  PopAMP : public PopType {
+	template <typename TPop>
+	class PopAMP : public TPop {
 	public:
 		template<typename> friend class AMP;
-		using IndType = typename PopType::IndType;
+		using IndType = typename TPop::IndType;
 
 	protected:
 		bool m_stagnant = false;
@@ -23,7 +23,7 @@ namespace OFEC {
 
 	//	int mc_max_idxs, mc_min_idxs;
 	public:
-		PopAMP(size_t pop_size, int id_pro) : PopType(pop_size, id_pro) {}
+		PopAMP(size_t pop_size, int id_pro) : TPop(pop_size, id_pro) {}
 		void setInitialRadius(Real r) {
 			m_initial_radius = r;
 		}
@@ -70,9 +70,9 @@ namespace OFEC {
 
 		virtual bool judgeConverged() { return false; }
 
-		EvalTag evolve(int id_pro, int id_alg, int id_rnd) override {
+		int evolve(int id_pro, int id_alg, int id_rnd) override {
 			Real before_radius(m_cur_radius);
-			EvalTag rf = PopType::evolve(id_pro, id_alg, id_rnd);
+			int rf = TPop::evolve(id_pro, id_alg, id_rnd);
 			udpateCurRadius(id_pro);
 			if (m_cur_radius / (before_radius + 0.00001) < 0.9) m_count_radius_decre = 0;
 			else m_count_radius_decre++;

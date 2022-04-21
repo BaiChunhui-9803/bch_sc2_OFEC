@@ -22,7 +22,7 @@
 
 #include "CEC2015_function.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F8_SR_modified_vincent final : public CEC2015_function
 		{

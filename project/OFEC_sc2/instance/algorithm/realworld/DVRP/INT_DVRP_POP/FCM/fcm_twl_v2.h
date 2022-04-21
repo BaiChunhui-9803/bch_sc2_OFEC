@@ -17,7 +17,7 @@
 #include "../../../../../../core/global.h"
 //#include <windows.h>
 
-namespace OFEC {
+namespace ofec {
 	class fcm_twl_v2
 	{
 	public:

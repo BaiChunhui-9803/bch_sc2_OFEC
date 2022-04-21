@@ -267,3 +267,7 @@ ofec_launcher.*
 /run/register_algorithm.cpp
 /run/include_problem.h
 /run/include_algorithm.h
+/instance/problem/realworld/csiwdn/data/map/hyd.epa
+/instance/problem/realworld/csiwdn/data/map/*.rpt
+/tasks.txt
+/instance/problem/combination/airport_planing/data

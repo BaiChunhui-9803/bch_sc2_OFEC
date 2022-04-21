@@ -1,0 +1,33 @@
+file(GLOB_RECURSE OFEC_SOURCES
+	${OFEC_DIR}/core/*.h
+	${OFEC_DIR}/core/*.cpp
+	${OFEC_DIR}/run/*.h
+	${OFEC_DIR}/run/*.cpp
+	${OFEC_DIR}/utility/*.h
+	${OFEC_DIR}/utility/*.hpp
+	${OFEC_DIR}/utility/*.cpp
+)
+list(APPEND OFEC_SOURCES
+	${OFEC_DIR}/instance/algorithm/multi_objective/moea_de_pop.h
+	${OFEC_DIR}/instance/algorithm/multi_objective/moead_de/moead_de.cpp
+	${OFEC_DIR}/instance/algorithm/multi_objective/moead_de/moead_de.h
+	${OFEC_DIR}/instance/algorithm/multi_objective/nsgaii_de/nsgaii_de.cpp
+	${OFEC_DIR}/instance/algorithm/multi_objective/nsgaii_de/nsgaii_de.h
+	${OFEC_DIR}/instance/algorithm/template/classic/de/de_ind.cpp
+	${OFEC_DIR}/instance/algorithm/template/classic/de/de_ind.h
+	${OFEC_DIR}/instance/algorithm/template/classic/de/de_pop.h
+	${OFEC_DIR}/instance/algorithm/template/multi_objective/moead/moead.h
+	${OFEC_DIR}/instance/algorithm/template/multi_objective/nsgaii/nsgaii.h
+	${OFEC_DIR}/instance/problem/continuous/multi_objective/dtlz/dtlz.cpp
+	${OFEC_DIR}/instance/problem/continuous/multi_objective/dtlz/dtlz.h
+	${OFEC_DIR}/instance/problem/continuous/multi_objective/dtlz/dtlz1.cpp
+	${OFEC_DIR}/instance/problem/continuous/multi_objective/dtlz/dtlz1.h
+	${OFEC_DIR}/instance/problem/continuous/multi_objective/dtlz/dtlz2.cpp
+	${OFEC_DIR}/instance/problem/continuous/multi_objective/dtlz/dtlz2.h
+	${OFEC_DIR}/instance/problem/continuous/multi_objective/metrics_mop.cpp
+	${OFEC_DIR}/instance/problem/continuous/multi_objective/metrics_mop.h
+	${OFEC_DIR}/instance/record/dynamic/rcr_vec_real_dynamic.cpp
+	${OFEC_DIR}/instance/record/dynamic/rcr_vec_real_dynamic.h
+	${OFEC_DIR}/instance/record/rcr_vec_real.cpp
+	${OFEC_DIR}/instance/record/rcr_vec_real.h
+)

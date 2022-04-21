@@ -17,7 +17,7 @@
 #define CONFORMINGOS_SHIFTEDSCHWEFEL_F13_H
 
 #include "function_CEC2013.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		class ConformingOS_ShiftedSchwefel_F13 final:public function_CEC2013 {
 		public:

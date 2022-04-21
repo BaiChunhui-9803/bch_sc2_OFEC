@@ -2,8 +2,8 @@
 
 //part of the source code is from nanoflann lib at https://github.com/jlblancoc/nanoflann
 
-#ifndef  KD_TREE_SPACE_PARTITION_HPP_
-#define  KD_TREE_SPACE_PARTITION_HPP_
+#ifndef  NANOFLANN_HPP_
+#define  NANOFLANN_HPP_
 
 #include <vector>
 #include <list>
@@ -18,7 +18,7 @@
 #include <map>
 #include <memory>
 
-namespace KDTreeSpace
+namespace nanoflann
 {
 	/** @addtogroup memalloc_grp Memory allocation
 	* @{ */
@@ -197,7 +197,7 @@ namespace KDTreeSpace
 		/*--------------------- Internal Data Structures --------------------------*/
 		struct BoundingBox {
 			std::vector<std::pair<ElementType, ElementType>> box;
-			OFEC::Real rat = 1.0, volume;
+			ofec::Real rat = 1.0, volume;
 			size_t depth = 1;
 		};
 
@@ -237,7 +237,7 @@ namespace KDTreeSpace
 		* number small of memory allocations.
 		*/
 		PooledAllocator m_pool;
-		OFEC::Real m_lrat = 0, m_srat = 1;
+		ofec::Real m_lrat = 0, m_srat = 1;
 		int m_lbox = 0, m_sbox = 0;
 		int m_mode;
 	public:
@@ -375,7 +375,7 @@ namespace KDTreeSpace
 			return m_pool.used_memory + m_pool.wasted_memory + m_pointdata.size() * sizeof(IndexType);  // pool memory and vind array memory
 		}
 
-		size_t getRegionIdx(const std::vector<ElementType>& p) const {
+		int getRegionIdx(const std::vector<ElementType>& p) const {
 			return enqury(p, m_root);
 		}
 
@@ -387,7 +387,7 @@ namespace KDTreeSpace
 		const std::vector<std::pair<ElementType, ElementType>>& getBox(IndexType idx) const {
 			return m_regions[idx]->box;
 		}
-		OFEC::Real getBoxVolume(IndexType idx) const {
+		ofec::Real getBoxVolume(IndexType idx) const {
 			return m_regions[idx]->volume;
 		}
 		size_t getDepth(IndexType idx) const {
@@ -434,7 +434,6 @@ namespace KDTreeSpace
 			else
 				node->sub.pivot = *split_pivot;
 			node1->lr.idx_region = idx;
-			m_regions[node1->lr.idx_region]->volume /= 2;
 			m_regions[node1->lr.idx_region]->depth++;
 			if (m_shelvedIndices.empty()) {
 				node2->lr.idx_region = m_regions.size();
@@ -442,14 +441,16 @@ namespace KDTreeSpace
 			}
 			else {
 				node2->lr.idx_region = *m_shelvedIndices.begin();
-				m_shelvedIndices.erase(m_shelvedIndices.begin());
-				m_regions[node2->lr.idx_region]->volume = m_regions[node1->lr.idx_region]->volume;
+				m_shelvedIndices.erase(m_shelvedIndices.begin());	
 				m_regions[node2->lr.idx_region]->depth = m_regions[node1->lr.idx_region]->depth;
 			}
 			m_regions[node1->lr.idx_region]->box[node->sub.divfeat].second = node->sub.pivot;
 			m_regions[node2->lr.idx_region]->box[node->sub.divfeat].first = node->sub.pivot;
 			node1->lr.bbox = m_regions[node1->lr.idx_region].get();
 			node2->lr.bbox = m_regions[node2->lr.idx_region].get();
+			auto pre_vol = m_regions[node1->lr.idx_region]->volume;
+			m_regions[node1->lr.idx_region]->volume = pre_vol * ((node->sub.pivot - node->sub.low) / (node->sub.high - node->sub.low));
+			m_regions[node2->lr.idx_region]->volume = pre_vol - m_regions[node1->lr.idx_region]->volume;
 			m_size++;
 			return node2->lr.idx_region;
 		}
@@ -667,8 +668,8 @@ namespace KDTreeSpace
 
 		void midSplit(IndexType* ind, IndexType count, IndexType& index, int& cutfeat, ElementType& cutval, const BoundingBox& bbox, int depth)
 		{
-			OFEC::Real sum1 = 0.0;
-			OFEC::Real sum2 = 0.0;
+			ofec::Real sum1 = 0.0;
+			ofec::Real sum2 = 0.0;
 			cutfeat = (m_relative_depth + depth) % m_dim;
 			//cutfeat = rand() % m_dim;
 			std::vector<IndexType> cur_idx(count);
@@ -727,7 +728,7 @@ namespace KDTreeSpace
 			lim2 = left;
 		}
 
-		size_t enqury(const std::vector<ElementType>& p, NodePtr node) const {
+		int enqury(const std::vector<ElementType>& p, NodePtr node) const {
 			if (node->child1 == NULL && node->child2 == NULL) {
 				return node->lr.idx_region;
 			}
@@ -747,8 +748,9 @@ namespace KDTreeSpace
 					return enqury(p, node->child2);
 				}
 			}
-			return 0;
+			return -1;
 		}
+
 		void leafParent(IndexType idx_region, NodePtr node, NodePtr parent, NodePtr& result) {
 			if (node->child1 == NULL && node->child2 == NULL) {
 				if (node->lr.idx_region == idx_region) {
@@ -908,4 +910,4 @@ namespace KDTreeSpace
 } // end of NS
 
 
-#endif /* kdtree_space_HPP_ */
+#endif /* NANOFLANN_HPP_ */

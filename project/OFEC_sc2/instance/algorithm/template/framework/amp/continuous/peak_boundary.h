@@ -1,10 +1,10 @@
 #ifndef PEAK_BOUNDARY_H
 #define PEAK_BOUNDARY_H
 
-#include "../../../../../../core/algorithm/solution.h"
-#include "../../../../../../utility/vector.h"
+#include "../../../../../../core/problem/solution.h"
+#include "../../../../../../utility/linear_algebra/vector.h"
 
-namespace OFEC {
+namespace ofec {
 	class PeakBoundary : public Solution<> {
 	protected:
 		using Individual = Solution<>;

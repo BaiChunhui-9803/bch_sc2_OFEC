@@ -32,30 +32,30 @@
 #include "../../core/algorithm/population.h"
 #include "../../core/algorithm/individual.h"
 
-namespace OFEC {
-	template<typename Individual>
+namespace ofec {
+	template<typename TInd>
 	class NBC {
 	protected:
 		Real m_phi;
 		size_t m_N;                 // size of data
-		std::vector<const typename Individual::solution_type*> m_data;
+		std::vector<const typename TInd::SolType*> m_data;
 		std::vector<std::vector<size_t>> m_clusters;
 		std::vector<std::vector<Real>> m_distance;
 		std::vector<int> m_graph;   // target node, if -1 means no target node
 	public:
 		NBC(Real phi = 2) : m_phi(phi) {}
-		void updateData(const population<Individual>& pop);
-		void updateData(const std::vector<Individual>& inds);
-		void clustering();
-		const std::vector<std::vector<size_t>>& getClusters() const { return m_clusters; }
+		void updateData(const Population<TInd>& pop);
+		void updateData(const std::vector<TInd>& inds);
+		void clustering(int id_pro);
+		const std::vector<std::vector<size_t>>& clusters() const { return m_clusters; }
 	protected:
-		void updateDistance();
-		void updateGraph();
+		void updateDistance(int id_pro);
+		void updateGraph(int id_pro);
 		void updateClusters();
 	};
 
-	template<typename Individual>
-	void NBC<Individual>::updateData(const population<Individual>& pop) {
+	template<typename TInd>
+	void NBC<TInd>::updateData(const Population<TInd>& pop) {
 		m_N = pop.size();
 		if (m_distance.size() != m_N) {
 			m_distance.resize(m_N);
@@ -71,8 +71,8 @@ namespace OFEC {
 			m_clusters.clear();
 	}
 
-	template<typename Individual>
-	void NBC<Individual>::updateData(const std::vector<Individual>& inds) {
+	template<typename TInd>
+	void NBC<TInd>::updateData(const std::vector<TInd>& inds) {
 		m_N = inds.size();
 		if (m_distance.size() != m_N) {
 			m_distance.resize(m_N);
@@ -88,25 +88,25 @@ namespace OFEC {
 			m_clusters.clear();
 	}
 
-	template<typename Individual>
-	void NBC<Individual>::clustering() {
-		updateDistance();
-		updateGraph();
+	template<typename TInd>
+	void NBC<TInd>::clustering(int id_pro) {
+		updateDistance(id_pro);
+		updateGraph(id_pro);
 		updateClusters();
 	}
 
-	template<typename Individual>
-	void NBC<Individual>::updateDistance() {
+	template<typename TInd>
+	void NBC<TInd>::updateDistance(int id_pro) {
 		for (size_t i = 0; i < m_N; i++) {
 			for (size_t j = i + 1; j < m_N; j++) {
-				m_distance[i][j] = m_distance[j][i] = m_data[i]->variable_distance(*m_data[j]);
+				m_distance[i][j] = m_distance[j][i] = m_data[i]->variableDistance(*m_data[j], id_pro);
 			}
 		}
 	}
 
 
-	template<typename Individual>
-	void NBC<Individual>::updateGraph() {
+	template<typename TInd>
+	void NBC<TInd>::updateGraph(int id_pro) {
 		Real mean_lenth(0);
 		size_t num_edges(0);                 // reset the graph
 		m_graph.assign(m_N, -1);
@@ -117,7 +117,7 @@ namespace OFEC {
 					seq_dis.emplace(std::make_pair(m_distance[i][j], j));
 			}
 			for (const auto& p : seq_dis) {
-				if (m_data[p.second]->dominate(*m_data[i])) {
+				if (m_data[p.second]->dominate(*m_data[i], id_pro)) {
 					m_graph[i] = p.second;
 					num_edges++;
 					mean_lenth += m_distance[i][p.second];
@@ -132,8 +132,8 @@ namespace OFEC {
 		}
 	}
 
-	template<typename Individual>
-	void NBC<Individual>::updateClusters() {
+	template<typename TInd>
+	void NBC<TInd>::updateClusters() {
 		std::vector<int> idxs_clu(m_N, -1);
 		size_t  idx_clu(0), idx_cur_ind;
 		for (size_t i = 0; i < m_N; i++) {

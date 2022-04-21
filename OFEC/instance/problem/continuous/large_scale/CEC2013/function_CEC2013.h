@@ -17,7 +17,7 @@
 #include "../../../../../core/problem/continuous/continuous.h"
 #include "../../../../../utility/matrix.h"
 
-namespace OFEC {
+namespace ofec {
 	struct index_map {
 		unsigned arr_index1;
 		unsigned arr_index2;

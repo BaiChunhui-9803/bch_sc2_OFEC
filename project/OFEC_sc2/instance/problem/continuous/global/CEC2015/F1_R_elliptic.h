@@ -20,18 +20,12 @@
 #define OFEC_F1_R_ELLIPTIC_H
 
 #include "../classical/elliptic.h"
-namespace OFEC {
-	namespace CEC2015 {
-		class F1_R_elliptic final: public elliptic
-		{
-		public:
-			F1_R_elliptic(const ParamMap &v);
-			F1_R_elliptic(const std::string &name, size_t size_var, size_t size_obj);
-			void initialize();
-		protected:
-			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
 
-		private:
+namespace ofec {
+	namespace CEC2015 {
+		class F1_R_elliptic final: public Elliptic {
+		protected:
+			void initialize_() override;
 		};
 	}
 	using CEC2015_GOP_F01 = CEC2015::F1_R_elliptic;

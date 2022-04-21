@@ -4,7 +4,7 @@
 #include "../instance/problem/continuous/multi_objective/DTLZ/DTLZ1.h"
 #include <iostream>
 
-using namespace OFEC;
+using namespace ofec;
 
 TEST_CASE("domination relationship", "[domination]")
 {

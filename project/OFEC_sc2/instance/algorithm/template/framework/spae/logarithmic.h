@@ -17,12 +17,12 @@
 #define OFEC_RGR_LOG_H
 
 #include "../../../../../core/problem/continuous/continuous.h"
-#include "../../../../problem/continuous/global/metrics_gop.h"
 
-namespace OFEC {
-	class RegressLog : public MetricsGOP {
+namespace ofec {
+	class RegressLog : public Continuous {
 	public:
 		RegressLog(const std::vector<Real> &x, const std::vector<Real> &y);
+		void updateCandidates(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const override;
 	protected:
 		void initialize_() override;
 		void evaluateObjective(Real* x, std::vector<Real>& obj) override;

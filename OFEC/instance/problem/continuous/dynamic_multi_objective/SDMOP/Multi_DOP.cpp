@@ -4,7 +4,7 @@
 #include "../../../../../utility/functional.h"
 //#include<utility>
 
-namespace OFEC {
+namespace ofec {
 	Multi_DOP::Multi_DOP(const ParamMap &v) :Multi_DOP(v.at("problem name"), v.at("number of variables"), v.at("numObj"), v.at("testItems"), v.at("numPeak")) {
 
 	}
@@ -156,7 +156,7 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag Multi_DOP::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int Multi_DOP::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
@@ -201,7 +201,7 @@ namespace OFEC {
 			if (!temp1.empty())
 				opt_pub.push_back(temp1);
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 		//是否验证一下子目标最高峰位置张成的区域属于最优解集的可能性有多少？
 	}
 }

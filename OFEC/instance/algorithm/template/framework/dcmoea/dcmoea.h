@@ -2,7 +2,7 @@
 #define DCMOEA_H
 #include "../../../../../core/algorithm/individual.h"
 
-namespace OFEC {
+namespace ofec {
 	template<typename TIndividual>
 	class DCMOEA_ind : public TIndividual {
 	public:
@@ -46,8 +46,8 @@ namespace OFEC {
 
 	template<typename TIndividual>
 	void DCMOEA<TIndividual>::initialize(size_t num_cons) {
-		m_num_cons(num_cons),
-			m_max_G.assign(num_cons, 1);
+		m_num_cons = num_cons;
+		m_max_G.assign(num_cons, 1);
 		m_e = m_max_G;
 	}
 

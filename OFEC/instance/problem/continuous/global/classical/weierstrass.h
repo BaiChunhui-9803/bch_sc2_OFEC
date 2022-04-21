@@ -1,4 +1,4 @@
-//Register Weierstrass "Classic_weierstrass" GOP,ConOP,SOP
+//Register Weierstrass "Classic_Weierstrass" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -19,11 +19,11 @@
 #include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_gop.h"
 
-namespace OFEC {
+namespace ofec {
 	class Weierstrass : public Function, public MetricsGOP {
 	protected:
 		void initialize_() override;
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
+		void evaluateOriginalObj(Real *x, std::vector<Real>& obj) override;
 	private:
 		Real m_a, m_b;
 		int m_kmax;

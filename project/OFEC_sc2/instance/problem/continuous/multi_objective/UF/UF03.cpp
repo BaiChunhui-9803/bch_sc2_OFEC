@@ -1,14 +1,7 @@
-#include "UF03.h"
+#include "uf03.h"
 
-namespace OFEC {
-	UF03::UF03(param_map & v) : UF03(v.at("problem name"), v.at("number of variables")) { //param_numDim = 30 is suggested
-
-	}
-	UF03::UF03(const std::string & name, size_t size_var) : problem(name, size_var, 2), UF(name, size_var, 2) {
-
-	}
-
-	EvalTag UF03::evaluateObjective(Real *x, std::vector<Real> &obj) {
+namespace ofec {
+	void UF03::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		int count1, count2;
 		Real sum1, sum2, prod1, prod2, yj, pj;
 		sum1 = sum2 = 0.0;
@@ -39,7 +32,5 @@ namespace OFEC {
 			obj[0] = x[0] + 2.0 * (4.0*sum1 - 2.0*prod1 + 2.0) / (Real)count1;
 			obj[1] = 1.0 - std::sqrt(x[0]) + 2.0*(4.0*sum2 - 2.0*prod2 + 2.0) / (Real)count2;
 		}
-		return EvalTag::Normal;
 	}
-
 }

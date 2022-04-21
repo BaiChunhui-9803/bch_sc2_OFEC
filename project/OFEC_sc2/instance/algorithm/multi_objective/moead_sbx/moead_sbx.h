@@ -20,34 +20,32 @@
 #ifndef OFEC_MOEAD_SBX_H
 #define OFEC_MOEAD_SBX_H
 
-#include "../MOEAD.h"
-#include "../../../GA/SBX/SBX.h"
+#include "../../template/multi_objective/moead/moead.h"
+#include "../../template/classic/ga/sbx_pop.h"
 
-
-namespace OFEC {
-	class MOEAD_SBX_pop :public SBX_pop<>, MOEAD<individual<>> {
+namespace ofec {
+	class PopMOEAD_SBX :public PopSBX<>, MOEAD<Individual<>> {
 	public:
-		MOEAD_SBX_pop(size_t size_pop);
-		void initialize();
-		EvalTag evolve();
-	protected:
-		EvalTag evolve_mo();
+		PopMOEAD_SBX(size_t size_pop, int id_pro);
+		void initialize_(int id_pro, int id_rnd);
+		int evolve(int id_pro, int id_alg, int id_rnd) override;
 	};
 
-	class MOEAD_SBX :public algorithm {
-	protected:
-		MOEAD_SBX_pop m_pop;
+
+	class MOEAD_SBX :public Algorithm {
 	public:
-		MOEAD_SBX(const ParamMap &v);
-		void initialize() override;
+		void initialize_() override;
 		void record() override;
+		void initPop();
 #ifdef OFEC_DEMO
-		void updateBuffer() override {}
+		void updateBuffer();
 #endif
 	protected:
 		void run_() override;
+		std::unique_ptr<PopMOEAD_SBX> m_pop;
+		size_t m_pop_size;
 	};
 
 }
 
-#endif
+#endif //!OFEC_MOEAD_SBX_H

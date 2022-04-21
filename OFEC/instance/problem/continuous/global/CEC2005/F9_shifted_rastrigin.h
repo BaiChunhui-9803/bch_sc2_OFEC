@@ -19,16 +19,14 @@
 
 #include "../classical/rastrigin.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class ShiftedRastrigin final : public Rastrigin {
-		public:
-			ShiftedRastrigin(const ParamMap &v);
-			ShiftedRastrigin(const std::string &name, size_t num_vars);
-			void initialize();
+		protected:
+			void initialize_() override;
 		};
 	}
-	using CEC2005_GOP_F09 = CEC2005::ShiftedRastrigin;
+	using CEC2005_GOP_F09 = cec2005::ShiftedRastrigin;
 }
 #endif // ! OFEC_F9_SHIFTED_RASTRIGIN_H
 

@@ -8,7 +8,7 @@
 #include <fstream>
 #include <string>
 
-using namespace OFEC;
+using namespace ofec;
 
 TEST_CASE("k-d tree space", "[kdtree][space]") {
 	size_t num_genes;

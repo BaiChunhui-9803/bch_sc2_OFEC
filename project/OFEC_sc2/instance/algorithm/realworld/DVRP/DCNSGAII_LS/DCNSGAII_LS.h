@@ -7,14 +7,14 @@
 #include "../int_dvrp_pop/int_dvrp_pop.h"
 #include "ga_dvrp.h"
 
-namespace OFEC {
+namespace ofec {
 	class DCNSGAII_LS_pop : public Population<DCMOEA_ind<Individual<DVRP::routes>>>, 
 							public DCMOEA<DCMOEA_ind<Individual<DVRP::routes>>> {
 	public:
 		using Population<DCMOEA_ind<Individual<DVRP::routes>>>::IndType;
 	public:
 		DCNSGAII_LS_pop(size_t size_pop, int id_pro);
-		EvalTag evolve(int id_pro, int id_alg, int id_rnd) override;
+		int evolve(int id_pro, int id_alg, int id_rnd) override;
 		void initialize(int id_pro, int id_rnd) override;
 		void initializeAfterEvaluation();
 		void sort();
@@ -65,6 +65,7 @@ namespace OFEC {
 		bool m_convergence = false;
 		int m_num_operators = 8;
 		
+		
 		//Online
 		IndType m_best_ind_Online;
 		IndType m_best_ind_Offline;
@@ -102,6 +103,9 @@ namespace OFEC {
 		void initialize_() override;
 		void run_() override;
 	public:
+		DCNSGAII_LS(param_map& v);
+		void initialize();
+		void run_();
 		void record();
 #ifdef OFEC_DEMO
 		void updateBuffer() override{}

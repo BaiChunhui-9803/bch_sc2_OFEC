@@ -1,4 +1,4 @@
-//Register penalized_1 "Classic_penalized_1" GOP,ConOP,SOP
+//Register Penalized_1 "Classic_penalized_1" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -17,21 +17,14 @@
 #define OFEC_PENALIZED_1_H
 
 #include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_gop.h"
 
-namespace OFEC {
-	
-
-	class penalized_1 : public function
-	{
-	public:
-		penalized_1(const ParamMap &v);
-		penalized_1(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class Penalized_1 : public Function, public MetricsGOP {
 	protected:
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real> &obj) override;
 		Real u(Real x, Real a, Real k, Real m)const;
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
-	};
-	
+	}; 	
 }
 #endif // !OFEC_PENALIZED_1_H

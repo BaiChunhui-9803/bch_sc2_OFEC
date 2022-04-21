@@ -15,36 +15,37 @@
 // Created: 7 Jan 2015
 // Last modified: 15 Aug 2019 by Junchen Wang (email:wangjunchen.chris@gmail.com)
 
-#ifndef OFEC_NSGAIII_SBXRM_H
-#define OFEC_NSGAIII_SBXRM_H
+#ifndef OFEC_NSGAIII_SBX_H
+#define OFEC_NSGAIII_SBX_H
 
-#include "../NSGAIII.h"
-#include "../../../../../core/algorithm/individual.h"
-#include "../../../GA/SBX/SBX.h"
+#include "../../template/multi_objective/nsgaiii/nsgaiii.h"
+#include "../../../../core/algorithm/individual.h"
+#include "../../template/classic/ga/sbx_pop.h"
 
-namespace OFEC {
-	class NSGAIII_SBX_pop : public SBX_pop<>, NSGAIII<individual<>> {
+namespace ofec {
+	class PopNSGAIII_SBX : public PopSBX<>, NSGAIII<Individual<>> {
 	public:
-		explicit NSGAIII_SBX_pop(size_t size_pop);
-		void initialize() override;
-		EvalTag evolve() override;
+		explicit PopNSGAIII_SBX(size_t size_pop, int id_pro, size_t size_var, size_t size_obj, const std::vector<OptMode>& opt_mode);
+		void initialize_(int id_pro, int id_rnd);
+		int evolve(int id_pro, int id_alg, int id_rnd) override;
 	protected:
-		std::vector<individual<>> m_offspring;  // 2 size of population
+		std::vector<Individual<>> m_offspring;  // 2 size of population
 	};
 
-	class NSGAIII_SBX : public algorithm {
+	class NSGAIII_SBX : public Algorithm {
 	public:
-		explicit NSGAIII_SBX(param_map& v);
-		void initialize() override;
+		void initialize_() override;
 		void record() override;
+		void initPop();
 #ifdef OFEC_DEMO
-		void updateBuffer() override {}
+		void updateBuffer();
 #endif
 	protected:
 		void run_() override;
-		NSGAIII_SBX_pop m_pop;
+		std::unique_ptr<PopNSGAIII_SBX> m_pop;
+		size_t m_pop_size;
 	};
 }
 
-#endif // !OFEC_NSGAIII_SBXRM_H
+#endif // !OFEC_NSGAIII_SBX_H
 

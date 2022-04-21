@@ -22,7 +22,7 @@
 
 #include "CEC2015_function.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F7_SR_expanded_six_hump_camel_back final : public CEC2015_function
 		{

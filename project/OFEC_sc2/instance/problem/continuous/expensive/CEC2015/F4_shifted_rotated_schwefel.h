@@ -19,7 +19,7 @@
 
 #include "../../global/classical/schwefel.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F4_shifted_rotated_schwefel final : public schwefel
 		{

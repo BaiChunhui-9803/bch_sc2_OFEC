@@ -1,7 +1,7 @@
 
 #include "extreal.h"
 
-namespace OFEC {
+namespace ofec {
 
 ExtReal ExtReal::operator+(const ExtReal& er) const
 {

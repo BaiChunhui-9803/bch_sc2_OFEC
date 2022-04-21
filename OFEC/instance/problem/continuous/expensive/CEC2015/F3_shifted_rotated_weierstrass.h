@@ -19,7 +19,7 @@
 
 #include "../../global/classical/weierstrass.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F3_shifted_rotated_weierstrass final : public weierstrass
 		{

@@ -5,7 +5,7 @@
 #include "../../../../core/algorithm/algorithm.h"
 #include "../../template/classic/de/de_pop.h"
 
-namespace OFEC {
+namespace ofec {
 	class AMP_DE : public Algorithm {
 	protected:
 		using PopType = PopDE<IndContAMP<IndDE>>;
@@ -13,14 +13,15 @@ namespace OFEC {
 		size_t m_pop_size;
 		Real m_f, m_cr;
 		MutationDE m_ms;
-	public:
-		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override;
-#endif
-	protected:
+		
 		void initialize_() override;
 		void run_() override;
 		void initMultiPop();
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
+
+	public:
+		void record() override;
 	};
 }

@@ -5,7 +5,7 @@
 
 
 
-namespace OFEC {
+namespace ofec {
 	namespace NOISY_FUN {
 
 

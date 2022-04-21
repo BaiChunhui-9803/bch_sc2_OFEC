@@ -1,6 +1,6 @@
 #include "function_CEC2013.h"
 
-namespace OFEC {
+namespace ofec {
 	function_CEC2013::function_CEC2013(const std::string &name, size_t size_var, size_t size_obj) : problem(name, size_var, size_obj), continuous(name, size_var, size_obj) \
 	{
 		m_variable_accuracy=1.0e-6;

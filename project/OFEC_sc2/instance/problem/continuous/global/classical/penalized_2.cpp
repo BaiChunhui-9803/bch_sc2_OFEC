@@ -12,56 +12,34 @@
 *************************************************************************/
 
 #include "penalized_2.h"
-namespace OFEC {
-	
-	penalized_2::penalized_2(const ParamMap &v) : 
-		penalized_2((v.at("problem name")), (v.at("number of variables")), 1) {
+#include "../../../../../core/instance_manager.h"
 
-		
-	}
-	penalized_2::penalized_2(const std::string &name, size_t size_var, size_t size_obj) : problem(name, size_var, size_obj), \
-		function(name, size_var, size_obj) {
-
-		
-	}
-
-	void penalized_2::initialize() {
-		m_variable_monitor = true;
+namespace ofec {
+	void Penalized_2::initialize_() {
+		Function::initialize_();
+		m_opt_mode[0] = OptMode::kMinimize;
+		auto &v = GET_PARAM(m_id_param);
+		resizeVariable(std::get<int>(v.at("number of variables")));
 		setDomain(-50, 50);
-		setInitialDomain(-50., 50.);
-		std::vector<Real> v(m_num_vars, 1.0);
-		setOriginalGlobalOpt(v.data());
+		std::vector<Real> var(m_num_vars, 1);
+		setOriginalGlobalOpt(var.data());
 		m_optima = m_original_optima;
-		m_initialized = true;
 	}
 
-
-	EvalTag penalized_2::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		if (m_translated)
-			translate(x);
-		if (m_scaled)
-			scale(x);
-		if (m_rotated)
-			rotate(x);
-		if (m_translated)
-			translateOrigin(x);
+	void Penalized_2::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 		Real s = 0;
-
 		for (int i = 0; i < m_num_vars - 1; i++)
 			s += (x[i] - 1)*(x[i] - 1)*(1 + sin(3 * OFEC_PI*x[i + 1])*sin(3 * OFEC_PI*x[i + 1]));
 		s += (x[m_num_vars - 1] - 1)*(x[m_num_vars - 1] - 1)*(1 + sin(2 * OFEC_PI*x[m_num_vars - 1])*sin(2 * OFEC_PI*x[m_num_vars - 1])) + sin(3 * OFEC_PI*x[0])*sin(3 * OFEC_PI*x[0]);
 		s = s*0.1;
 		for (int i = 0; i < m_num_vars; i++)
 			s += u(x[i], 5, 100, 4);
-
 		obj[0] = s + m_bias;
-		return EvalTag::Normal;
-
 	}
-	Real penalized_2::u(Real x, Real a, Real k, Real m)const {
+
+	Real Penalized_2::u(Real x, Real a, Real k, Real m)const {
 		if (x > a) return k*pow(x - a, m);
 		else if (x < -a) return k*pow(-x - a, m);
 		else return 0;
 	}
-	
 }

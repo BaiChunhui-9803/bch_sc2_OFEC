@@ -28,7 +28,7 @@
 #include "../DMOPs.h"
 //#include "../../dynamic/dynamic.h"
 
-namespace OFEC {
+namespace ofec {
 	class Multi_DOP :public DMOPs {
 	public:
 		Multi_DOP(const ParamMap &v);

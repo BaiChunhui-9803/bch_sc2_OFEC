@@ -17,7 +17,7 @@
 #define N7S1_SHIFTEDSCHWEFEL_F7_H
 
 #include "function_CEC2013.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		class N7S1_ShiftedSchwefel_F7 final:public function_CEC2013 {
 		public:

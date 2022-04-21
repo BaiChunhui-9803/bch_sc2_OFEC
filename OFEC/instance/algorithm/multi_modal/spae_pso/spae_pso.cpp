@@ -1,6 +1,6 @@
 #include "spae_pso.h"
 
-namespace OFEC {
+namespace ofec {
 	void SPAE_PSO::initialize_() {
 		ContSPAE::initialize_();
 		auto &v = GET_PARAM(m_id_param);
@@ -9,8 +9,8 @@ namespace OFEC {
 		m_c2 = v.count("accelerator2") > 0 ? std::get<Real>(v.at("accelerator2")) : 1.193;
 	}
 
-	void SPAE_PSO::initSubPop(Swarm<Particle11> &pop, size_t id_atr_bsn, HLC &hlc, int id_pro, int id_alg) {
-		ContSPAE::initSubPop(pop, id_atr_bsn, hlc, id_pro, id_alg);
+	void SPAE_PSO::initSubPop(Swarm<Particle11> &pop, size_t id_atr_bsn, HLC &hlc, int id_pro, int id_alg, int id_rnd) {
+		ContSPAE::initSubPop(pop, id_atr_bsn, hlc, id_pro, id_alg, id_rnd);
 		pop.W() = m_w;
 		pop.C1() = m_c1;
 		pop.C2() = m_c2;
@@ -18,22 +18,21 @@ namespace OFEC {
 		pop.initVelocity(m_id_pro, m_id_rnd);
 	}
 
-	void SPAE_PSO::evolveSubPop(Swarm<Particle11> &pop) {
-		pop.evolve(m_id_pro, m_id_alg, m_id_rnd);
-		for (size_t i = 0; i < pop.size(); ++i)
-			m_hlc->inputSample(pop[i].solut());
-	}
-
 	void SPAE_PSO::setPopType() {
 		m_pop_type = "SPSO11";
 	}
 
-	//bool SPAE_PSO::isPopConverged(Swarm<Particle11> &pop) {
-	//	if (pop.averageSpeed() > 1.0e-5)
-	//		return false;
-	//	else
-	//		return true;
-	//}
+	bool SPAE_PSO::isPopConverged(Swarm<Particle11> &pop) {
+		//for (size_t i = 0; i < pop.size(); ++i) {
+		//	if (pop[i].speed() > 1e-4)
+		//		return false;
+		//}
+		//return true;
+		if (pop.iteration() - pop.timeBestUpdated() < 10)
+			return false;
+		else
+			return true;
+	}
 
 	void SPAE_PSO::initInd(HLC &hlc, int id_pro, int id_alg, size_t id_atr_bsn, size_t id_div, IndType &ind) {
 		ContSPAE::initInd(hlc, id_pro, id_alg, id_atr_bsn, id_div, ind);

@@ -1,4 +1,4 @@
-//Register DTLZ7 "DTLZ7" MOP,ConOP
+//Register DTLZ7 "MOP_DTLZ7" MOP,ConOP
 
 /*************************************************************************
 * Project: Library of Open Frameworks for Evolutionary Computation (OFEC)
@@ -13,23 +13,21 @@
 *  Foundation; either version 2, or (at your option) any later version.
 
 *************************************************************************/
+
+//Note: It was named after DTLZ7 in [Deb2001] and source file "dtlz_c_source.tar.gz"
+
 // Created: 7 Oct 2018 by Junchen Wang (wangjunchen.chris@gmail.com)
 // Modified: 
 
 #ifndef OFEC_DTLZ7_H
 #define OFEC_DTLZ7_H
 
-#include "DTLZ.h"
+#include "dtlz.h"
 
-//Note: It was named after DTLZ7 in [Deb2001] and source file "dtlz_c_source.tar.gz"
-
-namespace OFEC {
-	class DTLZ7 final : public DTLZ {
-	public:
-		DTLZ7(const ParamMap &v);
-		DTLZ7(const std::string &name, size_t size_var, size_t size_obj);
-	private:
-		void evaluateObjective(Real *x, std::vector<Real> &obj);
+namespace ofec {
+	class DTLZ7 : public DTLZ {
+	protected:
+		void evaluateObjective(Real* x, std::vector<Real>& obj) override;
 	};
 }
 

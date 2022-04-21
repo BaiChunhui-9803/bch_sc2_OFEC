@@ -1,4 +1,4 @@
-//Register modified_vincent "Classic_vincent_modified" MMOP,ConOP,SOP
+//Register ModifiedVincent "Classic_vincent_modified" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -16,25 +16,17 @@
 *  Competition on Single Objective Multi-Niche Optimization.
 *******************************************************************************************/
 
-
 #ifndef OFEC_MODIFIED_VINCENT_H
 #define OFEC_MODIFIED_VINCENT_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-
-	class modified_vincent : public function
-	{
-	public:
-		modified_vincent(const ParamMap &v);
-		modified_vincent(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class ModifiedVincent : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
-
 }
 #endif // !OFEC_MODIFIED_VINCENT_H
 

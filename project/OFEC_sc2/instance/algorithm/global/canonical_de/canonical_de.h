@@ -23,7 +23,7 @@
 #include "../../template/classic/de/de_pop.h"
 #include "../../../../core/algorithm/algorithm.h"
 
-namespace OFEC {
+namespace ofec {
 	class Canonical_DE : public Algorithm {
 	protected:
 		std::unique_ptr<PopDE<>> m_pop;
@@ -34,12 +34,12 @@ namespace OFEC {
 		void initialize_() override;
 		void run_() override;
 		virtual void initPop();
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
 
 	public:
 		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override;
-#endif
 	};
 }
 

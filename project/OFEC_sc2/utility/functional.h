@@ -27,14 +27,15 @@
 #include "../core/definition.h"
 #include <cstdio>
 #include <string>
+#include <list>
 #include <functional>
 
-namespace OFEC {	
+namespace ofec {	
 		/*
 		distance measures between two std::vector-based points
 		*/
 	template<typename Iter1, typename Iter2>
-	Real euclidean_distance(Iter1 first1, Iter1 last1, Iter2 first2) {
+	Real euclideanDistance(Iter1 first1, Iter1 last1, Iter2 first2) {
 		Real dis = 0;
 		while (first1 != last1) {
 			dis += (*first1 - *first2)*(*first1 - *first2);
@@ -46,7 +47,7 @@ namespace OFEC {
 	}
 
 	template<typename Iter1, typename Iter2>
-	Real manhattan_distance(Iter1 first1, Iter1 last1, Iter2 first2) {
+	Real manhattanDistance(Iter1 first1, Iter1 last1, Iter2 first2) {
 		Real dis = 0;
 		while (first1 != last1) {
 			dis += fabs(*first1++ - *first2++);
@@ -57,7 +58,7 @@ namespace OFEC {
 
 
 	template<typename Iter1, typename Iter2>
-	int hamming_distance(Iter1 first1, Iter1 last1, Iter2 first2)  {
+	int hammingDistance(Iter1 first1, Iter1 last1, Iter2 first2)  {
 		int dis = 0;
 		while (first1 != last1) {
 			dis += *first1++ != *first2++;
@@ -70,20 +71,20 @@ namespace OFEC {
 	template<typename T = Real >
 	Dominance objectiveCompare(const std::vector<T>& a, const std::vector<T>& b, const std::vector<OptMode> &mode)  {
 		if (a.size() != b.size()) 
-			return Dominance::NonComparable;
+			return Dominance::kNonComparable;
 
 		int better = 0, worse = 0, equal = 0;
 		for (decltype(a.size()) i = 0; i<a.size(); ++i) {
-			if (mode[i] == OptMode::Minimize) {
+			if (mode[i] == OptMode::kMinimize) {
 				if (a[i] < b[i]) {
 					if (worse > 0)
-						return Dominance::NonDominated;
+						return Dominance::kNonDominated;
 					else
 						++better;
 				}
 				else if (a[i] > b[i]) {
 					if (better > 0)
-						return Dominance::NonDominated;
+						return Dominance::kNonDominated;
 					else
 						++worse;
 				}
@@ -94,13 +95,13 @@ namespace OFEC {
 			else {
 				if (a[i] > b[i]) {
 					if (worse > 0)
-						return Dominance::NonDominated;
+						return Dominance::kNonDominated;
 					else
 						++better;
 				}
 				else if (a[i] < b[i]) {
 					if (better > 0)
-						return Dominance::NonDominated;
+						return Dominance::kNonDominated;
 					else
 						++worse;
 				}
@@ -109,29 +110,29 @@ namespace OFEC {
 				}
 			}
 		}
-		if (equal == a.size()) return Dominance::Equal;
-		else if (worse == 0) return Dominance::Dominant;
-		else if (better == 0) return Dominance::Dominated;
-        else return Dominance::NonDominated;
+		if (equal == a.size()) return Dominance::kEqual;
+		else if (worse == 0) return Dominance::kDominant;
+		else if (better == 0) return Dominance::kDominated;
+        else return Dominance::kNonDominated;
 	}
 
 	template<typename T = Real >
 	Dominance objectiveCompare(const std::vector<T> & a, const std::vector<T> & b, OptMode mode) {
 		if (a.size() != b.size())
-			return Dominance::NonComparable;
+			return Dominance::kNonComparable;
 
 		int better = 0, worse = 0, equal = 0;
 		for (decltype(a.size()) i = 0; i < a.size(); ++i) {
-			if (mode == OptMode::Minimize) {
+			if (mode == OptMode::kMinimize) {
 				if (a[i] < b[i]) {
 					if (worse > 0)
-						return Dominance::NonDominated;
+						return Dominance::kNonDominated;
 					else
 						++better;
 				}
 				else if (a[i] > b[i]) {
 					if (better > 0)
-						return Dominance::NonDominated;
+						return Dominance::kNonDominated;
 					else
 						++worse;
 				}
@@ -142,13 +143,13 @@ namespace OFEC {
 			else {
 				if (a[i] > b[i]) {
 					if (worse > 0)
-						return Dominance::NonDominated;
+						return Dominance::kNonDominated;
 					else
 						++better;
 				}
 				else if (a[i] < b[i]) {
 					if (better > 0)
-						return Dominance::NonDominated;
+						return Dominance::kNonDominated;
 					else
 						++worse;
 				}
@@ -157,10 +158,10 @@ namespace OFEC {
 				}
 			}
 		}
-		if (equal == a.size()) return Dominance::Equal;
-		else if (worse == 0) return Dominance::Dominant;
-		else if (better == 0) return Dominance::Dominated;
-        else return Dominance::NonDominated;
+		if (equal == a.size()) return Dominance::kEqual;
+		else if (worse == 0) return Dominance::kDominant;
+		else if (better == 0) return Dominance::kDominated;
+        else return Dominance::kNonDominated;
 	}
 
 	//add by tanqingshan. return the first rank points.
@@ -174,14 +175,14 @@ namespace OFEC {
 			size_t m = data.size();
 			for (size_t j = 0; j < m; j++) {
 				Dominance temp_ = objectiveCompare(*obj[i], *data[j], opt_mode);
-				if (temp_ == Dominance::Equal) {
+				if (temp_ == Dominance::kEqual) {
 					data.push_back(obj[i]);
 				}
-				else if (temp_ == Dominance::Dominant) {
+				else if (temp_ == Dominance::kDominant) {
 					data[j] = obj[i];
 					break;
 				}
-				else if (temp_ == Dominance::NonDominated) {
+				else if (temp_ == Dominance::kNonDominated) {
 					if (j == m - 1)
 						data.push_back(obj[i]);
 					else
@@ -253,7 +254,7 @@ namespace OFEC {
 
 	/* index[i] denotes the index of the i-th minimum (in ascending order) element */
 	template<typename T>
-	void merge_sort(const T &data, int size, std::vector<int>& index, bool ascending = true, int low = 0, int up = -1, int num = -1, bool start = true) {
+	void mergeSort(const T &data, int size, std::vector<int>& index, bool ascending = true, int low = 0, int up = -1, int num = -1, bool start = true) {
 		if (start) {
 			if (up == -1) up = size - 1;
 			if (num == -1) num = size;
@@ -305,41 +306,100 @@ namespace OFEC {
 		}
 	}
 	template<typename T>
-	inline T map_real(T value, T input_min, T input_max, T output_min, T output_max) {
+	inline T mapReal(T value, T input_min, T input_max, T output_min, T output_max) {
 		return ((value - input_min) / (input_max - input_min) * (output_max - output_min) + output_min);
 	}
 	template<typename T,typename K>
-	inline void calMeanAndStd(const std::vector<T> &data, K&mean, K&std) {
+	inline void calMeanAndStd(const std::vector<T> &data, K&mean, K&dev) {
 		mean = 0;
 		for (T val : data)
 			mean += val;
 		mean /= static_cast<K>(data.size());
-		std = 0;
+		dev = 0;
 		for (T val : data)
-			std += (val - mean) * (val - mean);
-		std = sqrt(std / static_cast<K>(data.size()));
+			dev += (val - mean) * (val - mean);
+		dev = sqrt(dev / static_cast<K>(data.size()));
 	}
 
-	template<typename Individual>
-	inline std::vector<int> calBestIdx(const std::vector<Individual>& inds, std::function<Dominance(const Individual&, const Individual&)>& comp) {
+	template<typename T>
+	inline int calIdx(const std::vector<T>& inds, const std::function<bool(const T&, const T&)>& comp) {
 
-		std::vector<int> best_idx;
-		std::vector<bool> flag(inds.size(), true);
-
-		for (size_t j = 0; j < inds.size(); j++) {
-			for (size_t i = 0; i < inds.size(); i++) {
-				if (i == j || !flag[j] || !flag[i]) continue;
-				if (comp(inds[i], inds[j])) {
-					flag[i] = false;
-				}
+		if (inds.empty()) return -1;
+		int bestIdx(0);
+		for (int curIdx(0); curIdx < inds.size(); ++curIdx) {
+			if (comp(inds[curIdx], inds[bestIdx])) {
+				bestIdx = curIdx;
 			}
 		}
-		for (size_t i = 0; i < inds.size(); i++) {
-			if (flag[i])
-				best_idx.push_back(i);
+		return bestIdx;
+	}
+	
+
+	template<typename T>
+	inline std::list<int> calBestIdx(const std::vector<T>& inds, const std::function<Dominance(const T&, const T&)>& comp) {
+		
+		if (inds.empty()) return std::list<int>();
+		std::list<int> bestIdx;
+		
+		for (int idx(0); idx < inds.size(); ++idx) {
+			bool flag = true;
+			for (auto bestIter = bestIdx.begin(); bestIter != bestIdx.end(); ) {
+				auto com_flag = comp(inds[idx], inds[*bestIter]);
+				if (com_flag == Dominance::Dominated) {
+					flag = false;
+					break;
+				}
+				else if(com_flag==Dominance::Dominant) {
+					bestIter=bestIdx.erase(bestIter);
+				}
+				else {
+					bestIter++;
+				}
+			}
+			if (flag) {
+				bestIdx.push_back(idx);
+			}
 		}
 
-		return std::move(best_idx);
+		return bestIdx;
+		
+	}
+
+	template<typename T,typename K>
+	inline bool updateBestSol( std::vector<T>& inds, const K & newly_one ,std::function<Dominance(const K&, const T&)>& comp) {
+		std::vector<bool> flag(inds.size(), true);
+		bool newly_one_flag = true;
+		bool erase_flag = false;
+		for (int idx(0); idx < inds.size(); ++idx) {
+			auto com_flag = comp(newly_one,inds[idx]);
+			if (com_flag == Dominance::Dominated) {
+				newly_one_flag = false;
+				break;
+			}
+			else if (com_flag == Dominance::Dominant) {
+				flag[idx] = false;
+				erase_flag = true;
+			}
+		}
+		if (newly_one_flag) {
+			if (erase_flag) {
+				int cur_idx(0);
+				for (int idx(0); idx < inds.size(); ++idx) {
+					if (flag[idx]) {
+						if (cur_idx != idx) {
+							std::swap(inds[idx], inds[cur_idx]);
+						}
+						++cur_idx;
+					}
+				}
+				inds.resize(cur_idx);
+				return true;
+			}
+			else {
+				return true;
+			}
+		}
+		return false;
 	}
 }
 #endif // !OFEC_FINCTIONAL_H

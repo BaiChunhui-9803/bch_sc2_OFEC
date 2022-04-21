@@ -1,4 +1,4 @@
-//Register shubert "Classic_shubert" MMOP,ConOP,SOP
+//Register Shubert "Classic_Shubert" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -13,24 +13,16 @@
 *  Foundation; either version 2, or (at your option) any later version.
 *************************************************************************/
 
-
 #ifndef OFEC_SHUBERT_H
 #define OFEC_SHUBERT_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-	
-	class shubert : public function
-	{
-	public:
-		shubert(const ParamMap &v);
-		shubert(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class Shubert : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
-	
 }
 #endif // ! OFEC_FSHUBERT_H

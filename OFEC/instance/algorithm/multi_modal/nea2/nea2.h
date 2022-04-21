@@ -26,27 +26,27 @@
 #include "../../../../core/algorithm/algorithm.h"
 #include "../../../../core/algorithm/multi_population.h"
 #include "../../../../utility/clustering/nbc.h"
-#include "../CMA_ES/CMA_ES.h"
+#include "../../global/cma_es/cmaes_pop.h"
 
-namespace OFEC {
-	class NEA2 : public algorithm {
-		using pop_type = cmaes_pop;
-		using ind_type = individual<>;
-	public:
-		NEA2(param_map& v);
-		void initialize() override;
-		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override;
-#endif
+namespace ofec {
+	class NEA2 : public Algorithm {
 	protected:
+		MultiPopulation<PopCMAES> m_subpops;
+		NBC<Individual<>> m_nbc;
+		size_t m_pop_size;
+
+		void initialize_() override;
 		void run_() override;
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
+
+	public:
+		void record() override;
+
 	private:
-		void add_subpops();
-		bool stopTolFun(pop_type& subpop);
-		multi_population<pop_type> m_subpops;
-		NBC<ind_type> m_nbc;
-		size_t m_sizepop;
+		void addSubpops();
+		bool stopTolFun(PopCMAES& subpop);
 	};
 }
 

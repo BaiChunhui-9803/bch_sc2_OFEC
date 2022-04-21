@@ -11,7 +11,7 @@ updated Jun 22, 2019 by Long Xiao
 #include "../../../../../problem/realworld/DVRP/dynamic_vrp.h"
 #include "../../../../../../core/global.h"
 
-namespace OFEC {
+namespace ofec {
 	class AHC {
 	public:
 		struct Clustering_result {

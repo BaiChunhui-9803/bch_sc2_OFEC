@@ -19,18 +19,14 @@
 
 #include "../classical/schwefel_1_2.h"
 
-namespace OFEC {
-	namespace CEC2005 {
-		class ShiftedSchwefel_1_2_Noisy final : public Schwefel_1_2 {
-		public:
-			ShiftedSchwefel_1_2_Noisy(const ParamMap &v);
-			ShiftedSchwefel_1_2_Noisy(const std::string &name, size_t num_vars);
-			void initialize();
+namespace ofec {
+	namespace cec2005 {
+		class ShiftedSchwefel_1_2_Noisy final : public Schwefel_1_2 {	
 		protected:
-			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-		private:
+			void initialize_() override;
+			void evaluateOriginalObj(Real *x, std::vector<Real>& obj) override;
 		};
 	}
-	using CEC2005_GOP_F04 = CEC2005::ShiftedSchwefel_1_2_Noisy;
+	using CEC2005_GOP_F04 = cec2005::ShiftedSchwefel_1_2_Noisy;
 }
 #endif // ! OFEC_F4_SHIFTED_SCHWEFEL_1_2_NOISY_H

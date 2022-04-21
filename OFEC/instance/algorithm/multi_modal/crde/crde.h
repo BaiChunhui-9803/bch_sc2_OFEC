@@ -25,28 +25,33 @@ the 2004 IEEE congress on evolutionary computation, pp 1382�C1389. IEEE Press,
 #ifndef OFEC_CRDE_H
 #define OFEC_CRDE_H
 
-#include "../population.h"
+#include "../../template/classic/de/de_pop.h"
 #include "../../../../core/algorithm/algorithm.h"
 
-namespace OFEC {
+namespace ofec {
 
-	class CRDE_pop final : public DE::population<DE::individual> {
+	class PopCRDE final : public PopDE<> {
 	public:
-		explicit CRDE_pop(size_t size_pop);
-		EvalTag evolve() override;
+		PopCRDE(size_t size_pop, int id_pro);
+		int evolve(int id_pro, int id_alg, int id_rnd) override;
 	};
 
-	class CRDE final : public algorithm {
-	public:
-		explicit CRDE(const ParamMap &v);
-		void initialize() override;
-		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override {}
-#endif
+	class CRDE final : public Algorithm {
 	protected:
+		std::unique_ptr<PopCRDE> m_pop;
+		size_t m_pop_size;
+		Real m_f, m_cr;
+		MutationDE m_ms;
+
+		void initialize_() override;
 		void run_() override;
-		CRDE_pop m_pop;
+		void initPop();
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
+
+	public:
+		void record() override;
 	};
 }
 #endif // OFEC_CRDE_H

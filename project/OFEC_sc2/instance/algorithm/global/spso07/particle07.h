@@ -3,7 +3,7 @@
 
 #include "../../template/classic/pso/particle.h"
 
-namespace OFEC {
+namespace ofec {
 	class Particle07 final : public Particle {
 	public:
 		Particle07(size_t num_obj, size_t num_con, size_t size_var) : Particle(num_obj, num_con, size_var) {}

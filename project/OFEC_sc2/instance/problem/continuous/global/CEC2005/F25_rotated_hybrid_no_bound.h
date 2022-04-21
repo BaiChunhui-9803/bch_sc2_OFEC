@@ -19,17 +19,17 @@
 #include "composition.h"
 #include "../metrics_gop.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class RotatedHybridNoBound final : public Composition, public MetricsGOP {
 		protected:
 			void initialize_() override;
 			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-			void setFunction();
-			void setTranslation();
+			void setFunction() override;
+			void setTranslation() override;
 		};
 	}
-	using CEC2005_GOP_F25 = CEC2005::RotatedHybridNoBound;
+	using CEC2005_GOP_F25 = cec2005::RotatedHybridNoBound;
 }
 #endif // !OFEC_F25_ROTATED_HYBRID_NO_BOUND_H
 

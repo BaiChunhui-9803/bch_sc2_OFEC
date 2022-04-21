@@ -25,7 +25,7 @@
 
 #include "dynamic_continuous.h"
 #include "../../../../utility/matrix.h"
-namespace OFEC {
+namespace ofec {
 	class real_DBG : public dynamic_continuous
 	{
 	protected:

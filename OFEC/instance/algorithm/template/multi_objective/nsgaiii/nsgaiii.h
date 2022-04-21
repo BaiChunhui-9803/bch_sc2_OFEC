@@ -23,79 +23,79 @@
 #ifndef OFEC_NSGAIII_H
 #define OFEC_NSGAIII_H
 
-#include "../../../../utility/nondominated_sorting/fast_sort.h"
+#include "../../../../../utility/nondominated_sorting/fast_sort.h"
 #include "reference_point.h"
 #include <algorithm>
+#include "../../../../../core/instance_manager.h"
+#include "../../../../../core/problem/continuous/continuous.h"
 
-namespace OFEC {
-	template<typename Individual>
+namespace ofec {
+	template<typename TInd>
 	class NSGAIII {
 	public:
-		using objective_type = typename Individual::solution_type::objective_encoding;
-	public:
-		NSGAIII(size_t size_pop) {
-			size_t num_obj = global::ms_global->m_problem->objective_size();
-			set_default_param();
-			reference_point::generate_ref_points(&mv_rps, num_obj, mv_obj_division_p_);
+		NSGAIII(size_t size_pop, size_t size_obj, std::vector<OptMode> opt_mode, int id_pro) {
+			setDefaultParam(id_pro);
+			reference_point::generateRefPoints(&mv_rps, size_obj, mv_obj_division_p_);
 			mvv_off_conv_obj.resize(2 * size_pop);
 			for (int i = 0; i < 2 * size_pop; i++)
-				mvv_off_conv_obj[i].resize(num_obj);
+				mvv_off_conv_obj[i].resize(size_obj);
 		}
-		void survivor_selection(std::vector<std::unique_ptr<Individual>>& parent, std::vector<Individual>& offspring);
+		void survivorSelection(std::vector<std::unique_ptr<TInd>>& parent, std::vector<TInd>& offspring, int id_pro, int id_rnd);
 	private:
-		void set_default_param();
-		void nondominated_sorting(std::vector<Individual>& offspring);
-		std::vector<Real> translate_objectives(const std::vector<std::vector<int> > &fronts, std::vector<Individual>& offspring);
-		void find_extreme_points(std::vector<size_t> *extreme_points, const std::vector<std::vector<int> > &fronts, std::vector<Individual>& offspring);
-		void construct_hyperplane(std::vector<Real> *pintercepts, const std::vector<size_t> &extreme_points, std::vector<Individual>& offspring);
-		void normalize_objectives(const std::vector<std::vector<int> > &fronts, const std::vector<Real> &intercepts, const std::vector<Real> &ideal_point);
-		size_t find_niche_ref_point(const std::vector<ref_point> &rps);
-		int select_cluster_member(const ref_point &rp);
+		void setDefaultParam(int id_param);
+		void nondominatedSorting(std::vector<TInd>& offspring, int id_pro);
+		std::vector<Real> translateObjectives(const std::vector<std::vector<int> >& fronts, std::vector<TInd>& offspring, int id_pro);
+		void findExtremePoints(std::vector<size_t>* extreme_points, const std::vector<std::vector<int> >& fronts, std::vector<TInd>& offspring, int id_pro);
+		void constructHyperplane(std::vector<Real>* pintercepts, const std::vector<size_t>& extreme_points, std::vector<TInd>& offspring, int id_pro);
+		void normalizeObjectives(const std::vector<std::vector<int> >& fronts, const std::vector<Real>& intercepts, const std::vector<Real>& ideal_point, int id_pro);
+		size_t findNicheRefPoint(const std::vector<RefPoint>& rps, int id_rnd);
+		int selectClusterMember(const RefPoint& rp, int id_pro);
 	protected:
 		std::vector<size_t> mv_obj_division_p_;
-		std::vector<ref_point> mv_rps;
+		std::vector<RefPoint> mv_rps;
 		std::vector<std::vector<Real>> mvv_off_conv_obj;
 	};
 
-	template<typename Individual>
-	void NSGAIII<Individual>::set_default_param() {
-		if (global::ms_global->m_problem->name().find("DTLZ") != std::string::npos) {
-			int num_obj = global::ms_global->m_problem->objective_size();
-			if (num_obj == 3)
-				mv_obj_division_p_.resize(1, 12);
-			else if (num_obj == 5)
-				mv_obj_division_p_.resize(1, 6);
-			else if (num_obj == 8)
-			{
-				mv_obj_division_p_.resize(2);
-				mv_obj_division_p_[0] = 3;
-				mv_obj_division_p_[1] = 2;
-			}
-			return;
-		}
+	template<typename TInd>
+	void NSGAIII<TInd>::setDefaultParam(int id_pro) {
+		//auto& v = GET_PRO(id_pro);
+		//if (v.name().find("DTLZ") != std::string::npos) {
+		//	int num_obj = v.numObjectives();
+		//	if (num_obj == 3)
+		//		mv_obj_division_p_.resize(1, 12);
+		//	else if (num_obj == 5)
+		//		mv_obj_division_p_.resize(1, 6);
+		//	else if (num_obj == 8)
+		//	{
+		//		mv_obj_division_p_.resize(2);
+		//		mv_obj_division_p_[0] = 3;
+		//		mv_obj_division_p_[1] = 2;
+		//	}
+		//	return;
+		//}
 		mv_obj_division_p_.resize(1, 12);
 	}
 
-	template<typename Individual>
-	void NSGAIII<Individual>::nondominated_sorting(std::vector<Individual>& offspring) {
-		std::vector<std::vector<objective_type>*> objs;
+	template<typename TInd>
+	void NSGAIII<TInd>::nondominatedSorting(std::vector<TInd>& offspring, int id_pro) {
+		std::vector<std::vector<Real>*> objs;
 		for (auto& i : offspring)
 			objs.emplace_back(&i.objective());
 		std::vector<int> rank;
-		NS::fast_sort<objective_type>(objs, rank, global::ms_global->m_problem->opt_mode());
+		nd_sort::fastSort<Real>(objs, rank, GET_CONOP(id_pro).optMode());
 		for (size_t i = 0; i < offspring.size(); ++i)
-			offspring[i].set_rank(rank[i]);
+			offspring[i].setRank(rank[i]);
 	}
 
-	template<typename Individual>
-	void NSGAIII<Individual>::survivor_selection(std::vector<std::unique_ptr<Individual>>& parent, std::vector<Individual>& offspring) {
-		std::vector<ref_point> rps = mv_rps;
+	template<typename TInd>
+	void NSGAIII<TInd>::survivorSelection(std::vector<std::unique_ptr<TInd>>& parent, std::vector<TInd>& offspring, int id_pro, int id_rnd) {
+		std::vector<RefPoint> rps = mv_rps;
 		std::vector<std::vector<int> > fronts;
 		int rank = 0;
 		int count = 0;
 		int size = offspring.size();
 		// ---------- Step 4 in Algorithm 1: non-dominated sorting ----------
-		nondominated_sorting(offspring);
+		nondominatedSorting(offspring, id_pro);
 		while (1)
 		{
 			std::vector<int> temp;
@@ -132,15 +132,15 @@ namespace OFEC {
 
 
 		// ---------- Step 14 / Algorithm 2 ----------
-		std::vector<Real> ideal_point = translate_objectives(fronts, offspring);
+		std::vector<Real> ideal_point = translateObjectives(fronts, offspring, id_pro);
 
 		std::vector<size_t> extreme_points;
-		find_extreme_points(&extreme_points, fronts, offspring);
+		findExtremePoints(&extreme_points, fronts, offspring, id_pro);
 
 		std::vector<Real> intercepts;
-		construct_hyperplane(&intercepts, extreme_points, offspring);
+		constructHyperplane(&intercepts, extreme_points, offspring, id_pro);
 
-		normalize_objectives(fronts, intercepts, ideal_point);
+		normalizeObjectives(fronts, intercepts, ideal_point, id_pro);
 
 		// ---------- Step 15 / Algorithm 3, Step 16 ----------
 		reference_point::associate(&rps, mvv_off_conv_obj, fronts);
@@ -148,25 +148,25 @@ namespace OFEC {
 		// ---------- Step 17 / Algorithm 4 ----------
 		while (count < parent.size())
 		{
-			size_t min_rp = find_niche_ref_point(rps);
+			size_t min_rp = findNicheRefPoint(rps, id_rnd);
 
-			int chosen = select_cluster_member(rps[min_rp]);
+			int chosen = selectClusterMember(rps[min_rp], id_pro);
 			if (chosen < 0) // no potential member in Fl, disregard this reference point
 			{
 				rps.erase(rps.begin() + min_rp);
 			}
 			else
 			{
-				rps[min_rp].add_member();
-				rps[min_rp].remove_potential_member(chosen);
+				rps[min_rp].addMember();
+				rps[min_rp].removePotentialMember(chosen);
 				*(parent[count++]) = offspring[chosen];
 			}
 		}
 	}
 
-	template<typename Individual>
-	std::vector<Real> NSGAIII<Individual>::translate_objectives(const std::vector<std::vector<int>>& fronts, std::vector<Individual>& offspring) {
-		int numObj = global::ms_global->m_problem->objective_size();
+	template<typename TInd>
+	std::vector<Real> NSGAIII<TInd>::translateObjectives(const std::vector<std::vector<int>>& fronts, std::vector<TInd>& offspring, int id_pro) {
+		int numObj = GET_PRO(id_pro).numObjectives();
 		std::vector<Real> ideal_point(numObj);
 
 		for (int f = 0; f < numObj; f += 1)
@@ -191,10 +191,10 @@ namespace OFEC {
 		return ideal_point;
 	}
 
-	template<typename Individual>
-	void NSGAIII<Individual>::find_extreme_points(std::vector<size_t>* extreme_points, const std::vector<std::vector<int>>& fronts, std::vector<Individual>& offspring) {
-		int numObj = global::ms_global->m_problem->objective_size();
-		std::vector<size_t> &exp = *extreme_points;
+	template<typename TInd>
+	void NSGAIII<TInd>::findExtremePoints(std::vector<size_t>* extreme_points, const std::vector<std::vector<int>>& fronts, std::vector<TInd>& offspring, int id_pro) {
+		int numObj = GET_PRO(id_pro).numObjectives();
+		std::vector<size_t>& exp = *extreme_points;
 		exp.clear();
 
 		for (size_t f = 0; f < numObj; f += 1)
@@ -219,11 +219,11 @@ namespace OFEC {
 		}
 	}
 
-	template<typename Individual>
-	void NSGAIII<Individual>::construct_hyperplane(std::vector<Real>* pintercepts, const std::vector<size_t>& extreme_points, std::vector<Individual>& offspring) {
+	template<typename TInd>
+	void NSGAIII<TInd>::constructHyperplane(std::vector<Real>* pintercepts, const std::vector<size_t>& extreme_points, std::vector<TInd>& offspring, int id_pro) {
 		// Check whether there are duplicate extreme points.
 	// This might happen but the original paper does not mention how to deal with it.
-		int numObj = global::ms_global->m_problem->objective_size();
+		int numObj = GET_PRO(id_pro).numObjectives();
 		bool duplicate = false;
 		for (size_t i = 0; !duplicate && i < extreme_points.size(); i += 1)
 		{
@@ -233,7 +233,7 @@ namespace OFEC {
 			}
 		}
 
-		std::vector<Real> &intercepts = *pintercepts;
+		std::vector<Real>& intercepts = *pintercepts;
 		intercepts.assign(numObj, 0);
 
 		if (duplicate) // cannot construct the unique hyperplane (this is a casual method to deal with the condition)
@@ -254,7 +254,7 @@ namespace OFEC {
 				A.push_back(offspring[extreme_points[p]].objective());
 			}
 			std::vector<Real> x;
-			math_aux::guassian_elimination(&x, A, b);
+			math_aux::guassianElimination(&x, A, b);
 
 			// Find intercepts
 			for (size_t f = 0; f < intercepts.size(); f += 1)
@@ -264,9 +264,9 @@ namespace OFEC {
 		}
 	}
 
-	template<typename Individual>
-	void NSGAIII<Individual>::normalize_objectives(const std::vector<std::vector<int>>& fronts, const std::vector<Real>& intercepts, const std::vector<Real>& ideal_point) {
-		int numObj = global::ms_global->m_problem->objective_size();
+	template<typename TInd>
+	void NSGAIII<TInd>::normalizeObjectives(const std::vector<std::vector<int>>& fronts, const std::vector<Real>& intercepts, const std::vector<Real>& ideal_point, int id_pro) {
+		int numObj = GET_PRO(id_pro).numObjectives();
 		for (size_t t = 0; t < fronts.size(); t += 1)
 		{
 			for (size_t i = 0; i < fronts[t].size(); i += 1)
@@ -282,42 +282,42 @@ namespace OFEC {
 			}
 		}
 	}
-	template<typename Individual>
-	size_t NSGAIII<Individual>::find_niche_ref_point(const std::vector<ref_point>& rps) {
+	template<typename TInd>
+	size_t NSGAIII<TInd>::findNicheRefPoint(const std::vector<RefPoint>& rps, int id_rnd) {
 		// find the minimal cluster size
 		size_t min_size = std::numeric_limits<size_t>::max();
 		for (size_t r = 0; r < rps.size(); r += 1)
 		{
-			min_size = std::min(min_size, rps[r].member_size());
+			min_size = std::min(min_size, rps[r].memberSize());
 		}
 
 		// find the reference points with the minimal cluster size Jmin
 		std::vector<size_t> min_rps;
 		for (size_t r = 0; r < rps.size(); r += 1)
 		{
-			if (rps[r].member_size() == min_size)
+			if (rps[r].memberSize() == min_size)
 			{
 				min_rps.push_back(r);
 			}
 		}
 
 		// return a random reference point (j-bar)
-		int rnd = global::ms_global->m_uniform[caller::Algorithm]->next_non_standard<int>(0, min_rps.size());
+		int rnd = GET_RND(id_rnd).uniform.nextNonStd((size_t)0, min_rps.size());
 		return min_rps[rnd];
 	}
 
-	template<typename Individual>
-	int NSGAIII<Individual>::select_cluster_member(const ref_point & rp) {
+	template<typename TInd>
+	int NSGAIII<TInd>::selectClusterMember(const RefPoint& rp, int id_pro) {
 		int chosen = -1;
-		if (rp.has_potential_member())
+		if (rp.hasPotentialMember())
 		{
-			if (rp.member_size() == 0) // currently has no member
+			if (rp.memberSize() == 0) // currently has no member
 			{
-				chosen = rp.find_closest_member();
+				chosen = rp.findClosestMember();
 			}
 			else
 			{
-				chosen = rp.random_member();
+				chosen = rp.randomMember(id_pro);
 			}
 		}
 		return chosen;

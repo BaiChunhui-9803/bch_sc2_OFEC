@@ -1,19 +1,14 @@
 //Register UF03 "MOP_UF03" MOP,ConOP
 
-#ifndef UF3_H
-#define UF3_H
+#ifndef OFEC_UF3_H
+#define OFEC_UF3_H
 
+#include "uf.h"
 
-#include "UF.h"
-
-namespace OFEC {
-	class UF03 final : public UF {
-	public:
-		UF03(const ParamMap &v);
-		UF03(const std::string &name, size_t size_var);
-		~UF03() {}
-	private:
-		void evaluateObjective(Real *x, std::vector<Real> &obj);
+namespace ofec {
+	class UF03 : public UF{
+	protected:
+		void evaluateObjective(Real* x, std::vector<Real>& obj) override;
 	};
 }
 

@@ -1,6 +1,6 @@
 #include "HE7.h"
 
-namespace OFEC {
+namespace ofec {
 	HE7::HE7(param_map & v) : HE7(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -37,7 +37,7 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag HE7::evaluateObjective(Real *x, std::vector<Real> &obj) {//recommend the number of variables is 20
+	int HE7::evaluateObjective(Real *x, std::vector<Real> &obj) {//recommend the number of variables is 20
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -69,6 +69,6 @@ namespace OFEC {
 				obj[m] = gt * (1 - std::pow(obj[0] / gt, Ht));
 			}
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

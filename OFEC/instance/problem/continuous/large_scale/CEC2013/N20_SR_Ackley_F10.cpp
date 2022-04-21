@@ -1,6 +1,6 @@
 
 #include "N20_SR_Ackley_F10.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		N20_SR_Ackley_F10::N20_SR_Ackley_F10(const ParamMap &v) : 
 			N20_SR_Ackley_F10((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -55,7 +55,7 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag N20_SR_Ackley_F10::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int N20_SR_Ackley_F10::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			size_t i;
 			Real result = 0.0;
 
@@ -74,7 +74,7 @@ namespace OFEC {
 			}
 
 			obj[0] = result;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

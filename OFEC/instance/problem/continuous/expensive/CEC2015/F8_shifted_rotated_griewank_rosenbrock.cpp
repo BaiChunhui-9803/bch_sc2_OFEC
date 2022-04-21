@@ -1,6 +1,6 @@
 #include "F8_shifted_rotated_griewank_rosenbrock.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F8_shifted_rotated_griewank_rosenbrock::F8_shifted_rotated_griewank_rosenbrock(const ParamMap &v) :
 			F8_shifted_rotated_griewank_rosenbrock((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -27,7 +27,7 @@ namespace OFEC {
 			setGlobalOpt(m_translation.data());
 			m_initialized = true;
 		}
-		EvalTag F8_shifted_rotated_griewank_rosenbrock::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F8_shifted_rotated_griewank_rosenbrock::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			return griewank_rosenbrock::evaluateObjective(x, obj);
 		}
 	}

@@ -21,10 +21,10 @@
 #define OFEC_FUNCTION_H
 
 #include "continuous.h"
-#include "../../../utility/matrix.h"
+#include "../../../utility/linear_algebra/matrix.h"
 #include <algorithm>
 
-namespace OFEC {
+namespace ofec {
 	class Function : virtual public Continuous {
 	public:
 		void initialize_() override;
@@ -49,6 +49,8 @@ namespace OFEC {
 		std::vector<Real>& translation() { return m_translation; }
 
 	protected:
+		void evaluateObjective(Real *x, std::vector<Real> &obj) final override;
+		virtual void evaluateOriginalObj(Real *x, std::vector<Real> &obj) {}
 		virtual void clear();
 		virtual bool loadTranslation(const std::string& path);
 		virtual void loadTranslation_(const std::string& path);
@@ -66,13 +68,15 @@ namespace OFEC {
 		void translateOrigin(Real* x);
 		void rotate(Real* x);
 		void scale(Real* x);
-		void updateParameters();
-
+		void updateParameters() override;
+ 
 	protected:
+		// translation in variable space
 		std::vector<Real> m_translation;
 		bool m_scaled, m_rotated, m_translated, m_noisy;
 		Real m_scale, m_bias;
 		Real m_condition_number;
+		// dim: num_var * num_var
 		Matrix m_rotation;
 		Optima<> m_original_optima;
 	};

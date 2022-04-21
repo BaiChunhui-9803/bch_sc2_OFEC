@@ -20,18 +20,11 @@
 #define OFEC_F2_R_CIGAR_H
 
 #include "../classical/bent_cigar.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
-		class F2_R_cigar final : public bent_cigar
-		{
-		public:
-			F2_R_cigar(const ParamMap &v);
-			F2_R_cigar(const std::string &name, size_t size_var, size_t size_obj);
-			void initialize();
+		class F2_R_cigar final : public BentCigar {
 		protected:
-			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-
-		private:
+			void initialize_() override;
 		};
 	}
 	using CEC2015_GOP_F02 = CEC2015::F2_R_cigar;

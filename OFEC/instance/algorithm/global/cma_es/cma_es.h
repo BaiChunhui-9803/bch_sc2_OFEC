@@ -1,4 +1,4 @@
-//Register CMA_ES "CMA-ES" ConOP,GOP,SOP
+//Register CMA_ES "CMA-ES" ConOP,GOP,SOP,MMOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -23,45 +23,22 @@ https://github.com/CMA-ES/c-cmaes */
 #define OFEC_CMAES_H
 
 #include "../../../../core/algorithm/algorithm.h"
-#include "../../../../core/algorithm/population.h"
-#include "../../../../core/algorithm/individual.h"
-#include "cmaes.h"
-#include <vector>
+#include "cmaes_pop.h"
 
-namespace OFEC {
-	class cmaes_pop : public population<individual<>> {
-	public:
-		cmaes_pop(size_t size_pop);
-		cmaes_pop(size_t size_pop, const std::vector<Real>& start_ind, Real step_size);
-		void reinit_cmaest();
-		void resizepop_cmaest();
-		void initialize() override;
-		EvalTag evolve() override;
-		~cmaes_pop();
+namespace ofec {
+	class CMA_ES : public Algorithm {
 	protected:
-		cmaes_t evo;
-		double* arFunvals = nullptr, * const* pop = nullptr, * xfinal = nullptr;
-		std::string signalsFilePathName;
-		std::string initialsFilePathName;
-	protected:
-		void copy(double* x, std::vector<Real>& vx);
-		void reverse_x(const std::vector<Real>& vx, double* x);
-		void reverse_size(const std::vector<Real>& vstddev, double* stddev);
-		double fit_map(Solution<>& s);
-	};
+		std::unique_ptr<PopCMAES>  m_pop;
+		size_t m_pop_size;
 
-	class CMA_ES : public algorithm {
-	public:
-		CMA_ES(param_map& v);
-		void initialize() override;
-		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override {}
-#endif
-	protected:
 		void run_() override;
-	private:
-		cmaes_pop  m_pop;
+		void initialize_() override;
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
+
+	public:
+		void record() override;
 	};
 }
 

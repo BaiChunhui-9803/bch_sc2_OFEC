@@ -12,38 +12,24 @@
 *************************************************************************/
 
 #include "step.h"
-namespace OFEC {
-	
-	step::step(const ParamMap &v) :
-		step((v.at("problem name")), (v.at("number of variables")), 1) {
+#include "../../../../../core/instance_manager.h"
 
-		
-	}
-	step::step(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-		function(name, size_var, size_obj) {
-
-		
-	}
-
-	void step::initialize() {
-		m_variable_monitor = true;
-		setDomain(-100, 100);
-		setInitialDomain(-100, 100);
+namespace ofec {
+	void Step::initialize_() {
+		Function::initialize_();
+		m_opt_mode[0] = OptMode::kMinimize;
+		auto &v = GET_PARAM(m_id_param);
+		resizeVariable(std::get<int>(v.at("number of variables")));
+		setDomain(-100., 100.);
 		setOriginalGlobalOpt();
-
-		setGlobalOpt();
-		m_initialized = true;
+		m_optima = m_original_optima;
 	}
 
-	EvalTag step::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	void Step::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 		Real fitness = 0;
-
 		for (size_t i = 0; i < m_num_vars; ++i) {
 			fitness += fabs((Real)int(x[i] + 0.5)*int(x[i] + 0.5));
 		}
-
 		obj[0] = fitness + m_bias;
-		return EvalTag::Normal;
 	}
-	
 }

@@ -1,4 +1,4 @@
-//Register expanded_five_uneven_peak_trap "Classic_five_uneven_peak_trap_expanded" MMOP,ConOP,SOP
+//Register ExpandedFiveUnevenPeakTrap "Classic_five_uneven_peak_trap_expanded" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -16,25 +16,17 @@
 *  Competition on Single Objective Multi-Niche Optimization.
 *******************************************************************************************/
 
-
 #ifndef OFEC_EXPANDED_FIVE_UNEVEN_PEAK_TRAP_H
 #define OFEC_EXPANDED_FIVE_UNEVEN_PEAK_TRAP_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-
-	class expanded_five_uneven_peak_trap : public function
-	{
-	public:
-		expanded_five_uneven_peak_trap(const ParamMap &v);
-		expanded_five_uneven_peak_trap(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class ExpandedFiveUnevenPeakTrap : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
-
 }
 #endif // !OFEC_EXPANDED_FIVE_UNEVEN_PEAK_TRAP_H
 

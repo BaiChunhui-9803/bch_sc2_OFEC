@@ -1,7 +1,7 @@
 #include "HE2.h"
 #include "../../../../../utility/functional.h"
 
-namespace OFEC {
+namespace ofec {
 	HE2::HE2(param_map & v) : HE2(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -42,7 +42,7 @@ namespace OFEC {
 	}
 
 	//f1 = x1; f2 = g * h; f2 = 1 - (f1)^Ht-f1^Ht*sin(10πtf1)
-	EvalTag HE2::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int HE2::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -66,6 +66,6 @@ namespace OFEC {
 			else
 				obj[j] = gt * (1 - std::pow(obj[0] / gt,Ht) - std::pow(obj[0] / gt,Ht) * std::sin(10 * OFEC_PI*t*obj[0]));
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

@@ -31,7 +31,7 @@ IEEE transactions on cybernetics, 47(1):198-211, 2016
 
 #include "../DMOPs.h"
 
-namespace OFEC {
+namespace ofec {
 	class JY4 final : public DMOPs {
 	public:
 		JY4(const ParamMap &v);

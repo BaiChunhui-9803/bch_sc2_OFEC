@@ -1,4 +1,4 @@
-//Register katsuura "Classic_katsuura" GOP,ConOP,SOP
+//Register katsuura "Classic_Katsuura" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -17,18 +17,13 @@
 #define OFEC_KATSUURA_H
 
 #include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
+#include "../metrics_gop.h"
 
-	class katsuura : public function
-	{
-	public:
-		katsuura(const ParamMap &v);
-		katsuura(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class katsuura : public Function, public MetricsGOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real> &obj) override;
 	};
-
 }
 #endif // !OFEC_KATSUURA_H

@@ -12,42 +12,28 @@
 *************************************************************************/
 
 #include "schwefel_1_2.h"
-namespace OFEC {
-	
-	Schwefel_1_2::Schwefel_1_2(const ParamMap &v) :
-		Schwefel_1_2((v.at("problem name")), (v.at("number of variables"))) {}
+#include "../../../../../core/instance_manager.h"
 
-	Schwefel_1_2::Schwefel_1_2(const std::string &name, size_t num_vars) :
-		Problem(name), Function(name, num_vars) {}
-
-	void Schwefel_1_2::initialize() {
+namespace ofec {
+	void Schwefel_1_2::initialize_() {
+		Function::initialize_();
+		m_opt_mode[0] = OptMode::kMinimize;
+		resizeVariable(std::get<int>(GET_PARAM(m_id_param).at("number of variables")));
 		setDomain(-100, 100);
 		setOriginalGlobalOpt();
-		setGlobalOpt();
-		m_initialized = true;
+		m_optima = m_original_optima;
+		m_variable_niche_radius = 1e-4 * 100 * m_num_vars;
+		m_objective_accuracy = 1e-8;
 	}
 
-
-	EvalTag Schwefel_1_2::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		if (m_translated)
-			translate(x);
-		if (m_scaled)
-			scale(x);
-		if (m_rotated)
-			rotate(x);
-		if (m_translated)
-			translateOrigin(x);
+	void Schwefel_1_2::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 		Real s1 = 0, s2 = 0;
-
 		for (int i = 0; i < m_num_vars; i++) {
 			for (int j = 0; j <= i; j++)
 				s1 += x[j];
 			s2 += s1*s1;
 			s1 = 0;
 		}
-
 		obj[0] = s2 + m_bias;
-		return EvalTag::Normal;
 	}
-	
 }

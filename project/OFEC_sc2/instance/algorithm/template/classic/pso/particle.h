@@ -20,7 +20,7 @@
 
 #include "../../../../../core/algorithm/individual.h"
 
-namespace OFEC {
+namespace ofec {
 	class Particle : public Individual<> {
 	protected:
 		Solution<> m_pbest;
@@ -37,13 +37,13 @@ namespace OFEC {
 
 		std::vector<Real>& velocity() { return m_vel; }
 		Solution<>& pbest() { return m_pbest; }
-		void initialize(int id, int id_pro, int id_rnd) override;
 		virtual void initVelocity(int id_pro, int id_rnd);
+		virtual void initializeVmax(int id_pro, int id_rnd){}
 		void initVelocity(const std::vector<std::pair<Real, Real>> &vrange, int id_rnd);
 		void initVelocity(Real min, Real max, int id_rnd);
 		virtual void nextVelocity(const Solution<> *lbest, Real w, Real c1, Real c2, int id_rnd);
-		virtual void clampVelocity(int id_pro); // set to zero by default if the particle goes out the space
-		void move();		 
+		virtual void clampVelocity(int id_pro, int id_rnd); // set to zero by default if the particle goes out the space
+		virtual void move();
 		void resizeVar(size_t n);
 
 		Real speed() const;

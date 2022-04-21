@@ -1,4 +1,4 @@
-//Register expanded_two_peak_trap "Classic_two_peak_trap_expanded" MMOP,ConOP,SOP
+//Register ExpandedTwoPeakTrap "Classic_two_peak_trap_expanded" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -16,24 +16,17 @@
 *  Competition on Single Objective Multi-Niche Optimization.
 *******************************************************************************************/
 
-
 #ifndef OFEC_EXPANDED_TWO_PEAK_TRAP_H
 #define OFEC_EXPANDED_TWO_PEAK_TRAP_H
 
 #include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-	
-		class expanded_two_peak_trap : public function
-		{
-		public:
-			expanded_two_peak_trap(const ParamMap &v);
-			expanded_two_peak_trap(const std::string &name, size_t size_var, size_t size_obj);
-			void initialize();
-		protected:
-			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-		private:
-		};
-	
+namespace ofec {	
+	class ExpandedTwoPeakTrap : public Function, public MetricsMMOP {
+	protected:
+		void initialize_();
+		void evaluateOriginalObj(Real *x, std::vector<Real> &obj) override;
+	};	
 }
 #endif // !OFEC_EXPANDED_TWO_PEAK_TRAP_H

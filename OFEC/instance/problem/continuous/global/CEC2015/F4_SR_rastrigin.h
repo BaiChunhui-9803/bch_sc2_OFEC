@@ -20,18 +20,11 @@
 #define OFEC_F4_SR_RASTRIGIN_H
 
 #include "../classical/rastrigin.h"
-namespace OFEC {
-	namespace CEC2015 {
-		class F4_SR_rastrigin final : public rastrigin
-		{
-		public:
-			F4_SR_rastrigin(const ParamMap &v);
-			F4_SR_rastrigin(const std::string &name, size_t size_var, size_t size_obj);
-			void initialize();
-		protected:
-			void evaluateObjective(Real *x, std::vector<Real>& obj) override;
 
-		private:
+namespace ofec {
+	namespace CEC2015 {
+		class F4_SR_rastrigin final : public Rastrigin {
+			void initialize_() override;
 		};
 	}
 	using CEC2015_GOP_F04 = CEC2015::F4_SR_rastrigin;

@@ -8,10 +8,11 @@
 #include <chrono>
 #include <thread>
 
-namespace OFEC {
+namespace ofec {
 	void run() {
 		InstanceManager::ms_instance_manager.reset(new InstanceManager);
 		registerParamAbbr();
+		customizeFileName();
 		ParamMap params;
 		std::string argvs;
 		std::ifstream task_file(g_working_dir + "/tasks.txt");
@@ -27,14 +28,16 @@ namespace OFEC {
 				std::list<int> ids_algs, ids_pros;
 				auto start = std::chrono::steady_clock::now();
 				for (size_t i = 0; i < num_runs; i++) {
-					int id_pro = ADD_PRO(id_param, Real(i + 1) / (num_runs + 1));
-					int id_alg = ADD_ALG(id_param, id_pro, Real(i + 1) / (num_runs + 1), id_rcr);
+					Real seed = Real(i + 1) / (num_runs + 1);
+					int id_pro = ADD_PRO(id_param, seed);
+					int id_alg = ADD_ALG(id_param, id_pro, seed, id_rcr);
 					GET_PRO(id_pro).initialize();
 					GET_ALG(id_alg).initialize();
 					ids_pros.push_back(id_pro);
 					ids_algs.push_back(id_alg);
-					thrds.emplace_back(runAlg, id_alg);
 				}
+				for (int id_alg : ids_algs)
+					thrds.emplace_back(runAlg, id_alg);
 				for (auto& t : thrds)
 					t.join();
 				std::cout << "############ Output data" << std::endl;
@@ -43,6 +46,7 @@ namespace OFEC {
 				for (int id_alg : ids_algs) DEL_ALG(id_alg);
 				for (int id_pro : ids_pros) DEL_PRO(id_pro);
 				DEL_RCR(id_rcr);
+				DEL_PARAM(id_param);
 				auto end = std::chrono::steady_clock::now();
 				float diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 				std::cout << "[Task finished] Time used: " << diff / 1000 << " s" << std::endl;

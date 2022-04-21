@@ -14,33 +14,23 @@
 #include "rastrigin.h"
 #include "../../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
 	void Rastrigin::initialize_() {
 		Function::initialize_();
 		auto &v = GET_PARAM(m_id_param);
 		resizeVariable(std::get<int>(v.at("number of variables")));
-		m_opt_mode[0] = OptMode::Minimize;
 		setDomain(-5.12, 5.12);
 		setOriginalGlobalOpt();
-		setGlobalOpt();
+		m_optima = m_original_optima;
+		m_variable_niche_radius = 1e-4 * 5.12 * m_num_vars;
+		m_opt_mode[0] = OptMode::kMinimize;
+		m_objective_accuracy = 1e-8;
 	}
 
-
-	void Rastrigin::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		if (m_translated)
-			translate(x);
-		if (m_scaled)
-			scale(x);
-		if (m_rotated)
-			rotate(x);
-		if (m_translated)
-			translateOrigin(x);
-
+	void Rastrigin::evaluateOriginalObj(Real *x, std::vector<Real> &obj) {
 		Real fit = 0;
-
 		for (int i = 0; i < m_num_vars; i++)
 			fit += x[i] * x[i] - 10.*cos(2 * OFEC_PI*x[i]) + 10.;
-
 		obj[0] = fit + m_bias;
 	}
 	

@@ -3,27 +3,26 @@
 #include "../../core/problem/continuous/continuous.h"
 #include <fstream>
 
-namespace OFEC {
+namespace ofec {
 	void RecordVecReal::outputData(const std::list<int>& ids_pros, const std::list<int>& ids_algs) {
 		int id_pro = ids_pros.front();
-		if (GET_PRO(id_pro).hasTag(ProTag::ConOP)) {
+		if (GET_PRO(id_pro).hasTag(ProTag::kConOP)) {
 			auto& optima = GET_CONOP(id_pro).getOptima();
 			m_heading.push_back("Evaluations");
-			if (optima.isVariableGiven() && GET_PRO(id_pro).hasTag(ProTag::MMOP)) {
-				for (size_t i = 0; i < optima.numberVariables(); i++)
-					m_heading.push_back("Mininum distance to optimum " + std::to_string(i + 1));
+			if (GET_PRO(id_pro).hasTag(ProTag::kDOP)) {
+				m_heading.push_back("Number of environment");
+				m_heading.push_back("Optimal objective value");
+				m_heading.push_back("Best objective value so far");
 			}
-			else if (optima.isObjectiveGiven()) {
-				if (GET_PRO(id_pro).hasTag(ProTag::MMOP)) {
-					m_heading.push_back("Success Rate");
-					m_heading.push_back("Number of optima found");
-				}
-				else {
-					m_heading.push_back("Error");
-				}
+			else if (GET_PRO(id_pro).hasTag(ProTag::kMMOP)) {
+				m_heading.push_back("Number of optima found");
+				m_heading.push_back("Success Rate");
+			}
+			else {
+				m_heading.push_back("Error");
 			}
 		}
-		outputProgress();
+		/*outputProgress();*/
 		outputFinal();
 	}
 	
@@ -56,9 +55,6 @@ namespace OFEC {
 					sum[k] += rcr_run.second[k];
 			for (size_t k = i; k < i + size_row; ++k)
 				sum[k] /= m_data.size();
-		}
-		if (m_filename.str().empty()) {
-			setFileName();
 		}
 		std::ofstream out_file(m_filename.str() + "progr.csv");
 		std::stringstream out;

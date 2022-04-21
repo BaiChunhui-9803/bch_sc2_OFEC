@@ -19,16 +19,14 @@
 
 #include "../classical/scaffer_F6.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class ShiftedRotatedExpandedScafferF6 final : public ScafferF6 {
-		public:
-			ShiftedRotatedExpandedScafferF6(const ParamMap &v);
-			ShiftedRotatedExpandedScafferF6(const std::string &name, size_t num_vars);
-			void initialize();
+		protected:
+			void initialize_() override;
 		};
 	}
-	using CEC2005_GOP_F14 = CEC2005::ShiftedRotatedExpandedScafferF6;
+	using CEC2005_GOP_F14 = cec2005::ShiftedRotatedExpandedScafferF6;
 }
 #endif // ! OFEC_F14_SHIFTED_ROTATED_EXPANDED_SCAFFER_F6_H
 

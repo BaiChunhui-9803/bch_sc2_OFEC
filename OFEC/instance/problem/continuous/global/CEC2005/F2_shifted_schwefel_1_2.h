@@ -19,15 +19,13 @@
 
 #include "../classical/schwefel_1_2.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class ShiftedSchwefel_1_2 final : public Schwefel_1_2 {
-		public:
-			ShiftedSchwefel_1_2(const ParamMap &v);
-			ShiftedSchwefel_1_2(const std::string &name, size_t num_vars);
-			void initialize();
+		protected:
+			void initialize_() override;
 		};
 	}
-	using CEC2005_GOP_F02 = CEC2005::ShiftedSchwefel_1_2;
+	using CEC2005_GOP_F02 = cec2005::ShiftedSchwefel_1_2;
 }
 #endif // ! OFEC_F2_SHIFTED_SCHWEFEL_1_2_H

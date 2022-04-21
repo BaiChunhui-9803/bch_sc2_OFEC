@@ -25,22 +25,27 @@ in IEEE Transactions on Evolutionary Computation, vol. 24, no. 1, pp. 114-128, F
 #define OFEC_ANDE_H
 
 #include "../../../../core/algorithm/algorithm.h"
-#include "../population.h"
+#include "../../template/classic/de/de_pop.h"
 #include "../../../../utility/clustering/apc.h"
 
-namespace OFEC {
-	class ANDE : public algorithm {
-		DE::population<> m_pop;
-		APC<DE::individual> m_apc;
+namespace ofec {
+	class ANDE : public Algorithm {
+	protected:
+		std::unique_ptr<PopDE<>> m_pop;
+		std::unique_ptr<APC<IndDE>> m_apc;
 		size_t m_MaxFEs = 1000000;
-	public:
-		ANDE(param_map& v);
-		void initialize() override;
+		size_t m_pop_size;
+		Real m_f, m_cr;
+
+		void initialize_() override;
 		void run_() override;
-		void record() override;
 #ifdef OFEC_DEMO
-		void updateBuffer() override;
+		void updateBuffer();
 #endif
+
+	public:
+		void record() override;
+
 	private:
 		void CPA(const std::vector<size_t> &cluster);
 		void TLLS(const std::vector<std::vector<size_t>>& clusters);

@@ -2,7 +2,7 @@
 #include "../../utility/typevar/typevar.h"
 #include <cmath>
 
-namespace OFEC {
+namespace ofec {
 	Termination::Termination() : 
 		m_max_time(12 * 3600) {}
 

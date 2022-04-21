@@ -30,7 +30,7 @@ In 2014 IEEE Congress on Evolutionary Computation (CEC), pages 3192-3199. IEEE, 
 
 #include "../DMOPs.h"
 
-namespace OFEC {
+namespace ofec {
 	class UDF4 final : public DMOPs {
 	public:
 		UDF4(const ParamMap &v);

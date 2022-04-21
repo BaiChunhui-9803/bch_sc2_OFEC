@@ -1,6 +1,6 @@
 #include "T3.h"
 
-namespace OFEC {
+namespace ofec {
 	T3::T3(param_map & v) : T3(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -24,7 +24,7 @@ namespace OFEC {
 
 	}
 
-	EvalTag T3::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int T3::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -54,6 +54,6 @@ namespace OFEC {
 			else
 				obj[m] = obj[m] * sin(0.5*x[0] * OFEC_PI);
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

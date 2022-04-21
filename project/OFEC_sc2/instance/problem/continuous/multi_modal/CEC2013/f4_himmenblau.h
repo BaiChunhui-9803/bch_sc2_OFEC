@@ -17,13 +17,12 @@
 #ifndef OFEC_F4_HIMMENBLAU_H
 #define OFEC_F4_HIMMENBLAU_H
 
-#include "../../../../../core/problem/continuous/function.h"
 #include "../metrics_mmop.h"
 
-namespace OFEC {
-	namespace CEC2013 {
+namespace ofec {
+	namespace cec2013 {
 		// An inverted version of Himmelblau function
-		class Himmenblau final : public Function, public MetricsMMOP {
+		class Himmenblau final : public MetricsMMOP {
 		protected:
 			void initialize_() override;
 			void evaluateObjective(Real *x, std::vector<Real>& obj) override;

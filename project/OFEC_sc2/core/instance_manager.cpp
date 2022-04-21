@@ -2,15 +2,8 @@
 #include "../run/custom_method.h"
 #include "../utility/factory.h"
 
-namespace OFEC {
+namespace ofec {
 	std::unique_ptr<InstanceManager> InstanceManager::ms_instance_manager = nullptr;
-
-	Random::Random(Real seed) :
-		uniform(seed),
-		normal(seed),
-		cauchy(seed),
-		levy(1.4, seed),
-		gamma(0.5, seed) {}
 
 	int InstanceManager::addRecord(int id_param) {
 		std::unique_lock<std::shared_mutex> lock(m_rcr_mtx);
@@ -36,13 +29,13 @@ namespace OFEC {
 			int id_pro(0);
 			if (m_shelved_ids_pro.empty()) {
 				id_pro = m_problems.size();
-				m_problems.emplace_back(factory<Problem>::produce(std::get<std::string>(getParamMap(id_param).at("problem name"))));
+				m_problems.emplace_back(Factory<Problem>::produce(std::get<std::string>(getParamMap(id_param).at("problem name"))));
 				m_num_occupied_pro.emplace_back(0);
 			}
 			else {
 				id_pro = m_shelved_ids_pro.front();
 				m_shelved_ids_pro.pop_front();
-				m_problems[id_pro].reset(factory<Problem>::produce(std::get<std::string>(getParamMap(id_param).at("problem name"))));
+				m_problems[id_pro].reset(Factory<Problem>::produce(std::get<std::string>(getParamMap(id_param).at("problem name"))));
 			}
 			int id_rnd = addRandom(seed);
 			m_problems[id_pro]->m_id_pro = id_pro;
@@ -90,13 +83,13 @@ namespace OFEC {
 			int id_alg(0);
 			if (m_shelved_ids_alg.empty()) {
 				id_alg = m_algorithms.size();
-				m_algorithms.emplace_back(factory<Algorithm>::produce(std::get<std::string>(getParamMap(id_param).at("algorithm name"))));
+				m_algorithms.emplace_back(Factory<Algorithm>::produce(std::get<std::string>(getParamMap(id_param).at("algorithm name"))));
 				m_num_occupied_alg.emplace_back(0);
 			}
 			else {
 				id_alg = m_shelved_ids_alg.front();
 				m_shelved_ids_alg.pop_front();
-				m_algorithms[id_alg].reset(factory<Algorithm>::produce(std::get<std::string>(getParamMap(id_param).at("algorithm name"))));
+				m_algorithms[id_alg].reset(Factory<Algorithm>::produce(std::get<std::string>(getParamMap(id_param).at("algorithm name"))));
 			}
 			int id_rnd = addRandom(seed);
 			m_algorithms[id_alg]->m_id_param = id_param;

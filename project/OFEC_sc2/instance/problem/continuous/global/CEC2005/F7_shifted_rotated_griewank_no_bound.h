@@ -19,16 +19,14 @@
 
 #include "../classical/griewank.h"
 
-namespace OFEC {
-	namespace CEC2005 {
+namespace ofec {
+	namespace cec2005 {
 		class ShiftedRotatedGriewankNoBound final : public Griewank {
-		public:
-			ShiftedRotatedGriewankNoBound(const ParamMap &v);
-			ShiftedRotatedGriewankNoBound(const std::string &name, size_t num_vars);
-			void initialize();
+		protected:
+			void initialize_() override;
 		};
 	}
-	using CEC2005_GOP_F07 = CEC2005::ShiftedRotatedGriewankNoBound;
+	using CEC2005_GOP_F07 = cec2005::ShiftedRotatedGriewankNoBound;
 }
 #endif // ! OFEC_F7_SHIFTED_ROTATED_GRIEWANK_NO_BOUND_H
 

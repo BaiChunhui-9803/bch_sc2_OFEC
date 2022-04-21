@@ -1,4 +1,4 @@
-//Register szu "Classic_szu" MMOP,ConOP,SOP
+//Register Szu "Classic_Szu" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -19,19 +19,13 @@
 #ifndef OFEC_SZU_H
 #define OFEC_SZU_H
 
-#include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
-	
-	class szu : public function
-	{
-	public:
-		szu(const ParamMap &v);
-		szu(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+#include "../metrics_mmop.h"
+
+namespace ofec {
+	class Szu : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
-	
 }
 #endif // !OFEC_SZU_H

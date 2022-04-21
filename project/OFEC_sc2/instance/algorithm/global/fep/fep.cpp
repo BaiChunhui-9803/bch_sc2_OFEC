@@ -1,77 +1,75 @@
-#include "FEP.h"
+#include "fep.h"
+#include "../../../record/rcr_vec_real.h"
 
 #ifdef OFEC_DEMO
-#include "../../../../../ui/buffer/continuous/buffer_cont.h"
-extern unique_ptr<Demo::scene> Demo::msp_buffer;
+#include <core/global_ui.h>
 #endif
 
-namespace OFEC {
-
-	FEP_pop::FEP_pop(size_t size_pop) : EP::population<>(size_pop) {}
-
-	void FEP_pop::mutate() {
-		size_t size_parents = m_inds.size();
-		if (m_offspring.size() != 2 * size_parents)
-			throw myexcept("Error at EP::population::mutate(). The size of offspring must be 2 times of the size of parents.");
-		for (size_t i = 0; i < size_parents; ++i)
-			* m_offspring[i] = *m_inds[i];
-		for (size_t i = size_parents; i < m_offspring.size(); i++) {
-			Real N = global::ms_global->m_normal[caller::Algorithm]->next();
+namespace ofec {
+	void PopFEP::mutate(int id_rnd, int id_pro) {
+		for (size_t i = 0; i < m_inds.size(); ++i)
+			*m_offspring[i] = *m_inds[i];
+		for (size_t i = 0; i < m_inds.size(); i++) {
+			Real N = GET_RND(id_rnd).normal.next();
 			for (size_t j = 0; j < m_offspring[i]->variable().size(); ++j) {
-				Real delta_j = global::ms_global->m_cauchy[caller::Algorithm]->next();
-				m_offspring[i]->variable()[j] = m_inds[i - size_parents]->variable()[j] + m_inds[i - size_parents]->eta()[j] * delta_j;
-				Real N_j = global::ms_global->m_normal[caller::Algorithm]->next();
-				m_offspring[i]->eta()[j] = m_inds[i - size_parents]->eta()[j] * exp(m_tau_prime * N + m_tau * N_j);
+				Real delta_j = GET_RND(id_rnd).cauchy.next();
+				m_offspring[i+ m_inds.size()]->variable()[j] = m_inds[i]->variable()[j] + m_inds[i]->eta()[j] * delta_j;
+				Real N_j = GET_RND(id_rnd).normal.next();
+				m_offspring[i + m_inds.size()]->eta()[j] = m_inds[i]->eta()[j] * exp(m_tau_prime * N + m_tau * N_j);
 			}
 		}
 	}
 
-	FEP::FEP(param_map & v) : algorithm(v.at("algorithm name")), m_pop(v.at("population size")) {
-		if (CONTINUOUS_CAST->has_tag(problem_tag::GOP))
-			CONTINUOUS_CAST->set_eval_monitor_flag(true);
-	}
-
-	void FEP::initialize() {
-        m_pop.tau_prime() = 1 / (sqrt(2 / sqrt(m_pop.size())));
-        m_pop.tau() = 1 / (sqrt(2 * m_pop.size()));
-        m_pop.q() = 10;
-		m_pop.initialize();
-		m_pop.evaluate();
-#ifdef OFEC_DEMO
-		vector<vector<Solution<>*>> pops(1);
-		for (size_t i = 0; i < m_pop.size(); ++i)
-			pops[0].emplace_back(&m_pop[i].solut());
-		dynamic_cast<Demo::buffer_cont*>(Demo::msp_buffer.get())->updateBuffer_(&pops);
-#endif
+	void FEP::initialize_() {
+		Algorithm::initialize_();
+		m_pop_size = std::get<int>(GET_PARAM(m_id_param).at("population size"));
+		m_tau_prime = 1 / (sqrt(2 / sqrt(m_pop_size)));
+		m_tau = 1 / (sqrt(2 * m_pop_size));
+		m_q = 10;
+		m_pop.clear();
+		if (ID_RCR_VALID(m_id_rcr))
+			m_keep_candidates_updated = true;
 	}
 
 	void FEP::run_() {
-		while (!terminating()) {
-			m_pop.evolve();
+		m_pop.resize(m_pop_size, m_id_pro);
+		m_pop.tauPrime() = m_tau_prime;
+		m_pop.tau() = m_tau;
+		m_pop.q() = m_q;
+		m_pop.initialize(m_id_pro, m_id_rnd);
+		m_pop.evaluate(m_id_pro, m_id_alg);
 #ifdef OFEC_DEMO
-			vector<vector<Solution<>*>> pops(1);
-			for (size_t i = 0; i < m_pop.size(); ++i)
-				pops[0].emplace_back(&m_pop[i].solut());
-			dynamic_cast<Demo::buffer_cont*>(Demo::msp_buffer.get())->updateBuffer_(&pops);
+		updateBuffer();
+#endif
+		while (!terminating()) {
+			m_pop.evolve(m_id_pro, m_id_alg, m_id_rnd);
+#ifdef OFEC_DEMO
+			updateBuffer();
 #endif
 		}
 	}
 
 	void FEP::record() {
-		if (CONTINUOUS_CAST->has_tag(problem_tag::MMOP)) {
-			// ******* Multi-Modal Optimization *******
-			size_t evals = CONTINUOUS_CAST->evaluations();
-			size_t num_opt_found = CONTINUOUS_CAST->num_optima_found();
-			size_t num_opt_known = CONTINUOUS_CAST->get_optima().number_objective();
-			Real peak_ratio = (Real)num_opt_found / (Real)num_opt_known;
-			Real success_rate = CONTINUOUS_CAST->solved() ? 1 : 0;
-			measure::get_measure()->record(global::ms_global.get(), evals, peak_ratio, success_rate);
+		std::vector<Real> entry;
+		entry.push_back(m_effective_eval);
+		if (GET_PRO(m_id_pro).hasTag(ProTag::kMMOP)) {
+			size_t num_optima_found = GET_PRO(m_id_pro).numOptimaFound(m_candidates);
+			size_t num_optima = GET_CONOP(m_id_pro).getOptima().numberObjectives();
+			entry.push_back(num_optima_found);
+			entry.push_back(num_optima_found == num_optima ? 1 : 0);
 		}
-		else if (CONTINUOUS_CAST->has_tag(problem_tag::GOP)) {
-			// ******* Global Optimization ************
-			size_t evals = CONTINUOUS_CAST->evaluations();
-			Real err = std::fabs(problem::get_sofar_best<Solution<>>(0)->objective(0) - CONTINUOUS_CAST->get_optima().objective(0).at(0));
-			measure::get_measure()->record(global::ms_global.get(), evals, err);
-		}
+		else
+			entry.push_back(m_candidates.front()->objectiveDistance(GET_CONOP(m_id_pro).getOptima().objective(0)));
+		dynamic_cast<RecordVecReal &>(GET_RCR(m_id_rcr)).record(m_id_alg, entry);
 	}
+
+#ifdef OFEC_DEMO
+	void FEP::updateBuffer() {
+		m_solution.clear();
+		m_solution.resize(1);
+		for (size_t i = 0; i < m_pop.size(); ++i)
+			m_solution[0].push_back(&m_pop[i]);
+		ofec_demo::g_buffer->appendAlgBuffer(m_id_alg);
+	}
+#endif
 }

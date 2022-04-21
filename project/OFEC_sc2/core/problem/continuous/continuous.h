@@ -22,27 +22,31 @@
 #include "../problem.h"
 #include "../optima.h"
 #include "../domain.h"
+#include <vector>
 
-namespace OFEC {
+namespace ofec {
 #define GET_CONOP(id_pro) dynamic_cast<Continuous&>(GET_PRO(id_pro))
 
 	class Continuous : virtual public Problem {
 	public:
-		void initialize_() override;
+		Continuous() = default;
+		virtual ~Continuous() = default;
+		virtual void initialize_() override;
 		void initSolution(SolBase& s, int id_rnd) const override;
 		bool same(const SolBase& s1, const SolBase& s2) const override;
 		Real variableDistance(const SolBase& s1, const SolBase& s2) const override;
 		Real variableDistance(const VarBase& s1, const VarBase& s2) const override;
 		bool boundaryViolated(const SolBase &s) const override; // boudary check only
-		void validateSolution(SolBase& s, Validation mode, int id_rnd) override;
+		void validateSolution(SolBase& s, Validation mode, int id_rnd)const override;
 		virtual void resizeVariable(size_t num_vars);
-		void resizeObjective(size_t num_objs) override;
+		virtual void resizeObjective(size_t num_objs) override;
 		void updateParameters() override;
-		EvalTag updateEvalTag(SolBase &s, int id_alg, bool effective_eval) override;
-		bool isOptimaGiven() const override;
+		virtual int updateEvalTag(SolBase &s, int id_alg, bool effective_eval) override;
+		bool isOptimaObjGiven() const override;
+		bool isOptimaVarGiven() const override;
 
 		/* Read-only methods */
-		size_t numVariables() const { return m_num_vars; }
+		virtual size_t numVariables() const override { return m_num_vars; }
 		const std::pair<Real, Real>& range(size_t i) const { return m_domain.range(i).limit; }
 		std::vector<std::pair<Real, Real>> boundary() const;
 		const Optima<>& getOptima() const { return m_optima; }
@@ -57,8 +61,8 @@ namespace OFEC {
 		void setInitialDomain(const std::vector<std::pair<Real, Real>>& r);
 
 	protected:
-	//	void copy(const Problem&);
-		void evaluate_(SolBase& s, bool effective) override;
+		void copy(const Problem&) override;
+		void evaluate_(SolBase& s, bool effective) final override;
 		virtual void evaluateObjective(Real* x, std::vector<Real>& obj) {}
 		virtual void evaluateObjAndCon(Real* x, std::vector<Real>& obj, std::vector<Real>& con) {}
 

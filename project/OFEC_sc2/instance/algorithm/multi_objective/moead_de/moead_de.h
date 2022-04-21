@@ -20,31 +20,29 @@
 #ifndef OFEC_MOEAD_DE_H
 #define OFEC_MOEAD_DE_H
 
-#include "../MOEAD.h"
-#include "../../../DE/MOEA_DE/MOEA_DE.h"
+#include "../../template/multi_objective/moead/moead.h"
+#include "../moea_de_pop.h"
 
-namespace OFEC {
-	class MOEAD_DE_pop :public DE::MOEA_DE_pop<>, MOEAD<DE::individual> {
+namespace ofec {
+	class PopMOEAD_DE :public PopMODE<>, MOEAD<IndDE> {
 	public:
-		MOEAD_DE_pop(size_t size_pop);
-		void initialize();
-		EvalTag evolve();
-	protected:
-		EvalTag evolve_mo();
+		PopMOEAD_DE(size_t size_pop, int id_pro);
+		void initialize_(int id_pro, int id_rnd);
+		int evolve(int id_pro, int id_alg, int id_rnd);
 	};
 
-	class MOEAD_DE :public algorithm {
-	protected:
-		MOEAD_DE_pop m_pop;
+	class MOEAD_DE :public Algorithm {
 	public:
-		MOEAD_DE(const ParamMap &v);
-		void initialize() override; 
+		void initialize_() override;
 		void record() override;
+		void initPop();
 #ifdef OFEC_DEMO
-		void updateBuffer() override {}
+		void updateBuffer();
 #endif
 	protected:
 		void run_() override;
+		std::unique_ptr<PopMOEAD_DE> m_pop;
+		size_t m_pop_size;
 	};
 
 }

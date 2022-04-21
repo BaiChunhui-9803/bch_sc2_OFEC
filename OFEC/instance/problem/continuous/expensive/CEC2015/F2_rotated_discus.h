@@ -19,7 +19,7 @@
 
 #include "../../global/classical/discus.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F2_rotated_discus final : public discus
 		{

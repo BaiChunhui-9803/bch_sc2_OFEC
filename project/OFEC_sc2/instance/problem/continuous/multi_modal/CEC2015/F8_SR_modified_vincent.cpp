@@ -1,6 +1,6 @@
 #include "F8_SR_modified_vincent.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F8_SR_modified_vincent::F8_SR_modified_vincent(const ParamMap &v) :
 			F8_SR_modified_vincent((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -30,7 +30,7 @@ namespace OFEC {
 			evaluate_optima();
 			m_initialized = true;
 		}
-		EvalTag F8_SR_modified_vincent::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F8_SR_modified_vincent::evaluateObjective(Real *x, std::vector<Real> &obj) {
 
 			size_t i;
 
@@ -59,7 +59,7 @@ namespace OFEC {
 			}
 			obj[0] /= m_num_vars;
 			obj[0] += 1 + m_bias;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

@@ -17,7 +17,7 @@
 #include "../instance/problem/continuous/multi_modal/CEC2013/F1_F8.h"
 #include "../instance/problem/continuous/multi_modal/CEC2013/F9_composition1.h"
 
-using namespace OFEC;
+using namespace ofec;
 
 void plot_problem(const std::string& pro_name) {
 	std::cout << "plot problem" << std::endl;

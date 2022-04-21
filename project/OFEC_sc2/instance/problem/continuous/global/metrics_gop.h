@@ -3,7 +3,7 @@
 
 #include "../../../../core/problem/continuous/continuous.h"
 
-namespace OFEC{
+namespace ofec{
 	class MetricsGOP : virtual public Continuous {
 	public:
 		void updateCandidates(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const override;

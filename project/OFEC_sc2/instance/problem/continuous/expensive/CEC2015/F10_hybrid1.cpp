@@ -2,7 +2,7 @@
 #include "../../global/classical/modified_schwefel.h"
 #include "../../global/classical/rastrigin.h"
 #include "../../global/classical/elliptic.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F10_hybrid1::F10_hybrid1(const ParamMap &v) :
 			F10_hybrid1((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -66,11 +66,11 @@ namespace OFEC {
 			// end set
 			m_initialized = true;
 		}
-		EvalTag F10_hybrid1::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F10_hybrid1::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			
 			hybrid::evaluateObjective(x, obj);
 			obj[0] += 1000;   // add m_bias
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

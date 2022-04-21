@@ -2,7 +2,7 @@
 #include "../../../../../../core/instance_manager.h"
 //#include "../../../../../problem/realworld/DVRP/dynamic_vrp.h"
 
-namespace OFEC {
+namespace ofec {
 	void AHC_v2::clustering(Clustering_result &result, int id_pro) {
 		cacul_dis_matrix(m_data, id_pro);
 		auto dis_matrix = m_dis_matrix;

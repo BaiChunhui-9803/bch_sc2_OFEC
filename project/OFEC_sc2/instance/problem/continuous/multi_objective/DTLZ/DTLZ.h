@@ -20,32 +20,25 @@ Scalable test problems for evolutionary multiobjective optimization.
 In Evolutionary multiobjective optimization (pp. 105-145). Springer London.
 ************************************************************************************/
 
-#ifndef DTLZ_H
-#define DTLZ_H
+#ifndef OFEC_DTLZ_H
+#define OFEC_DTLZ_H
 
-#include "../../../../../core/problem/continuous/continuous.h"
+#include"../metrics_mop.h"
 
-namespace OFEC {
-
+namespace ofec {
 	typedef std::vector<Real> TObjVec;
 	typedef std::vector<TObjVec> TFront;
 
-	void generate_recursive(TFront *pf, TObjVec *pt, size_t num_objs, size_t left, size_t total, size_t element);
-	void generate_weight(TFront *pf, size_t M, size_t p);
-	void generate_PF_onelayer(std::ostream &os, const std::string &problem_name, int M, int p);
-	void generate_PF_twolayers(std::ostream &os, const std::string &problem_name, int M, int outside_p, int inside_p);
-
-	class DTLZ : public continuous
-	{
-	public:
-		void initialize();
+	class DTLZ : public MetricsMOP {
 	protected:
-		DTLZ(const std::string &name, size_t size_var, size_t size_obj);
-		void generate_PF();
-		void load_PF();
-		//void generateAdLoadPF();
+		void initialize_();
+		void generateParetoFront();
+		void loadParetoFront();
+		void generateRecursive(TFront *pf, TObjVec *pt, size_t num_objs, size_t left, size_t total, size_t element);
+		void generateWeight(TFront *pf, size_t M, size_t p);
+		void generateOnelayerPF(std::ostream &os, const std::string &problem_name, int M, int p);
+		void generateTwolayersPF(std::ostream &os, const std::string &problem_name, int M, int outside_p, int inside_p);
 	};
-
 }
 
-#endif //DTLZ_H
+#endif //OFEC_DTLZ_H

@@ -1,6 +1,6 @@
 #include "F3_shifted_rotated_weierstrass.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F3_shifted_rotated_weierstrass::F3_shifted_rotated_weierstrass(const ParamMap &v) :F3_shifted_rotated_weierstrass((v.at("problem name")), (v.at("number of variables")), 1) {
 
@@ -25,7 +25,7 @@ namespace OFEC {
 			setGlobalOpt(m_translation.data());
 			m_initialized = true;
 		}
-		EvalTag F3_shifted_rotated_weierstrass::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F3_shifted_rotated_weierstrass::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			return weierstrass::evaluateObjective(x, obj);
 		}
 	}

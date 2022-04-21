@@ -21,18 +21,18 @@
 
 #include <array>
 #include <memory>
-
+#include <list>
 #include "termination.h"
-#include "encoding.h"
+#include "../problem/encoding.h"
 #include "../../utility/typevar/typevar.h"
 
-namespace OFEC {
+namespace ofec {
 	class InstanceManager;
 
 	class Algorithm {
 		friend class InstanceManager;
 	public:
-		Algorithm& operator=(Algorithm &&) = default;
+		Algorithm& operator=(Algorithm&&) = default;
 		virtual ~Algorithm() {}
 
 		std::string name() const { return m_name; }
@@ -40,6 +40,7 @@ namespace OFEC {
 		size_t recordFrequency() const { return m_record_frequency; }
 		int idRecord() const { return m_id_rcr; }
 		int idParamMap() const { return m_id_param; }
+		int idRandom()const { return m_id_rnd; }
 		bool solved() const { return m_solved; }
 		size_t numEffectiveEvals() const { return m_effective_eval; }
 
@@ -56,28 +57,35 @@ namespace OFEC {
 
 		bool keepCandidatesUpdated() const { return m_keep_candidates_updated; }
 		void setKeepCandidatesUpdated(bool flag) { m_keep_candidates_updated = flag; }
-		void updateCandidates(const SolBase &sol);
+		virtual void updateCandidates(const SolBase &sol);
+		void resetCandidates() { m_candidates.clear(); }
+		void updateSolved();
 		const std::list<std::unique_ptr<SolBase>>&candidates() const { return m_candidates; }
 
 		bool isObjMinMaxMonitored() const { return m_obj_minmax_monitored; }
 		void setObjMinMaxMonitored(bool flag) { m_obj_minmax_monitored = flag; }
 		void updateObjMinMax(const std::vector<Real> &obj);
+		void clearObjMinMax();
 		Real minObjFound(size_t i) const { return m_minmax_objective[i][0]; }
 		Real maxObjFound(size_t i) const { return m_minmax_objective[i][1]; }	
 
 	protected:
 		virtual void initialize_();
 		virtual void run_() = 0;
-		
+	
+
 		std::string m_name;
-		int m_id_pro;
-		int m_id_rnd;
-		int m_id_alg;
-		int m_id_rcr;
-		int m_id_param;
+		int m_id_pro = -1;
+		int m_id_rnd = -1;
+		int m_id_alg = -1;
+		int m_id_rcr = -1;
+		int m_id_param = -1;
+
+
 		std::unique_ptr<Termination> m_term;
 		ParamMap m_params;
 		size_t m_record_frequency;
+
 		size_t m_effective_eval;
 		bool m_solved;
 		bool m_obj_minmax_monitored;
@@ -90,7 +98,6 @@ namespace OFEC {
 
 #ifdef OFEC_DEMO
 	public:
-		virtual void updateBuffer() = 0;
 		const std::vector<std::vector<const SolBase*>> &getSolution() const { return m_solution; }
 	protected:
 		std::vector<std::vector<const SolBase*>> m_solution;

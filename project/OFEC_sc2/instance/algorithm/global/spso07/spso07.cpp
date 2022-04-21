@@ -1,4 +1,4 @@
-#include "SPSO07.h"
+#include "spso07.h"
 #include "../../../../core/problem/continuous/continuous.h"
 #include "../../../../core/instance_manager.h"
 #include "../../../record/rcr_vec_real.h"
@@ -7,7 +7,7 @@
 #include <core/global_ui.h>
 #endif
 
-namespace OFEC {
+namespace ofec {
 	void SPSO07::initialize_() {
 		Algorithm::initialize_();
 		auto &v = GET_PARAM(m_id_param);
@@ -47,7 +47,7 @@ namespace OFEC {
 	void SPSO07::record() {
 		std::vector<Real> entry;
 		entry.push_back(m_effective_eval);
-		if (GET_PRO(m_id_pro).hasTag(ProTag::MMOP)) {
+		if (GET_PRO(m_id_pro).hasTag(ProTag::kMMOP)) {
 			size_t num_optima_found = GET_PRO(m_id_pro).numOptimaFound(m_candidates);
 			size_t num_optima = GET_CONOP(m_id_pro).getOptima().numberObjectives();
 			entry.push_back(num_optima_found);
@@ -60,13 +60,11 @@ namespace OFEC {
 	
 #ifdef OFEC_DEMO
 	void SPSO07::updateBuffer() {
-		if (Demo::g_buffer->idAlg() == m_id_alg) {
-			m_solution.clear();
-			m_solution.resize(1);
-			for (size_t i = 0; i < m_pop->size(); ++i)
-				m_solution[0].push_back(&m_pop->at(i).phenotype());
-			Demo::g_buffer->appendAlgBuffer(m_id_alg);
-		}
+		m_solution.clear();
+		m_solution.resize(1);
+		for (size_t i = 0; i < m_pop->size(); ++i)
+			m_solution[0].push_back(&m_pop->at(i).phenotype());
+		ofec_demo::g_buffer->appendAlgBuffer(m_id_alg);
 	}
 #endif // OFEC_DEMO
 }

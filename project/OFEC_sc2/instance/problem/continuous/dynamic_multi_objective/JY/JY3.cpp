@@ -1,6 +1,6 @@
 #include "JY3.h"
 
-namespace OFEC {
+namespace ofec {
 	JY3::JY3(param_map & v) : JY3(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -45,7 +45,7 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag JY3::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int JY3::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -74,6 +74,6 @@ namespace OFEC {
 			else
 				obj[j] = (1 + gt)*(1 - y1 + At * std::sin(Wt*OFEC_PI*y1));
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

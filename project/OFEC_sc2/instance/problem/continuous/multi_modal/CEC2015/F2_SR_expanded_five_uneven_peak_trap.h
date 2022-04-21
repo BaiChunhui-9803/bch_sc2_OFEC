@@ -22,7 +22,7 @@
 
 #include "CEC2015_function.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F2_SR_expanded_five_uneven_peak_trap final : public CEC2015_function
 		{

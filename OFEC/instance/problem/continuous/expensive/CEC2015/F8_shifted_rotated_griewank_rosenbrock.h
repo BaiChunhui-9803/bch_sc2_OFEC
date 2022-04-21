@@ -19,7 +19,7 @@
 
 #include "../../global/classical/griewank_rosenbrock.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F8_shifted_rotated_griewank_rosenbrock : public griewank_rosenbrock
 		{

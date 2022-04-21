@@ -1,4 +1,4 @@
-//Register RotatedScafferF6 "Classic_scaffer_F6_rotated" GOP,ConOP,SOP
+//Register RotatedScafferF6 "Classic_Scaffer_F6_rotated" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -18,7 +18,7 @@
 
 #include "scaffer_F6.h"
 
-namespace OFEC {
+namespace ofec {
 	class RotatedScafferF6 : public ScafferF6 {
 	protected:
 		void initialize_() override;

@@ -29,7 +29,7 @@
 #define GDBG_H
 #include "../../../../core/problem/uncertainty/dynamic.h"
 
-namespace OFEC {
+namespace ofec {
 #define CAST_DYN dynamic_cast<GDBG*>(global::ms_global->m_problem.get())
 
 	class GDBG : virtual public Dynamic

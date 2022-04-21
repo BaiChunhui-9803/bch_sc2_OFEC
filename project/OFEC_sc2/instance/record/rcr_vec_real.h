@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace OFEC {
+namespace ofec {
 	class RecordVecReal : public Record {
 	protected:
 		std::map<int, std::vector<Real>> m_data;

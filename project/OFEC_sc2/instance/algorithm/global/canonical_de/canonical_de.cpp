@@ -5,7 +5,7 @@
 #include <core/global_ui.h>
 #endif
 
-namespace OFEC {
+namespace ofec {
 	void Canonical_DE::initialize_() {
 		Algorithm::initialize_();
 		auto &v = GET_PARAM(m_id_param);
@@ -21,6 +21,9 @@ namespace OFEC {
 
 	void Canonical_DE::run_() {
 		initPop();
+#ifdef OFEC_DEMO
+		updateBuffer();
+#endif
 		while (!terminating()) {
 			m_pop->evolve(m_id_pro, m_id_alg, m_id_rnd);
 #ifdef OFEC_DEMO
@@ -36,15 +39,12 @@ namespace OFEC {
 		m_pop->CR() = m_cr;
 		m_pop->F() = m_f;
 		m_pop->mutationStrategy() = m_ms;
-#ifdef OFEC_DEMO
-		updateBuffer();
-#endif
 	}
 
 	void Canonical_DE::record() {
 		std::vector<Real> entry;
 		entry.push_back(m_effective_eval);
-		if (GET_PRO(m_id_pro).hasTag(ProTag::MMOP)) {
+		if (GET_PRO(m_id_pro).hasTag(ProTag::kMMOP)) {
 			size_t num_optima_found = GET_PRO(m_id_pro).numOptimaFound(m_candidates);
 			size_t num_optima = GET_CONOP(m_id_pro).getOptima().numberObjectives();
 			entry.push_back(num_optima_found);
@@ -57,13 +57,11 @@ namespace OFEC {
 
 #ifdef OFEC_DEMO
 	void Canonical_DE::updateBuffer() {
-		if (Demo::g_buffer->idAlg() == m_id_alg) {
-			m_solution.clear();
-			m_solution.resize(1);
-			for (size_t i = 0; i < m_pop->size(); ++i)
-				m_solution[0].push_back(&m_pop->at(i).phenotype());
-			Demo::g_buffer->appendAlgBuffer(m_id_alg);
-		}
+		m_solution.clear();
+		m_solution.resize(1);
+		for (size_t i = 0; i < m_pop->size(); ++i)
+			m_solution[0].push_back(&m_pop->at(i).phenotype());
+		ofec_demo::g_buffer->appendAlgBuffer(m_id_alg);
 	}
 #endif
 }

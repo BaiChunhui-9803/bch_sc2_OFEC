@@ -11,7 +11,7 @@ using namespace std::placeholders;
 extern unique_ptr<Demo::scene> Demo::msp_buffer;
 #endif
 
-namespace OFEC {
+namespace ofec {
 	void DCNSGAII_LS_pop::initialize(int id_pro, int id_rnd) {
 		//test_lkh();
 		m_ahc_tsp.ahc_tsp_init_pop(m_inds, id_pro, id_rnd);
@@ -628,13 +628,13 @@ namespace OFEC {
 		std::iota(m_rand_seq.begin(), m_rand_seq.end(), 0);
 	}
 
-	EvalTag DCNSGAII_LS_pop::evolve(int id_pro, int id_alg, int id_rnd) {
-		EvalTag tag = EvalTag::Normal;
+	int DCNSGAII_LS_pop::evolve(int id_pro, int id_alg, int id_rnd) {
+		int tag = kNormalEval;
 
 		if (judge_population_efeasible(m_inds)) {
 			m_k++;
 			if (m_k > m_max_K + 1) {
-				return EvalTag::Terminate;
+				return Terminate;
 				//m_flag = true;
 			}
 			reduce_boundary();
@@ -661,7 +661,7 @@ namespace OFEC {
 		}
 		//select next pop
 		select_next_parent_population(pop, id_pro);
-		if (tag == EvalTag::Normal)
+		if (tag == kNormalEval)
 			m_iter++;
 		return tag;
 	}
@@ -758,8 +758,8 @@ namespace OFEC {
 
 		/* Both efeasible */
 		else if (s1->get_efeasible() && s2->get_efeasible()) {
-			auto nor_obj_result = objectiveCompare<Real>(s1->objective(), s2->objective(), OptMode::Minimize);
-			auto vio_obj_result = objectiveCompare<Real>(s1->get_vio_obj(), s2->get_vio_obj(), OptMode::Minimize);
+			auto nor_obj_result = objectiveCompare<Real>(s1->objective(), s2->objective(), OptMode::kMinimize);
+			auto vio_obj_result = objectiveCompare<Real>(s1->get_vio_obj(), s2->get_vio_obj(), OptMode::kMinimize);
 
 			if (nor_obj_result == Dominance::Dominant && vio_obj_result == Dominance::Equal)
 				return Dominance::Dominant;
@@ -800,8 +800,8 @@ namespace OFEC {
 
 	Dominance DCNSGAII_LS_pop::Pareto_compare(IndType *const &s1, IndType *const &s2)
 	{
-		auto nor_obj_result = objectiveCompare<Real>(s1->objective(), s2->objective(), OptMode::Minimize);
-		auto vio_obj_result = objectiveCompare<Real>(s1->get_vio_obj(), s2->get_vio_obj(), OptMode::Minimize);
+		auto nor_obj_result = objectiveCompare<Real>(s1->objective(), s2->objective(), OptMode::kMinimize);
+		auto vio_obj_result = objectiveCompare<Real>(s1->get_vio_obj(), s2->get_vio_obj(), OptMode::kMinimize);
 
 		if (nor_obj_result == Dominance::Dominant && vio_obj_result == Dominance::Equal)
 			return Dominance::Dominant;
@@ -1575,6 +1575,8 @@ namespace OFEC {
 	void DCNSGAII_LS_pop::ls_maxLength(IndType &offspring, int id_pro, int id_rnd) {
 		if (offspring.objective()[0] == 0) //wait time ==0
 			return;
+
+
 		int max_length_car = 0;
 		Real max_length = 0.0;
 		for (int j = 0; j < offspring.variable().m_hi.route_length.size(); ++j) {

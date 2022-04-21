@@ -19,7 +19,7 @@
 
 #include "../../global/classical/katsuura.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F5_shifted_rotated_katsuura final : public katsuura
 		{

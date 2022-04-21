@@ -1,4 +1,4 @@
-//Register gear_train "Gear_-train" ConOP,SOP
+//Register GearTrain "Gear_train" ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -28,17 +28,13 @@ gears. It is to be designed that the gear ratio is as close as possible to
 #ifndef OFEC_FGEAR_TRAIN_H
 #define OFEC_FGEAR_TRAIN_H
 
-#include "../../../../core/problem/continuous/function.h"
-namespace OFEC {
-	class gear_train : public function
-	{
-	public:
-		gear_train(const ParamMap &v);
-		gear_train(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+#include "../../../../core/problem/continuous/continuous.h"
+
+namespace ofec {
+	class GearTrain : public Continuous {
 	protected:
+		void initialize_() override;
 		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
 	};
 }
 #endif // OFEC_FGEAR_TRAIN_H

@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "fcm_m.h"
 
-namespace OFEC {
+namespace ofec {
 		void fcm_m::init(const std::vector<size_t> &Data_points)
 		{
 			m_data_points = Data_points;

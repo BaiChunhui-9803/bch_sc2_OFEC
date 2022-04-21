@@ -1,4 +1,4 @@
-//Register DTLZ2 "DTLZ2" MOP,ConOP
+//Register DTLZ2 "MOP_DTLZ2" MOP,ConOP
 
 /*************************************************************************
 * Project: Library of Open Frameworks for Evolutionary Computation (OFEC)
@@ -16,21 +16,16 @@
 // Created: 12 JAN 2014
 // Modified: 29 Mar 2018 by Junchen Wang (wangjunchen@cug.edu.cn)
 
-#ifndef DTLZ2_H
-#define DTLZ2_H
+#ifndef OFEC_DTLZ2_H
+#define OFEC_DTLZ2_H
 
-#include "DTLZ.h"
+#include "dtlz.h"
 
-namespace OFEC {
-	class DTLZ2 final : public DTLZ
-	{
-	public:
-		DTLZ2(const ParamMap &v);
-		DTLZ2(const std::string &name, size_t size_var, size_t size_obj);
-		~DTLZ2() {};
-	private:
-		void evaluateObjective(Real *x, std::vector<Real> &obj);
+namespace ofec {
+	class DTLZ2 : public DTLZ {
+	protected:
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
 }
 
-#endif //DTLZ2_H  
+#endif //OFEC_DTLZ2_H  

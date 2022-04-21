@@ -7,7 +7,7 @@
 //extern bool ofg_algTermination;
 #endif
 
-namespace OFEC {
+namespace ofec {
 
 
 	const std::vector<std::string> Dynamic::ms_type = { "SmallStep", "LargeStep", "Random", "Recurrent", "Chaotic", "RecurrentNoisy" };
@@ -72,7 +72,7 @@ namespace OFEC {
 
 	void Dynamic::setFrequency(int rChangeFre) {
 		m_frequency = rChangeFre;
-		m_params["Change frequency:"] = m_frequency;
+		m_params["Change frequency"] = m_frequency;
 	}
 	void Dynamic::setPeriod( int rPeriod) {
 		m_period = rPeriod;

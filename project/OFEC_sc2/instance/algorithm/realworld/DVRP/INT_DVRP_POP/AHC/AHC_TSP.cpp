@@ -1,7 +1,7 @@
 #include "AHC_TSP.h"
 #include "../../../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
 	void AHC_TSP::clustering(Clustering_result &result, int id_pro) {
 		std::vector<std::vector<size_t>> cluster_temp(m_data.size());
 		for (int i = 0; i < m_data.size(); ++i) {

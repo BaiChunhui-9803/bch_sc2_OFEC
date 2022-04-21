@@ -1,4 +1,4 @@
-//Register valleys "Classic_valleys" MMOP,ConOP,SOP
+//Register Valleys "Classic_valleys" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -19,21 +19,13 @@
 #ifndef OFEC_VALLEYS_H
 #define OFEC_VALLEYS_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-	
-
-	class valleys : public function
-	{
-	public:
-		valleys(const ParamMap &v);
-		valleys(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class Valleys : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
-	};
-	
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
+	};	
 }
 #endif // !OFEC_VALLEYS_H

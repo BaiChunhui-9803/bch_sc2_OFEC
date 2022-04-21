@@ -24,7 +24,7 @@
 #include <string>
 #include "../definition.h"
 
-namespace OFEC {
+namespace ofec {
 	//terminate when the global opt. is found
 	class Termination {
 	public:

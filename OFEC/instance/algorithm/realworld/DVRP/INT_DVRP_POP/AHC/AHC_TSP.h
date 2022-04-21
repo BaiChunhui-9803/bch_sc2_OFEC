@@ -30,7 +30,7 @@ updated Jun 22, 2019 by Long Xiao
 #include <windows.h>
 #endif
 
-namespace OFEC {
+namespace ofec {
 	class AHC_TSP {
 	public:
 		struct Clustering_result {

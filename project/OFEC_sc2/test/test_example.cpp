@@ -5,9 +5,9 @@
 #include "../core/algorithm/solution.h"
 #include "../instance/algorithm/template/classic/de/de_pop.h"
 using namespace std;
-using namespace OFEC;
+using namespace ofec;
 
-
+// this is a
 
 
 TEST_CASE("exmaple", "[case1]")
@@ -29,9 +29,12 @@ TEST_CASE("exmaple", "[case1]")
 		int id_param = ADD_PARAM(params);
 		int id_pro = ADD_PRO(id_param, 0.1);
 		GET_PRO(id_pro).initialize();
+
+
 		Solution<> sol(GET_PRO(id_pro).numObjectives(), GET_PRO(id_pro).numConstraints(), GET_CONOP(id_pro).numVariables());
 
 		int id_rnd = ADD_RND(0.1);
+
 		sol.initialize(id_pro, id_rnd);
 		sol.evaluate(id_pro, -1);
 
@@ -45,9 +48,11 @@ TEST_CASE("exmaple", "[case1]")
 		int id_param = ADD_PARAM(params);
 		int id_pro = ADD_PRO(id_param, 0.1);
 		GET_PRO(id_pro).initialize();
+
 		PopDE<> pop_de(20,id_pro);
 
 		int id_rnd = ADD_RND(0.1);
+
 		pop_de.initialize(id_pro, id_rnd);
 		pop_de.evaluate(id_pro, -1);
 		pop_de.evolve(id_pro, -1, id_rnd);
@@ -58,14 +63,21 @@ TEST_CASE("exmaple", "[case1]")
 	}
 
 	SECTION("CASE algorithm") {
+		InstanceManager::ms_instance_manager.reset(new InstanceManager);
+
+		ParamMap params;
+		params["problem name"] = std::string("BBOB_F01");
+		params["number of variables"] = 2;
 		params["algorithm name"] = std::string("Canonical-DE");
-		params["population size"] = int(20);
-		params["maximum evaluations"] = int(1000);
+		params["population size"] = 20;
+		params["maximum evaluations"] = 1000;
+
 		int id_param = ADD_PARAM(params);
+
 		int id_pro = ADD_PRO(id_param, 0.1);
+		int id_alg = ADD_ALG(id_param, id_pro, 0.01, -1);
+
 		GET_PRO(id_pro).initialize();
-		id_param = ADD_PARAM(params);
-		int id_alg=ADD_ALG(id_param, id_pro, 0.01,-1);
 		GET_ALG(id_alg).initialize();
 		GET_ALG(id_alg).run();
 
@@ -129,7 +141,6 @@ TEST_CASE("example2", "[case2]")
 	std::vector<std::thread> thrds;
 	thrds.push_back(std::thread(runAlgExample, id_alg1));
 	thrds.push_back(std::thread(runAlgExample, id_alg2));
-
 	for (auto& it : thrds) it.join();
 
 	DEL_ALG(id_alg1);
@@ -154,13 +165,14 @@ TEST_CASE("example3", "[case3]")
 	params["algorithm name"] = std::string("Canonical-DE");
 	params["population size"] = int(20);
 	params["maximum evaluations"] = int(1000);
+	int num_runs(20);
+	params["number of runs"] = num_runs;
 
 	int id_param = ADD_PARAM(params);
 	int id_rcr = ADD_RCR(id_param);
 	std::list<int> ids_algs, ids_pros;
 	std::vector<std::thread> thrds;
 
-	int num_runs(20);
 	for (size_t i = 0; i < num_runs; i++) {
 		int id_pro = ADD_PRO(id_param, Real(i + 1) / (num_runs + 1));
 		int id_alg = ADD_ALG(id_param, id_pro, Real(i + 1) / (num_runs + 1), id_rcr);

@@ -3,32 +3,32 @@
 #include <limits>
 #include <algorithm>
 
-namespace OFEC {
+namespace ofec {
 	namespace math_aux {
-		Real ASF(const std::vector<Real> &objs, const std::vector<Real> &weight) {
+		Real ASF(const std::vector<Real>& objs, const std::vector<Real>& weight) {
 			Real max_ratio = -std::numeric_limits<Real>::max();
-			for (size_t f = 0; f < objs.size(); f += 1)	{
+			for (size_t f = 0; f < objs.size(); f += 1) {
 				Real w = weight[f] ? weight[f] : 0.00001;
 				max_ratio = std::max(max_ratio, objs[f] / w);
 			}
 			return max_ratio;
 		}
 
-		void guassian_elimination(std::vector<Real> *px, std::vector<std::vector<Real> > A, const std::vector<Real> &b) {
-			std::vector<Real> &x = *px;
+		void guassianElimination(std::vector<Real>* px, std::vector<std::vector<Real> > A, const std::vector<Real>& b) {
+			std::vector<Real>& x = *px;
 			const size_t N = A.size();
 			for (size_t i = 0; i < N; i += 1)
 				A[i].push_back(b[i]);
 			for (size_t base = 0; base < N - 1; base += 1) {
-				for (size_t target = base + 1; target < N; target += 1)	{
+				for (size_t target = base + 1; target < N; target += 1) {
 					Real ratio = A[target][base] / A[base][base];
-					for (size_t term = 0; term < A[base].size(); term += 1)	{
+					for (size_t term = 0; term < A[base].size(); term += 1) {
 						A[target][term] -= A[base][term] * ratio;
 					}
 				}
 			}
 			x.resize(N);
-			for (int i = N - 1; i >= 0; i -= 1)	{
+			for (int i = N - 1; i >= 0; i -= 1) {
 				for (size_t known = i + 1; known < N; known += 1)
 					A[i][N] -= A[i][known] * x[known];
 				x[i] = A[i][N] / A[i][i];
@@ -54,7 +54,7 @@ namespace OFEC {
 		//    vector<Real> dir{1, 3}, point{5.5, 1.5};
 		//    cout << PerpendicularDistance(dir, point) << endl;
 		// ---------------------------------------------------------------------
-		Real perpendicular_distance(const std::vector<Real> &direction, const std::vector<Real> &point) {
+		Real perpendicularDistance(const std::vector<Real>& direction, const std::vector<Real>& point) {
 			Real numerator = 0, denominator = 0;
 			for (size_t i = 0; i < direction.size(); i += 1) {
 				numerator += direction[i] * point[i];
@@ -63,7 +63,7 @@ namespace OFEC {
 			Real k = numerator / denominator;
 			Real d = 0;
 			for (size_t i = 0; i < direction.size(); i += 1)
-				d += (k*direction[i] - point[i])*(k*direction[i] - point[i]);
+				d += (k * direction[i] - point[i]) * (k * direction[i] - point[i]);
 			return sqrt(d);
 		}
 	}

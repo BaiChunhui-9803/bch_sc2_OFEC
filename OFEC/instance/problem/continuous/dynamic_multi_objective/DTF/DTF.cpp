@@ -1,6 +1,6 @@
 #include "DTF.h"
 
-namespace OFEC {
+namespace ofec {
 	DTF::DTF(const ParamMap &v) :DTF(v.at("problem name"), v.at("number of variables")) {
 
 	}
@@ -58,7 +58,7 @@ namespace OFEC {
 	}
 
 	//f1=x1, f2=g*h, recommend the number of decision variable is 20
-	EvalTag DTF::evaluateObjective(Real *x, std::vector<Real> &obj) {
+	int DTF::evaluateObjective(Real *x, std::vector<Real> &obj) {
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -85,6 +85,6 @@ namespace OFEC {
 			else
 				obj[m] = gt * (2 - std::pow(obj[0] / gt,alpha_t)- obj[0] / gt*std::pow(std::fabs(std::sin(pha_t*OFEC_PI*obj[0])),alpha_t));
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

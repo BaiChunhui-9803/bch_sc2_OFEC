@@ -30,7 +30,7 @@ In Proc. of 2nd Italian Workshop on Evolutionary Computation and 3rd Italian Wor
 #include "../DMOPs.h"
 //#include "../../dynamic/dynamic.h"
 
-namespace OFEC {
+namespace ofec {
 	class DTF :public DMOPs {
 	public:
 		DTF(const ParamMap &v);

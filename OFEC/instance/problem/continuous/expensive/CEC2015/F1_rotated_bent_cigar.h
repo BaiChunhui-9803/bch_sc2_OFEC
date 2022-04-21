@@ -19,7 +19,7 @@
 
 #include "../../global/classical/bent_cigar.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		class F1_rotated_bent_cigar final : public bent_cigar
 		{

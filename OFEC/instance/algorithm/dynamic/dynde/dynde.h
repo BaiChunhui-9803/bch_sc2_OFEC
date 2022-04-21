@@ -30,20 +30,21 @@ of the IEEE Congress on Evolutionary Computation (CEC��05), pp. 2808�C2815
 #include "../../../../core/algorithm/multi_population.h"
 #include "../../../../core/algorithm/algorithm.h"
 
-namespace OFEC {
-	class DynDE : public algorithm { 
+namespace ofec {
+	class DynDE : public Algorithm { 
 	public:
-		explicit DynDE(const ParamMap &v);
-		void initialize() override;
 		void record() override;
+	protected:
+		void initialize_() override;
 #ifdef OFEC_DEMO
-		void updateBuffer() override{}
+		void updateBuffer();
 #endif
 	protected:
 		void run_() override;
 		void exclusion_check();
 		Real m_r_excl; // radius of exlusion radius
-		multi_population<DynDE_subpopulation> m_multi_pop;
+		size_t m_pop_size, m_subpop_size;
+		MultiPopulation<SubPopDynDE> m_multi_pop;
 	};
 }
 #endif // OFEC_DYNDE_H

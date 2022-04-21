@@ -1,4 +1,4 @@
-//Register rotated_bent_cigar "Classic_bent_ciga_rotated" GOP,ConOP,SOP
+//Register RotatedBentCigar "Classic_bent_ciga_rotated" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -16,20 +16,13 @@
 #ifndef OFEC_ROTATED_BENT_CIGAR_H
 #define OFEC_ROTATED_BENT_CIGAR_H
 
-#include "../../../../../instance/problem/continuous/global/classical/bent_cigar.h"
-namespace OFEC {
+#include "bent_cigar.h"
 
-	class rotated_bent_cigar : public bent_cigar
-	{
-	public:
-		rotated_bent_cigar(const ParamMap &v);
-		rotated_bent_cigar(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class RotatedBentCigar : public BentCigar {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
 	};
-
 }
 #endif // !OFEC_ROTATED_BENT_CIGAR_H
 

@@ -13,34 +13,11 @@
 *************************************************************************/
 
 #include "rotated_rosenbrock.h"
-namespace OFEC {
 
-	rotated_rosenbrock::rotated_rosenbrock(const ParamMap &v) :
-		rotated_rosenbrock((v.at("problem name")), (v.at("number of variables")), 1) {
-		
-	}
-	rotated_rosenbrock::rotated_rosenbrock(const std::string &name, size_t size_var, size_t size_obj) :problem(name, size_var, size_obj), \
-		rosenbrock(name, size_var, 1) {
-		
-	}
-
-	void rotated_rosenbrock::initialize() {
-		m_variable_monitor = true;
-		setDomain(-2.048, 2.048);
-		setInitialDomain(-2.048, 2.048);
-		std::vector<Real> v(m_num_vars, 1);
-		setOriginalGlobalOpt(v.data());
-
+namespace ofec {
+	void RotatedRosenbrock::initialize_() {
+		Rosenbrock::initialize_();
 		setConditionNumber(1);
-		loadRotation("/instance/problem/continuous/global/CEC2005/data/");
-	
-		setGlobalOpt();
-		m_initialized = true;
+		loadRotation("/instance/problem/continuous/global/classical/data/");	
 	}
-
-	EvalTag rotated_rosenbrock::evaluateObjective(Real *x, std::vector<Real> &obj) {
-		return rosenbrock::evaluateObjective(x, obj);
-
-	}
-
 }

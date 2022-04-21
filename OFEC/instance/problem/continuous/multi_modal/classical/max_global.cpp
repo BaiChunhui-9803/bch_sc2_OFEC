@@ -13,40 +13,32 @@
 
 #include "max_global.h"
 
-namespace OFEC {
-	
-	max_global::max_global(const ParamMap &v) :
-		max_global((v.at("problem name")), 1, 1) {
-		
-		
-	}
-	max_global::max_global(const std::string &name, size_t size_var, size_t size_obj) : problem(name, size_var, size_obj), \
-		function(name, size_var, size_obj) {
-		
-	}
-
-	void max_global::initialize() {
+namespace ofec {
+	void MaxGlobal::initialize_() {
+		Continuous::initialize_();
+		resizeObjective(1);
+		m_opt_mode[0] = OptMode::kMaximize;
+		resizeVariable(1);
 		setDomain(0, 1);
-		setInitialDomain(0, 1);
-		m_opt_mode[0] = optimization_mode::Maximization;
-		m_variable_monitor = true;
-		 //5 gopt
-
 		m_objective_accuracy = 0.1;
 		m_variable_accuracy = 1.e-5;
-		std::vector<std::vector<Real>> var_data = { { 0.5f },{ 0.1f },{ 0.3f },{ 0.7f },{0.9f} };
-		for (auto &i : var_data) {
-			setOriginalGlobalOpt(i.data());
+		//5 gopt
+		m_optima.clear();
+		std::vector<Real> opt_x = { 0.5f, 0.1f, 0.3f, 0.7f, 0.9f };
+		for (Real x : opt_x) {
+			VarVec<Real> opt_var(1);
+			std::vector<Real> opt_obj(1);
+			opt_var[0] = x;
+			evaluateObjective(opt_var.data(), opt_obj);
+			m_optima.appendVar(opt_var);
+			m_optima.appendObj(opt_obj);
 		}
-
-		m_optima = m_original_optima;
-		m_initialized = true;
+		m_optima.setObjectiveGiven(true);
+		m_optima.setVariableGiven(true);
 	}
 
-	EvalTag max_global::evaluateObjective(Real *x, std::vector<Real> &obj) {
-
-		obj[0] = pow(sin(5 * OFEC_PI*x[0]), 6.) + m_bias;
-		return EvalTag::Normal;
+	void MaxGlobal::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		obj[0] = pow(sin(5 * OFEC_PI*x[0]), 6.);
 	}
 	
 }

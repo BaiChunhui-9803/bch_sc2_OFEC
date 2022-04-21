@@ -1,6 +1,6 @@
 #include "FDA4.h"
 
-namespace OFEC {
+namespace ofec {
 	FDA4::FDA4(param_map & v) : FDA4(v.at("problem name"), v.at("number of variables"),v.at("numObj")) {
 
 	}
@@ -44,7 +44,7 @@ namespace OFEC {
 	}
 
 	//f1^2+f2^2+...+fn^2=1, f = [0, 11],
-	EvalTag FDA4::evaluateObjective(Real *x, std::vector<Real> &obj) {//recommend n=M+9, x2 has 10 variables
+	int FDA4::evaluateObjective(Real *x, std::vector<Real> &obj) {//recommend n=M+9, x2 has 10 variables
 		Real t = get_time();
 		if (time_changed() && t != 0. && (!get_updated_state())) {//防止不计数评价重复更新问题和重复采样PF
 			m_optima.clear();
@@ -74,6 +74,6 @@ namespace OFEC {
 			else
 				obj[m] = obj[m] * std::sin(0.5*x[0] * OFEC_PI);
 		}
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 }

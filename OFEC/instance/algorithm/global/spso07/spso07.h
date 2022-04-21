@@ -28,21 +28,22 @@
 #include "../../template/classic/pso/swarm.h"
 #include "particle07.h"
 
-namespace OFEC {
+namespace ofec {
 	class SPSO07 final : public Algorithm {
-	public:	
-		void record() override;
-#ifdef OFEC_DEMO
-		void updateBuffer() override;
-#endif
-	protected:
-		void initialize_() override;
-		void run_() override;
-		void initPop();
 	protected:
 		std::unique_ptr<Swarm<Particle07>> m_pop;
 		Real m_w, m_c1, m_c2;
 		size_t m_pop_size;
+
+		void initialize_() override;
+		void run_() override;
+		void initPop();
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
+
+	public:	
+		void record() override;
 	};
 
 }

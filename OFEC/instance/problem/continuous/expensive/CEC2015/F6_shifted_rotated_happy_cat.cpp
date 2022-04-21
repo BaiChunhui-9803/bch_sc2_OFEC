@@ -1,6 +1,6 @@
 #include "F6_shifted_rotated_happy_cat.h"
 
-namespace OFEC {
+namespace ofec {
 	namespace CEC2015 {
 		F6_shifted_rotated_happy_cat::F6_shifted_rotated_happy_cat(const ParamMap &v) :
 			F6_shifted_rotated_happy_cat((v.at("problem name")), (v.at("number of variables")), 1) {
@@ -28,7 +28,7 @@ namespace OFEC {
 			setGlobalOpt(m_translation.data());
 			m_initialized = true;
 		}
-		EvalTag F6_shifted_rotated_happy_cat::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int F6_shifted_rotated_happy_cat::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			return happy_cat::evaluateObjective(x, obj);
 		}
 	}

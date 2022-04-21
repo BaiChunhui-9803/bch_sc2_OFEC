@@ -1,31 +1,26 @@
-//Register GL_cont "GLC" ConOP,GOP,MMOP,SOP
+//Register ContGL "GLC" ConOP,GOP,MMOP,SOP
 
 #ifndef OFEC_GL_CONT_H
 #define OFEC_GL_CONT_H
-#include "../GL.h"
+#include "gl_cont_pop.h"
 #include "../../../../core/algorithm/individual.h"
 
-namespace OFEC {
-	class GL_cont_pop : public GL<individual<>> {
-	public:
-		GL_cont_pop(size_t size_pop, size_t size_var);
-		void initialize();
-		EvalTag evolve();
+namespace ofec {
+	class ContGL : public Algorithm {
+		using UpdateScheme = PopContGL::UpdateScheme;
 	protected:
-		void initialize_curpop();
-	};
-
-	class GL_cont : public algorithm {
+		void initialize_() override;
+		void run_() override;
 	public:
-		GL_cont(param_map& v);
-		void initialize();
-		void run_();
-		void record();
+		void record() override;
 #ifdef OFEC_DEMO
-		void updateBuffer() override {}
+		void updateBuffer();
 #endif
 	protected:
-		GL_cont_pop m_pop;
+		size_t m_pop_size;
+		UpdateScheme m_update_scheme;
+		Real m_alpha, m_beta, m_gamma;
+		PopContGL m_pop;
 	};
 }
 

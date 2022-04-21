@@ -5,7 +5,7 @@
 #include <core/global_ui.h>
 #endif
 
-namespace OFEC {
+namespace ofec {
 	void AMP_DE::initialize_() {
 		Algorithm::initialize_();
 		auto &v = GET_PARAM(m_id_param);

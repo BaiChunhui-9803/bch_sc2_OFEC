@@ -2,7 +2,7 @@
 #include "../utility/matrix.h"
 #include <iostream>
 
-using namespace OFEC;
+using namespace ofec;
 
 TEST_CASE("eigen_decomposition", "[eigendecomp]") {
 	std::vector<std::vector<Real>> data = { {-5,-5,0},{-3,-3,0},{-1,-1,0},{1,1,0},{3,3,0},{5,5,0},{-1,1,0},{1,-1,0},{0,0,1},{0,0,-1} };

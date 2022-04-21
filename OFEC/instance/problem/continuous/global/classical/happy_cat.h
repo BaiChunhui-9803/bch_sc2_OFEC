@@ -1,4 +1,4 @@
-//Register happy_cat "Classic_happy_cat" GOP,ConOP,SOP
+//Register HappyCat "Classic_happy_cat" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -17,19 +17,14 @@
 #define OFEC_HAPPY_CAT_H
 
 #include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
+#include "../metrics_gop.h"
 
-	class happy_cat : public function
-	{
-	public:
-		happy_cat(const ParamMap &v);
-		happy_cat(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class HappyCat : public Function {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real> &obj) override;
 	};
-
 }
 #endif // !OFEC_HAPPY_CAT_H
 

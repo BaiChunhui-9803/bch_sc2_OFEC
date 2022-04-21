@@ -28,10 +28,10 @@
 
 #include "../../../../../core/algorithm/population.h"
 #include "../../../../../core/problem/continuous/continuous.h"
-#include "../../../../../core/algorithm/solution.h"
+#include "../../../../../core/problem/solution.h"
 #include <numeric>
 
-namespace OFEC {
+namespace ofec {
 	template <typename TParticle>
 	class Swarm : public Population<TParticle> {
 	protected:			
@@ -43,7 +43,7 @@ namespace OFEC {
 		Swarm(size_t size_pop, int id_pro);
 		void initPbest(int id_pro);
 		void initVelocity(int id_pro, int id_rnd);
-		EvalTag evolve(int id_pro, int id_alg, int id_rnd) override;
+		int evolve(int id_pro, int id_alg, int id_rnd) override;
 		Real& W() { return m_W; }
 		Real& C1() { return m_C1; }
 		Real& C2() { return m_C2; }
@@ -55,7 +55,7 @@ namespace OFEC {
 	template<typename TParticle>
 	Swarm<TParticle>::Swarm(size_t size_pop, int id_pro) : 
 		Population<TParticle>(size_pop, id_pro, GET_CONOP(id_pro).numVariables()),
-		m_link(size_pop, std::vector<bool>(size_pop, true)) {}
+		m_link(size_pop, std::vector<bool>(size_pop, false)) {}
 
 	template<typename TParticle>
 	void Swarm<TParticle>::initPbest(int id_pro) {
@@ -71,9 +71,8 @@ namespace OFEC {
 	}
 
 	template<typename TParticle>
-	EvalTag Swarm<TParticle>::evolve(int id_pro, int id_alg, int id_rnd)	{
-		EvalTag rf = EvalTag::Normal;
-
+	int Swarm<TParticle>::evolve(int id_pro, int id_alg, int id_rnd)	{
+		int rf = kNormalEval;
 		//generate a permutation of particle index
 		std::vector<int> rindex(this->m_inds.size());
 		std::iota(rindex.begin(), rindex.end(), 0);
@@ -87,7 +86,7 @@ namespace OFEC {
 
 			this->m_inds[rindex[i]]->nextVelocity(&x, m_W, m_C1, m_C2, id_rnd);
 			this->m_inds[rindex[i]]->move();
-			this->m_inds[rindex[i]]->clampVelocity(id_pro);
+			this->m_inds[rindex[i]]->clampVelocity(id_pro, id_rnd);
 
 			rf = this->m_inds[rindex[i]]->evaluate(id_pro, id_alg);
 
@@ -97,7 +96,7 @@ namespace OFEC {
 					flag = true;
 			}
 
-			if (rf != EvalTag::Normal) break;
+			if (rf != kNormalEval) break;
 		}
 		m_flag_best_impr = flag;
 		this->m_iter++;

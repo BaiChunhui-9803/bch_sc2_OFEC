@@ -1,6 +1,6 @@
 
 #include "ShiftedRosenbrock_F12.h"
-namespace OFEC {
+namespace ofec {
 	namespace CEC2013 {
 		ShiftedRosenbrock_F12::ShiftedRosenbrock_F12(const ParamMap &v) : 
 			ShiftedRosenbrock_F12((v.at("problem name")), (v.at("number of variables")), 1) \
@@ -39,7 +39,7 @@ namespace OFEC {
 			m_initialized = true;
 		}
 
-		EvalTag ShiftedRosenbrock_F12::evaluateObjective(Real *x, std::vector<Real> &obj) {
+		int ShiftedRosenbrock_F12::evaluateObjective(Real *x, std::vector<Real> &obj) {
 			int i;
 			Real result = 0.0;
 
@@ -51,7 +51,7 @@ namespace OFEC {
 			result = rosenbrock(mp_anotherz, m_num_vars);
 
 			obj[0] = result;
-			return EvalTag::Normal;
+			return kNormalEval;
 		}
 	}
 }

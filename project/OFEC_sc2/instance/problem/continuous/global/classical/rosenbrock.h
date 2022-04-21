@@ -1,4 +1,4 @@
-//Register rosenbrock "Classic_rosenbrock" GOP,ConOP,SOP
+//Register Rosenbrock "Classic_Rosenbrock" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -13,20 +13,17 @@
 *  Foundation; either version 2, or (at your option) any later version.
 *************************************************************************/
 
-
 #ifndef OFEC_ROSENBROCK_H
 #define OFEC_ROSENBROCK_H
 
 #include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_gop.h"
 
-namespace OFEC {
-	class Rosenbrock : public Function {
-	public:
-		Rosenbrock(const ParamMap &v);
-		Rosenbrock(const std::string &name, size_t num_vars);
-		void initialize();
+namespace ofec {
+	class Rosenbrock : public Function, public MetricsGOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real>& obj) override;
 	};
 	
 }

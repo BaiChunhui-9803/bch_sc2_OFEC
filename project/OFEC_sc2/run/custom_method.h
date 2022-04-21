@@ -4,7 +4,7 @@
 #include "../core/record/record.h"
 #include <memory>
 
-namespace OFEC {
+namespace ofec {
 	void run();
 	Record* getNewRecord(const ParamMap& param);
 	void registerParamAbbr();

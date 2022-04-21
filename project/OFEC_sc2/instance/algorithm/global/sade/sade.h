@@ -1,4 +1,4 @@
-//Register SaDE "SaDE" GOP,ConOP,SOP
+//Register SaDE "SaDE" GOP,ConOP,SOP,MMOP
 
 /******************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -25,48 +25,26 @@ Evolutionary Computation, 13(2): 398- 417, 2009.
 #ifndef OFEC_SADE_H
 #define OFEC_SADE_H
 
-#include <list>
-#include "../population.h"
+#include "sade_pop.h"
 #include "../../../../core/algorithm/algorithm.h"
 
-namespace OFEC {
-	class SaDE_pop final : public DE::population<DE::individual> {
-	public:
-		SaDE_pop(size_t size_pop);
-		EvalTag evolve() override;
+namespace ofec {
+	class SaDE final : public Algorithm	{
 	protected:
-		void update_F();
-		void update_CR();
-		void update_memory();
-	protected:
-		const size_t m_num_strategy = 4;
-		std::vector<Real> mv_F;
-		std::vector<std::vector<Real>> mvv_CR;
+		std::unique_ptr<PopSaDE> m_pop;
+		size_t m_pop_size;
 
-		std::list<std::vector<std::list<Real>>> m_CRsuc;
+		void initialize_() override;
+		void run_() override;
+#ifdef OFEC_DEMO
+		void updateBuffer();
+#endif
 
-		std::vector<Real> m_CRm, m_probability;
-		std::list<std::vector<int>> m_cnt_success, m_cnt_fail;
-		size_t m_LP = 50;
-		Real m_epsilon = 0.01;
-		std::vector<int> m_strategy_selection;
-		//enum Strategy { DE_rand_1_bin = 0, DE_rand_to_best_2_bin, DE_rand_2_bin, DE_current_to_rand_1 };
-		violation_type m_mode = violation_type::Boundary;
-	};
-
-	class SaDE final : public algorithm
-	{
-	public:
-		SaDE(param_map& v);
-		void initialize() override;
+	public:		
 		void record() override;
 #ifdef OFEC_DEMO
-		void updateBuffer() override {}
+		const std::vector<Real> &ratioStrategy() const { return m_pop->ratioStrategy(); }
 #endif
-	protected:
-		void run_() override;
-	protected:
-		SaDE_pop m_pop;
 	};
 }
 #endif // OFEC_SADE_H

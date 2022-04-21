@@ -1,4 +1,4 @@
-//Register expanded_uneven_minima "Classic_uneven_minima_expanded" MMOP,ConOP,SOP
+//Register ExpandedUnevenMinima "Classic_uneven_minima_expanded" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -16,25 +16,17 @@
 *  Competition on Single Objective Multi-Niche Optimization.
 *******************************************************************************************/
 
-
 #ifndef OFEC_EXPANDED_UNEVEN_MINIMA_H
 #define OFEC_EXPANDED_UNEVEN_MINIMA_H
 
-#include "../../../../../core/problem/continuous/function.h"
+#include "../metrics_mmop.h"
 
-namespace OFEC {
-
-	class expanded_uneven_minima : public function
-	{
-	public:
-		expanded_uneven_minima(const ParamMap &v);
-		expanded_uneven_minima(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class ExpandedUnevenMinima : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
-
 }
 #endif // !OFEC_EXPANDED_UNEVEN_MINIMA_H
 

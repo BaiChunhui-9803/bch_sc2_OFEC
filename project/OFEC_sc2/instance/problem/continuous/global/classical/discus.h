@@ -1,4 +1,4 @@
-//Register discus "Classic_discus" GOP,ConOP,SOP
+//Register Discus "Classic_discus" GOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -17,18 +17,13 @@
 #define OFEC_DISCUS_H
 
 #include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
+#include "../metrics_gop.h"
 
-	class discus : public function
-	{
-	public:
-		discus(const ParamMap &v);
-		discus(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+namespace ofec {
+	class Discus : public Function, public MetricsGOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_() override;
+		void evaluateOriginalObj(Real *x, std::vector<Real> &obj) override;
 	};
-
 }
 #endif // !OFEC_DISCUS_H

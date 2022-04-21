@@ -2,16 +2,15 @@
 #define AMP_CONTINUOUS_H
 
 #include "../amp.h"
-#include "../../../../core/problem/continuous/continuous.h"
+#include "../../../../../../core/problem/continuous/continuous.h"
 #include "amp_cont_pop.h"
 #include "hibernated_area.h"
 
-namespace OFEC {
-	template <typename T>
-	class ContAMP : public AMP<PopContAMP<T>> {
+namespace ofec {
+	template <typename TPop>
+	class ContAMP : public AMP<PopContAMP<TPop>> {
 	public:
-		using typename AMP<PopContAMP<T>>::PopType;
-		using typename AMP<PopContAMP<T>>::IndType;
+		using typename AMP<PopContAMP<TPop>>::IndType;
 	protected:
 		Real m_conv_thresh = 0.0001;
 		Real m_conv_factor = 0.005;
@@ -39,7 +38,7 @@ namespace OFEC {
 		void removeRedundentHiber(int id_pro) override;
 		bool checkIncreaseDiv(int id_pro) override;
 		void degradeExploredAreas(int id_pro, int id_alg, int id_rnd) override;
-		bool judgeOverlapping(const PopContAMP<T>& p1, const PopContAMP<T>& p2, int id_pro) override {
+		bool judgeOverlapping(const PopContAMP<TPop>& p1, const PopContAMP<TPop>& p2, int id_pro) override {
 			Real center_dis(GET_PRO(id_pro).variableDistance(p1.center(), p2.center()));
 			Real dis(0);
 			if (center_dis < p1.initialRadius() && center_dis < p1.initialRadius()) {
@@ -55,10 +54,11 @@ namespace OFEC {
 				}
 				return c1 > 0 && c2 > 0;
 			}
-			return false;
+			else
+				return false;
 		}
 
-		void hibernatePop(PopContAMP<T>& cur_pop, int id_pro, int id_alg, int id_rnd) override {
+		void hibernatePop(PopContAMP<TPop>& cur_pop, int id_pro, int id_alg, int id_rnd) override {
 			AMP<PopType>::hibernatePop(cur_pop, id_pro, id_alg, id_rnd);
 			int idx(0);
 			Real minDis(0);
@@ -74,8 +74,8 @@ namespace OFEC {
 		ContAMP(size_t size_pop);
 	};
 
-	template<typename T>
-	void ContAMP<T>::updateStagnateState(int id_pro){
+	template<typename TPop>
+	void ContAMP<TPop>::updateStagnateState(int id_pro){
 		for (size_t i = 0; i < this->m_pops.size(); ++i) {
 			if (this->m_pops[i]->isActive()) {
                 this->m_pops[i]->updateStagnant(this->m_avgRadius, id_pro);
@@ -83,8 +83,8 @@ namespace OFEC {
 		}
 	}
 
-	template<typename T>
-	void ContAMP<T>::removeRedundentHiber(int id_pro) {
+	template<typename TPop>
+	void ContAMP<TPop>::removeRedundentHiber(int id_pro) {
 		int idx(0);
 		Real minDis(0);
 		for (auto iter = this->m_pops.begin(); iter != this->m_pops.end();) {
@@ -100,8 +100,8 @@ namespace OFEC {
 		}
 	}
 
-	template<typename T>
-	bool ContAMP<T>::checkIncreaseDiv(int id_pro) {
+	template<typename TPop>
+	bool ContAMP<TPop>::checkIncreaseDiv(int id_pro) {
 		if (this->m_pops.size() == 0)
 			return true;
 
@@ -121,16 +121,16 @@ namespace OFEC {
 		else return false;
 	}
 
-	template<typename T>
-	void ContAMP<T>::degradeExploredAreas(int id_pro, int id_alg, int id_rnd) {
+	template<typename TPop>
+	void ContAMP<TPop>::degradeExploredAreas(int id_pro, int id_alg, int id_rnd) {
 		for (int i(0); i < this->m_pops.size(); ++i) {
 			this->m_pops[i]->degradeExploredAreas(m_hibernated_area, id_pro, id_alg, id_rnd);
 		}
 	}
 
-	template<typename T>
-	ContAMP<T>::ContAMP(size_t size_pop) :
-		AMP<PopContAMP<T>>(size_pop) {}
+	template<typename TPop>
+	ContAMP<TPop>::ContAMP(size_t size_pop) :
+		AMP<PopContAMP<TPop>>(size_pop) {}
 }
 
 #endif

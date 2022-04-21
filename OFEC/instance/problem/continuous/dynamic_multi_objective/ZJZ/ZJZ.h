@@ -30,7 +30,7 @@ In International Conference on Evolutionary Multi-Criterion Optimization, pages 
 #include "../DMOPs.h"
 //#include "../../dynamic/dynamic.h"
 
-namespace OFEC {
+namespace ofec {
 	class ZJZ :public DMOPs {
 	public:
 		ZJZ(const ParamMap &v);

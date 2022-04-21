@@ -2,7 +2,7 @@
 #include "../../../../../core/global.h"
 #include <algorithm>
 
-namespace OFEC {
+namespace ofec {
 	rotation_DBG::rotation_DBG(const ParamMap &v) :rotation_DBG(v.at("problem name"), v.at("number of variables"),v.at("numPeak"), v.at("changeFre"),static_cast<ChangeType>((int)(v.at("changeType"))), \
 		v.at("changeRatio"), v.at("flagNumDimChange"), v.at("flagNumPeakChange"), v.at("peakNumChangeMode"), v.at("flagNoise"), v.at("flagTimeLinkage")){
 	}
@@ -125,7 +125,7 @@ namespace OFEC {
 		update_num_change();
 		m_change.counter++;
 	}
-	EvalTag rotation_DBG::evaluateObjective(Real* x_, std::vector<Real>& obj_) {
+	int rotation_DBG::evaluateObjective(Real* x_, std::vector<Real>& obj_) {
 		Real *x = new Real[m_num_vars];
 		for (size_t i = 0; i < m_num_vars; ++i)
 			x[i] = x_[i];
@@ -158,27 +158,27 @@ namespace OFEC {
 		}
 		delete[] x;
 		x = 0;
-		//EvalTag rf = EvalTag::Normal;
+		//EvalTag rf = kNormalEval;
 		//if (effective) {
 		//	if (global::ms_global->m_algorithm != nullptr&&flag_stop) {
-		//		rf = EvalTag::Terminate;
+		//		rf = Terminate;
 		//	}
 
 		//	if ((m_effective_eval + 1) % (m_frequency) == 0) {
-		//		rf = EvalTag::Change_next_eval;
+		//		rf = Change_next_eval;
 		//	}
 		//	else if (m_effective_eval % m_frequency == 0) {
 		//		if (CAST_DYN->get_flag_dimension_change()) {
-		//			rf = EvalTag::Change_dimension;
+		//			rf = Change_dimension;
 		//		}
 		//		else if (CAST_DYN->get_flag_time_linkage() && CAST_DYN->get_trigger_flag_time_linkage()) {
-		//			rf = EvalTag::Change_timelinkage;
+		//			rf = Change_timelinkage;
 		//		}
-		//		else	rf = EvalTag::Change;
+		//		else	rf = Change;
 		//	}
 		//}
 		//return rf;
-		return EvalTag::Normal;
+		return kNormalEval;
 	}
 
 

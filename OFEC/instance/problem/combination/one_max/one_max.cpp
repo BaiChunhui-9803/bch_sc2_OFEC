@@ -1,39 +1,32 @@
 #include "one_max.h"
+#include "../../../../core/instance_manager.h"
+#include "../../../../core/problem/solution.h"
 
-namespace OFEC {
-	one_max::one_max(param_map & v) : one_max(v.at("problem name"), v.at("number of variables")) {}
-
-	one_max::one_max(const std::string & name, int size_var) : problem(name, size_var, 1) {}
-
-	void one_max::initialize() {
-		for (size_t idx = 0; idx < m_opt_mode.size(); ++idx)
-			m_opt_mode[idx] = optimization_mode::Maximization;
-		m_optima.append(VarVec<int>(std::vector<int>(m_num_vars, 1)));
-		m_optima.append(m_num_vars);
-		m_initialized = true;
+namespace ofec {
+	void OneMax::initialize_() {
+		Problem::initialize_();
+		auto & v = GET_PARAM(m_id_param);
+		m_num_vars = std::get<int>(v.at("number of variables"));
+		resizeObjective(1);
+		m_opt_mode[0] = OptMode::kMaximize;
+		m_optima.clear();
+		m_optima.appendVar(VarVec<int>(std::vector<int>(m_num_vars, 1)));
+		m_optima.appendObj(m_num_vars);
 	}
 
-	EvalTag one_max::evaluate_(solution_base & s, caller call, bool effective, bool initialized) {
-		VarVec<int> &x = dynamic_cast< Solution<VarVec<int>, Real> &>(s).variable();
-		std::vector<Real> &obj = dynamic_cast<Solution<VarVec<int>, Real> &>(s).objective();
-
+	void OneMax::evaluate_(SolBase &s, bool effective) {
+		VarVec<int> &x = dynamic_cast<Solution<VarVec<int>> &>(s).variable();
+		std::vector<Real> &obj = dynamic_cast<Solution<VarVec<int>> &>(s).objective();
 		for (int i = 0; i < m_num_objs; i++)
 			obj[i] = 0;
 		for (int n = 0; n < m_num_objs; n++)
 			for (size_t i = 0; i < m_num_vars; i++)
 				obj[n] += x[i];
-
-		if (initialized && call == caller::Algorithm) {
-			if (effective)		m_effective_eval++;
-			if (global::ms_global->m_algorithm&&global::ms_global->m_algorithm->terminating())
-				return EvalTag::Terminate;
-		}
-		return EvalTag::Normal;
 	}
 
-	bool one_max::is_valid(const solution_base & s) {
+	bool OneMax::isValid(const SolBase &s) {
 		if (!m_if_valid_check) return true;
-        const auto &x = dynamic_cast<const Solution<VarVec<int>, Real> &>(s).variable();
+		const auto &x = dynamic_cast<const Solution<VarVec<int>> &>(s).variable();
 		for (int i = 0; i < m_num_vars; i++) {
 			if (x[i] != 0 && x[i] != 1)
 				return false;
@@ -41,37 +34,34 @@ namespace OFEC {
 		return true;
 	}
 
-	void one_max::initialize_solution(solution_base & s) const
-	{
-		VarVec<int> &x = dynamic_cast< Solution<VarVec<int>, Real> &>(s).variable();
+	void OneMax::initSolution(SolBase &s, int id_rnd) const {
+		VarVec<int> &x = dynamic_cast<Solution<VarVec<int>> &>(s).variable();
 		for (size_t i = 0; i < m_num_vars; i++)
-			if (global::ms_global->m_uniform[caller::Problem]->next() < 0.5)
+			if (GET_RND(id_rnd).uniform.next() < 0.5)
 				x[i] = 0;
 			else x[i] = 1;
 	}
-	bool one_max::same(const solution_base & s1, const solution_base & s2) const
-	{
-        const auto &x1 = dynamic_cast<const Solution<VarVec<int>, Real> &>(s1).variable();
-        const auto &x2 = dynamic_cast<const Solution<VarVec<int>, Real> &>(s2).variable();
+	
+	bool OneMax::same(const SolBase &s1, const SolBase &s2) const {
+		const auto &x1 = dynamic_cast<const Solution<VarVec<int>> &>(s1).variable();
+		const auto &x2 = dynamic_cast<const Solution<VarVec<int>> &>(s2).variable();
 		for (int i = 0; i < m_num_vars; i++)
 			if (x1[i] != x2[i])
 				return false;
 		return true;
 	}
 
-	Real one_max::variable_distance(const solution_base & s1, const solution_base & s2) const
-	{
-        const auto &x1 = dynamic_cast<const Solution<VarVec<int>, Real> &>(s1).variable();
-        const auto &x2 = dynamic_cast<const Solution<VarVec<int>, Real> &>(s2).variable();
+	Real OneMax::variableDistance(const SolBase &x1, const SolBase &x2) const {
+		const auto &x1_ = dynamic_cast<const Solution<VarVec<int>> &>(x1).variable();
+		const auto &x2_ = dynamic_cast<const Solution<VarVec<int>> &>(x2).variable();
 		Real dis = 0;
 		for (int i = 0; i < m_num_vars; i++)
-			if (x1[i] != x2[i])
+			if (x1_[i] != x2_[i])
 				dis++;
 		return dis;
 	}
 
-	Real one_max::variable_distance(const variable_base & s1, const variable_base & s2) const
-	{
+	Real OneMax::variableDistance(const VarBase &s1, const VarBase &s2) const {
 		const auto &x1 = dynamic_cast<const VarVec<int>&>(s1);
 		const auto &x2 = dynamic_cast<const VarVec<int>&>(s2);
 		Real dis = 0;
@@ -81,7 +71,24 @@ namespace OFEC {
 		return dis;
 	}
 
-    bool one_max::is_optima_given() {
-        return true;
-    }
+	void OneMax::updateCandidates(const SolBase &sol, std::list<std::unique_ptr<SolBase>> &candidates) const {
+		if (candidates.empty())
+			candidates.emplace_back(new Solution<VarVec<int>>(dynamic_cast<const Solution<VarVec<int>>&>(sol)));
+		else if (sol.dominate(*candidates.front(), m_id_pro))
+			candidates.front().reset(new Solution<VarVec<int>>(dynamic_cast<const Solution<VarVec<int>>&>(sol)));
+	}
+
+	size_t OneMax::numOptimaFound(const std::list<std::unique_ptr<SolBase>> &candidates) const {
+		if (m_optima.isObjectiveGiven()
+			&& !candidates.empty()
+			&& candidates.front()->objectiveDistance(m_optima.objective(0)) < m_objective_accuracy)
+			return 1;
+		else
+			return 0;
+	}
+
+	int OneMax::updateEvalTag(SolBase &s, int id_alg, bool effective_eval) {
+		if (isValid(s)) return EvalTag::kNormalEval;
+		else return EvalTag::kInfeasible;
+	}
 }

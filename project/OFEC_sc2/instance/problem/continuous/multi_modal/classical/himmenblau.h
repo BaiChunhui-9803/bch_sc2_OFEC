@@ -1,4 +1,4 @@
-//Register himmenblau "Classic_himmenblau" MMOP,ConOP,SOP
+//Register Himmenblau "Classic_Himmenblau" MMOP,ConOP,SOP
 
 /*************************************************************************
 * Project:Open Frameworks for Evolutionary Computation (OFEC)
@@ -19,19 +19,13 @@
 #ifndef OFEC_HIMMENBLAU_H
 #define OFEC_HIMMENBLAU_H
 
-#include "../../../../../core/problem/continuous/function.h"
-namespace OFEC {
-	
-	class himmenblau : public function
-	{
-	public:
-		himmenblau(const ParamMap &v);
-		himmenblau(const std::string &name, size_t size_var, size_t size_obj);
-		void initialize();
+#include "../metrics_mmop.h"
+
+namespace ofec {	
+	class Himmenblau : public MetricsMMOP {
 	protected:
-		void evaluateObjective(Real *x, std::vector<Real>& obj) override;
-	private:
+		void initialize_();
+		void evaluateObjective(Real *x, std::vector<Real> &obj) override;
 	};
-	
 }
 #endif // !OFEC_HIMMENBLAU_H

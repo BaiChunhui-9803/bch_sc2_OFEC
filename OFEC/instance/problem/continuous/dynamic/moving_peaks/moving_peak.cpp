@@ -1,7 +1,9 @@
 #include "moving_peak.h"
 #include "../../../../../core/global.h"
 #include <algorithm>
-namespace OFEC {
+#include "../../../../../core/instance_manager.h"
+
+namespace ofec {
 	static Real basis_peak[5][7] = {
 	  {8.0,  64.0,  67.0,  55.0,   4.0, 0.1, 50.0},
 	  {50.0,  13.0,  76.0,  15.0,   7.0, 0.1, 50.0},
@@ -15,63 +17,45 @@ namespace OFEC {
 	  1.0,  1.0,  1.0,  1.0,   1.0, 0.0, 0.0,
 	};
 
-	void moving_peak::set_severity() {
+	void MovingPeak::setSeverity() {
 		for (int i = 0; i < m_peak.size(); i++) {
-			m_height_severity[i] = GET_RND(m_id_pro).uniform.nextNonStd(1.0,10.);//1.+9.*i/m_peak.size();//severity of height changes, larger numbers  mean larger severity. in the contex of ROOT, peaks have different values
-			m_width_severity[i] = GET_RND(m_id_pro).uniform.nextNonStd(0.1, 1.0);//1.+9.*i/m_peak.size();//severity of height changes, larger numbers  mean larger severity. in the contex of ROOT, peaks have different values
+			m_height_severity[i] = GET_RND(m_id_rnd).uniform.nextNonStd(1.0,10.);//1.+9.*i/m_peak.size();//severity of height changes, larger numbers  mean larger severity. in the contex of ROOT, peaks have different values
+			m_width_severity[i] = GET_RND(m_id_rnd).uniform.nextNonStd(0.1, 1.0);//1.+9.*i/m_peak.size();//severity of height changes, larger numbers  mean larger severity. in the contex of ROOT, peaks have different values
 		}
 
 	}
 
-	moving_peak::moving_peak(const ParamMap &v) :Problem(v.at("problem name")), \
-		UncertaintyContinuous(v.at("problem name"), v.at("number of variables"), v.at("numPeak")) {
-	
-		setFlagVarMemChange(v.at("flagNumDimChange"));
-		setNumPeakChangeMode(v.at("peakNumChangeMode"));
-		setFlagNumPeaksChange(v.at("flagNumPeakChange"));
-		setFlagNoisyFromVariable(v.at("flagNoise"));
-		setFlagTimeLinkage(v.at("flagTimeLinkage"));
-		setFrequency((v.at("changeFre")));
-		setType(CT_Random);
+	//MovingPeak::MovingPeak(const ParamMap &v) :Problem(v.at("problem name")), \
+	//	UncertaintyContinuous(v.at("problem name"), v.at("number of variables"), v.at("numPeak")) {
+	//
 
-		m_vlength = ((Real)v.at("shiftLength"));
-		if ((v.at("flagNoise")) == true)		setVarNoisyServerity(v.at("noiseSeverity"));
-		if ((v.at("flagTimeLinkage")) == true)	setTimeLinkageSeverity(v.at("timelinkageSeverity"));
+	//}
+	//MovingPeak::MovingPeak(const std::string &name, int rDimNumber,  int rNumPeaks, Real  rChangingRatio,  int fre, Real vlength, bool rFlagDimChange, \
+	//	 bool rFlagNumPeakChange,  int peakNumChangeMode,  bool flagNoise,  bool flagTimelinkage) :\
+	//	Problem(name), UncertaintyContinuous(name, rDimNumber, rNumPeaks, 1) {
 
-		m_num_peak_tracked = 0;
-		
-		initialize();
-		set_num_change((Real)v.at("changeRatio"));
-		m_optima.setVariableGiven(true);
-		
-		updateParameters();
-	}
-	moving_peak::moving_peak(const std::string &name, int rDimNumber,  int rNumPeaks, Real  rChangingRatio,  int fre, Real vlength, bool rFlagDimChange, \
-		 bool rFlagNumPeakChange,  int peakNumChangeMode,  bool flagNoise,  bool flagTimelinkage) :\
-		Problem(name), UncertaintyContinuous(name, rDimNumber, rNumPeaks, 1) {
-
-		setFrequency(fre);
-		setFlagVarMemChange(rFlagDimChange);
-		setNumPeakChangeMode(peakNumChangeMode);
-		setFlagNumPeaksChange(rFlagNumPeakChange);
-		setFlagNoisyFromVariable(flagNoise);
-		setFlagTimeLinkage(flagTimelinkage);
-		set_vlength(vlength);
-		set_num_change(rChangingRatio);
-		m_optima.setVariableGiven(true);
-		m_num_peak_tracked = 0;
-		
-		initialize();
-		updateParameters();
-	}
-	void moving_peak::initialize() {
+	//	setFrequency(fre);
+	//	setFlagVarMemChange(rFlagDimChange);
+	//	setNumPeakChangeMode(peakNumChangeMode);
+	//	setFlagNumPeaksChange(rFlagNumPeakChange);
+	//	setFlagNoisyFromVariable(flagNoise);
+	//	setFlagTimeLinkage(flagTimelinkage);
+	//	set_vlength(vlength);
+	//	setNumChange(rChangingRatio);
+	//	m_optima.setVariableGiven(true);
+	//	m_num_peak_tracked = 0;
+	//	
+	//	initialize();
+	//	updateParameters();
+	//}
+	void MovingPeak::initializeParameters() {
 		int i = 0;
 		m_variable_accuracy = 0.1;
 		m_objective_accuracy=0.2;
 		setDomain(0, 100);
 		setInitialDomain(0, 100);
-		setOptMode(OptMode::Maximize,0);
-		addTag(ProTag::MMOP);
+		setOptMode(OptMode::kMaximize,0);
+		addTag(ProTag::kMMOP);
 		/***************************************
 		//		m_F		Evaluation Function
 		//		1		constant_basis_func()
@@ -91,29 +75,30 @@ namespace OFEC {
 
 		m_F = 4;
 		m_lambda = 0;
-		m_vlength = 1.0;
-		m_min_height = 30.0;
+		//m_vlength = 1.0;
+		m_min_height =30.0;
 		m_max_height = 70.0;
 		m_standardHeight = 50.0;
-		m_min_width = 1.0;
-		m_max_width = 12.0;
+		m_min_width = 1.;
+		m_max_width = 12.;
 		m_standardWidth = 0.0;
 
 		m_shift.resize(m_num_vars);
 		m_pre_movement.resize(m_num_peaks, std::vector<Real>(m_num_vars));
 
-		set_severity();
+		setSeverity();
 
-		update_time_linkage();
-		for (i = 0; i < m_peak.size(); i++)
+		updateTimeLinkage();
+    		for (i = 0; i < m_peak.size(); i++) {
 			for (int j = 0; j < m_num_vars; j++) {
-				m_peak[i][j] = 100.0 * GET_RND(m_id_pro).uniform.next();
-				m_pre_movement[i][j] = GET_RND(m_id_pro).uniform.next() - 0.5;
+				m_peak[i][j] = 100.0 * GET_RND(m_id_rnd).uniform.next();
+				m_pre_movement[i][j] = GET_RND(m_id_rnd).uniform.next() - 0.5;
 			}
+		}
 
 		if (m_standardHeight <= 0.0) {
 			for (i = 0; i < m_peak.size(); i++) m_height[i] = (m_max_height - m_min_height) *
-				GET_RND(m_id_pro).uniform.next()+ m_min_height;
+				GET_RND(m_id_rnd).uniform.next()+ m_min_height;
 		}
 		else {
 			for (i = 0; i < m_peak.size(); i++) m_height[i] = m_standardHeight;
@@ -121,14 +106,14 @@ namespace OFEC {
 
 		if (m_standardWidth <= 0.0) {
 			for (i = 0; i < m_peak.size(); i++)
-				m_width[i] = (m_max_width - m_min_width)* GET_RND(m_id_pro).uniform.next()+ m_min_width;
+				m_width[i] = (m_max_width - m_min_width)* GET_RND(m_id_rnd).uniform.next()+ m_min_width;
 		}
 		else {
 			for (i = 0; i < m_peak.size(); i++)
 				m_width[i] = m_standardWidth;
 		}
 
-		calculate_global_optima();
+		calculateGlobalOptima();
 
 		for (i = 0; i < m_peak.size(); i++) m_num_tracking[i] = 0;
 		for (i = 0; i < m_peak.size(); i++)
@@ -136,19 +121,30 @@ namespace OFEC {
 
 		std::copy(m_height.begin(), m_height.end(), m_pre_height.begin());
 		std::copy(m_width.begin(), m_width.end(), m_pre_width.begin());
-		m_initialized = true;
+	}
+
+	void MovingPeak::initialize_()	{
+		UncertaintyContinuous::initialize_();
+		auto v(GET_PARAM(m_id_param));
+		if (v.find("shiftLength") != v.end())
+			m_vlength = std::get<Real>(v.at("shiftLength"));
+		else 
+			throw MyExcept("shift length is not given @MovingPeak::initialize_()");
+		setType(CT_Random);
+		m_num_peak_tracked = 0;
+		initializeParameters();
+		updateParameters();
 	}
 
 	/* current_peak_calc determines the peak of the current best individual */
-	void moving_peak::calculate_current_peak(const Real *gen)
-	{
+	void MovingPeak::calculateCurrentPeak(const Real *gen) {
 		int i;
 		Real maximum = -100000.0, dummy;
 
 		m_current_peak = 0;
-		maximum = select_function(gen, 0);
+		maximum = selectFunction(gen, 0);
 		for (i = 1; i < m_peak.size(); i++) {
-			dummy = select_function(gen, i);
+			dummy = selectFunction(gen, i);
 			if (dummy > maximum) {
 				maximum = dummy;
 				m_current_peak = i;
@@ -156,64 +152,39 @@ namespace OFEC {
 		}
 	}
 
-	EvalTag moving_peak::evaluateObjective(Real* x_, std::vector<Real>& obj_) {
+	void MovingPeak::evaluateObjective(Real* x_, std::vector<Real>& obj_) {
 		Real *x = new Real[m_num_vars];
 		for (size_t i = 0; i < m_num_vars; i++)
 			x[i] = x_[i];
-		if (this->m_flag_noisy_from_variable)	add_noise(x);
+		if (this->m_flag_noisy_from_variable)	addNoise(x);
 
 		Real maximum = -std::numeric_limits<Real>::max(), dummy;
 
 		for (int i = 0; i < m_peak.size(); i++) {
-			dummy = select_function(x, i);
+			dummy = selectFunction(x, i);
 			if (dummy > maximum)      maximum = dummy;
 		}
 		obj_[0] = maximum;
 
-		if (m_obj_minmax_monitored &&m_effective_eval%m_frequency == 0) {
-			m_minmax_objective.clear();
-		}
-
 		delete[] x;
 		x = 0;
-		//EvalTag rf = EvalTag::Normal;
-		//if (effective) {
-		//	if (global::ms_global->m_algorithm != nullptr&&flag_stop) {
-		//		rf = EvalTag::Terminate; 
-		//	}
-		//		
-		//	if ((m_effective_eval + 1) % (m_frequency) == 0) {
-		//		rf = EvalTag::Change_next_eval;
-		//	}
-		//	else if (m_effective_eval % m_frequency == 0) {
-		//		if (CAST_DYN->get_flag_dimension_change()) {
-		//			rf = EvalTag::Change_dimension;
-		//		}else if (CAST_DYN->get_flag_time_linkage() && CAST_DYN->get_trigger_flag_time_linkage()) {
-		//			rf = EvalTag::Change_timelinkage;
-		//		}
-		//		else	rf = EvalTag::Change;
-		//	}						
-		//}
-		//return rf;
-		return EvalTag::Normal;
 	}
 
 
 	/* dummy evaluation function allows to evaluate without being counted */
-	Real moving_peak::dummy_eval(const Real *gen)
-	{
+	Real MovingPeak::dummyEval(const Real *gen) {
 		int i;
 		Real maximum = -100000.0, dummy;
 
 		for (i = 0; i < m_peak.size(); i++) {
-			dummy = select_function(gen, i);
+			dummy = selectFunction(gen, i);
 			if (dummy > maximum)    maximum = dummy;
 		}
 		return(maximum);
 	}
 
 	/* whenever this function is called, the peaks are changed */
-	void moving_peak::change_random() {
+	void MovingPeak::changeRandom() {
 		int i = 0, j = 0;
 		Real sum, sum2, offset;
 
@@ -227,7 +198,7 @@ namespace OFEC {
 			/* shift peak locations */
 			sum = 0.0;
 			for (j = 0; j < m_num_vars; j++) {
-				m_shift[j] = GET_RND(m_id_pro).uniform.next() - 0.5;
+				m_shift[j] = GET_RND(m_id_rnd).uniform.next() - 0.5;
 				sum += m_shift[j] * m_shift[j];
 			}
 			if (sum > 0.0)		sum = m_vlength / sqrt(sum);
@@ -257,7 +228,7 @@ namespace OFEC {
 			}
 
 			/* change peak width */
-			offset = GET_RND(m_id_pro).normal.next() * m_width_severity[i];
+			offset = GET_RND(m_id_rnd).normal.next() * m_width_severity[i];
 			if ((m_width[i] + offset) < m_min_width)		m_width[i] = 2.0*m_min_width - m_width[i] - offset;
 			else if ((m_width[i] + offset) > m_max_width)	m_width[i] = 2.0*m_max_width - m_width[i] - offset;
 			else	m_width[i] += offset;
@@ -265,28 +236,25 @@ namespace OFEC {
 			if (m_counter > 1 && m_ratio_changing_peak < 1.0&&m_flag_global_optima[i]) continue;
 			/* change peak height */
 
-			offset = m_height_severity[i] * GET_RND(m_id_pro).normal.next();
+			offset = m_height_severity[i] * GET_RND(m_id_rnd).normal.next();
 
 			if ((m_height[i] + offset) < m_min_height)	m_height[i] = 2.0*m_min_height - m_height[i] - offset;
 			else if ((m_height[i] + offset) > m_max_height)	m_height[i] = 2.0*m_max_height - m_height[i] - offset;
 			else	m_height[i] += offset;
 		}
-
-		calculate_global_optima();
-		update_num_change();
-
+		calculateGlobalOptima();
+		updateNumChange();
 	}
 
 
 	/* Basis Functions */
 
 	/* This gives a constant value back to the eval-function that chooses the max of them */
-	Real moving_peak::constant_basis_func(const Real *gen)
-	{
+	Real MovingPeak::constantBasisFunc(const Real *gen) {
 		return 0.0;
 	}
 
-	Real moving_peak::five_peak_basis_func(const Real *gen) {
+	Real MovingPeak::fivePeakBasisFunc(const Real *gen) {
 		Real maximum = -100000.0, dummy = 0;
 		for (int i = 0; i < 5; i++) {
 			dummy = (gen[0] - basis_peak[i][0])*(gen[0] - basis_peak[i][0]);
@@ -300,7 +268,7 @@ namespace OFEC {
 	/* Peak Functions */
 
 	/* sharp peaks */
-	Real moving_peak::peak_function1(const Real *gen, int peak_number) {
+	Real MovingPeak::peakFunction1(const Real *gen, int peak_number) {
 
 		Real dummy = (gen[0] - m_peak[peak_number][0])*(gen[0] - m_peak[peak_number][0]);
 		for (int j = 1; j < m_num_vars; j++)
@@ -309,7 +277,7 @@ namespace OFEC {
 		return m_height[peak_number] / (1 + m_width[peak_number] * dummy);
 	}
 
-	Real moving_peak::peak_function_hilly(const Real *gen, int peak_number) {
+	Real MovingPeak::peakFunctionHilly(const Real *gen, int peak_number) {
 		int j = 0;
 		Real dummy = (gen[0] - m_peak[peak_number][0])*(gen[0] - m_peak[peak_number][0]);
 		for (j = 1; j < m_num_vars; j++)
@@ -318,7 +286,7 @@ namespace OFEC {
 		return m_height[peak_number] - m_width[peak_number] * dummy - 0.01*sin(20.0*dummy);
 	}
 
-	Real moving_peak::peak_function_twin(const Real  *gen, int peak_number) /* two twin peaks moving together */
+	Real MovingPeak::peakFunctionTwin(const Real  *gen, int peak_number) /* two twin peaks moving together */
 	{
 		int j;
 		Real maximum = -100000.0, dummy = pow(gen[0] - m_peak[peak_number][0], 2);
@@ -340,7 +308,7 @@ namespace OFEC {
 	}
 
 
-	Real moving_peak::peakFunctionCone(const Real *gen, const int &peak_number) {
+	Real MovingPeak::peakFunctionCone(const Real *gen, const int &peak_number) {
 
 		Real val, dummy = 0;
 		for (int j = 0; j < m_num_vars; j++) {
@@ -348,21 +316,22 @@ namespace OFEC {
 			dummy += val*val;
 		}
 		if (dummy != 0)  dummy = m_height[peak_number] - m_width[peak_number] * sqrt(dummy);
+		else dummy = m_height[peak_number];
 		return dummy;
 	}
-	Real moving_peak::select_function(const Real  *gen, const int &peak_number) {
+	Real MovingPeak::selectFunction(const Real  *gen, const int &peak_number) {
 		Real dummy = 0;
 		switch (m_F) {
 		case 1: {
-			dummy = constant_basis_func(gen);
+			dummy = constantBasisFunc(gen);
 			break;
 		}
 		case 2: {
-			dummy = five_peak_basis_func(gen);
+			dummy = fivePeakBasisFunc(gen);
 			break;
 		}
 		case 3: {
-			dummy = peak_function1(gen, peak_number);
+			dummy = peakFunction1(gen, peak_number);
 			break;
 		}
 		case 4: {
@@ -370,25 +339,25 @@ namespace OFEC {
 			break;
 		}
 		case 5: {
-			dummy = peak_function_hilly(gen, peak_number);
+			dummy = peakFunctionHilly(gen, peak_number);
 			break;
 		}
 		case 6: {
-			dummy = peak_function_twin(gen, peak_number);
+			dummy = peakFunctionTwin(gen, peak_number);
 			break;
 		}
 		}
 		return dummy;
 	}
-	/* The following procedures may be used to change the step size over time */
+	/* The following procedures may be used to change the Step size over time */
 
 
-	void moving_peak::change_stepsize_random() /* assigns vlength a value from a normal distribution */
+	void MovingPeak::changeStepsizeRandom() /* assigns vlength a value from a normal distribution */
 	{
-		m_vlength = GET_RND(m_id_pro).normal.next();
+		m_vlength = GET_RND(m_id_rnd).normal.next();
 	}
 
-	void moving_peak::change_stepsize_linear() /* sinusoidal change of the stepsize, */
+	void MovingPeak::changeStepsizeLinear() /* sinusoidal change of the stepsize, */
 	{
 		static	thread_local std::unique_ptr< int> counter;
 		if (!counter.get()) counter.reset(new int(1));
@@ -399,7 +368,7 @@ namespace OFEC {
 		(*counter)++;
 	}
 
-	int moving_peak::get_right_peak()  /* returns 1 if current best individual is on highest m_peak, 0 otherwise */
+	int MovingPeak::getRightPeak()  /* returns 1 if current best individual is on highest m_peak, 0 otherwise */
 	{
 		bool flag = false;
 
@@ -412,27 +381,36 @@ namespace OFEC {
 
 		return flag;
 	}
-	void moving_peak::set_vlength(Real s) {
+	void MovingPeak::setVlength(Real s) {
 		m_vlength = s;
 		m_params["vlength"] = s;
 	}
 
-	void moving_peak::change_num_peak() {
+	void MovingPeak::changeNumPeak() {
 
-		moving_peak mpb(m_name, m_num_vars, m_temp_num_peak, m_ratio_changing_peak, m_flag_variable_memory_change
-			, m_flag_num_peak_change, m_mode, m_flag_noisy_from_variable, m_flag_time_linkage);
+		m_num_peaks = m_temp_num_peak;
+		MovingPeak mpb(*this);
 
+		mpb.initialize();
+
+		/*
+		* 	//MovingPeak::MovingPeak(const std::string &name, int rDimNumber,  int rNumPeaks, Real  rChangingRatio,  int fre, Real vlength, bool rFlagDimChange, \
+	//	 bool rFlagNumPeakChange,  int peakNumChangeMode,  bool flagNoise,  bool flagTimelinkage) :\
+	//	Problem(name), UncertaintyContinuous(name, rDimNumber, rNumPeaks, 1)
+		*/
+		//MovingPeak mpb(m_name, m_num_vars, m_temp_num_peak, m_ratio_changing_peak, m_flag_variable_memory_change
+		//	, m_flag_num_peak_change, m_mode, m_flag_noisy_from_variable, m_flag_time_linkage);
 		mpb.copy(*this);
-		mpb.calculate_global_optima();
+		mpb.calculateGlobalOptima();
 
 		*this = std::move(mpb);
 
 	}
 
-	void moving_peak::copy(const Problem &rP) {
+	void MovingPeak::copy(const Problem &rP) {
 		UncertaintyContinuous::copy(rP);
 
-		auto& mpb = dynamic_cast<const moving_peak &>(rP);
+		auto& mpb = dynamic_cast<const MovingPeak &>(rP);
 		
 		int peaks = m_peak.size() < mpb.getNumPeak() ? m_peak.size() : mpb.getNumPeak();
 
@@ -449,11 +427,11 @@ namespace OFEC {
 
 	}
 
-	Real moving_peak::get_vlength() {
+	Real MovingPeak::getVlength() {
 		return m_vlength;
 	}
 
-	void moving_peak::updateParameters() {
+	void MovingPeak::updateParameters() {
 		UncertaintyContinuous::updateParameters();
 
 		m_params["vlength"]= m_vlength;

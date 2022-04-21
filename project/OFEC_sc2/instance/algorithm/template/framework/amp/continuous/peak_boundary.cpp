@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "../../../../../../core/instance_manager.h"
 
-namespace OFEC {
+namespace ofec {
 	PeakBoundary::PeakBoundary(int num_vars, int num_objs) :
 		Solution(num_vars, num_objs),
 		m_radius(0), 
@@ -23,7 +23,7 @@ namespace OFEC {
 		m_ready(false), 
 		m_order(1)
 	{
-		m_derating_obj = GET_PRO(id_pro).optMode(0) == OptMode::Minimize ?
+		m_derating_obj = GET_PRO(id_pro).optMode(0) == OptMode::kMinimize ?
 			GET_ALG(id_alg).maxObjFound(0) :
 			GET_ALG(id_alg).minObjFound(0);
 		if (m_start_radius == 0) {
@@ -47,9 +47,9 @@ namespace OFEC {
 		m_order = num;
 	}
 
-	Real OFEC::PeakBoundary::getDeratingObj(int id_pro, int id_alg) {
+	Real PeakBoundary::getDeratingObj(int id_pro, int id_alg) {
 		Real w = pow(1.001, -sqrt(m_order));
-		if (GET_PRO(id_pro).optMode(0) == OptMode::Minimize)
+		if (GET_PRO(id_pro).optMode(0) == OptMode::kMinimize)
 			m_derating_obj = GET_ALG(id_alg).minObjFound(0) * (1 - w) + GET_ALG(id_alg).maxObjFound(0) * w;
 		else
 			m_derating_obj = GET_ALG(id_alg).maxObjFound(0) * (1 - w) + GET_ALG(id_alg).minObjFound(0) * w;
@@ -102,7 +102,7 @@ namespace OFEC {
 				s1.evaluate(id_pro, id_alg);
 			}
 			else {
-				GET_PRO(id_pro).validateSolution(s1, Validation::SetToBound, id_rnd);
+				GET_PRO(id_pro).validateSolution(s1, Validation::kSetToBound, id_rnd);
 				//	SolutionValidation mode = VALIDATION_SETTOBOUND;
 				//	s1.validate(&mode);
 				s0 = s1;
