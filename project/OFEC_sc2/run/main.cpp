@@ -10,8 +10,8 @@
 
 int main(int argc, char* argv[]) {
 	time_t timer_start, timer_end;
-	ofec::registerProblem();
-	ofec::registerAlgorithm();
+	// ofec::registerProblem();
+	// ofec::registerAlgorithm();
 	ofec::setAlgForPro();
 	time(&timer_start);
 #ifdef OFEC_UNIT_TEST

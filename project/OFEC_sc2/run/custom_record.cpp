@@ -6,7 +6,7 @@
 
 namespace ofec {
 	Record* getNewRecord(const ParamMap& param) {
-		Record* record;
+		Record* record = nullptr;
 		auto alg_tag = Factory<Algorithm>::get().at(std::get<std::string>(param.at("algorithm name"))).second;
 		//if (alg_tag.find(ProTag::kDOP) != alg_tag.end())
 		//	record = new RecordVecRealDynamic(param);
